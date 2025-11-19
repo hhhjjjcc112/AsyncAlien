@@ -3,8 +3,14 @@
 use alloc::boxed::Box;
 use core::{arch::asm, cell::UnsafeCell};
 
+use crate::{sync::SRcuLock, timer::TimeTick};
+
 pub fn synchronize_sched() {
     synchronize_rcu();
+}
+
+pub fn sync_cpus() {
+    synchronize_sched()
 }
 
 // /// Acquire the RCU read lock
@@ -24,6 +30,7 @@ pub fn synchronize_rcu() {
 #[derive(Debug)]
 pub struct RcuData<T> {
     data_ptr: UnsafeCell<*mut T>,
+    srcu_lock: SRcuLock,
 }
 
 unsafe impl<T> Sync for RcuData<T> {}
@@ -36,14 +43,29 @@ impl<T> RcuData<T> {
         assert_eq!(core::mem::size_of_val(&data_ptr), 8);
         Self {
             data_ptr: UnsafeCell::new(data_ptr),
+            srcu_lock: SRcuLock::new(),
         }
     }
-    pub fn get(&self) -> &T {
+    fn get(&self) -> &T {
         let ptr_ptr = self.data_ptr.get();
         unsafe { &*(ptr_ptr.read_volatile()) }
     }
 
-    pub fn swap(&self, val: Box<T>) -> Box<T> {
+    pub fn read<R>(&self, f: impl FnOnce(&T) -> R) -> R {
+        let idx = self.srcu_lock.read_lock();
+        let ptr = unsafe { *self.data_ptr.get() };
+        let v = unsafe { &*ptr };
+        let r = f(v);
+        self.srcu_lock.read_unlock(idx);
+        r
+    }
+
+    pub fn read_directly<R>(&self, f: impl FnOnce(&T) -> R) -> R {
+        let v = self.get();
+        f(v)
+    }
+
+    fn swap(&self, val: Box<T>) -> Box<T> {
         let data_ptr = Box::into_raw(val);
         let old_data_ptr = unsafe { *self.data_ptr.get() };
         // This should insert a memory barrier
@@ -57,6 +79,21 @@ impl<T> RcuData<T> {
         // self.data_ptr = data_ptr;
         // after this, the readers can read the new data
         unsafe { Box::from_raw(old_data_ptr) }
+    }
+
+    pub fn update_directly(&self, val: Box<T>) -> Box<T> {
+        let old = self.swap(val);
+        old
+    }
+
+    pub fn update(&self, val: Box<T>) -> Box<T> {
+        let tick = TimeTick::new("Domain swap");
+        let old = self.swap(val);
+        drop(tick);
+        let tick = TimeTick::new("SRCU Synchronize");
+        self.srcu_lock.synchronize();
+        drop(tick);
+        old
     }
 }
 

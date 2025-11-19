@@ -1,11 +1,9 @@
 use alloc::boxed::Box;
-use core::{any::Any, fmt::Debug, mem::forget};
+use core::{any::Any, fmt::Debug, mem::forget, sync::atomic::AtomicBool};
 
 use interface::*;
-use jtable::*;
 use ksync::RwLock;
 use mem::free_frames;
-use paste::paste;
 use shared_heap::{DBox, SharedData};
 use task_meta::TaskSchedulingInfo;
 
@@ -14,17 +12,16 @@ use crate::{
     domain_loader::loader::DomainLoader,
     domain_proxy::{PerCpuCounter, ProxyBuilder},
     error::{AlienError, AlienResult},
-    k_static_branch_disable, k_static_branch_enable,
-    sync::{synchronize_sched, RcuData, SleepMutex},
+    sync::{sync_cpus, RcuData, SleepMutex},
     timer::TimeTick,
 };
 
-define_static_key_false!(SCHEDULER_DOMAIN_PROXY_KEY);
 #[derive(Debug)]
 pub struct SchedulerDomainProxy {
     domain: RcuData<Box<dyn SchedulerDomain>>,
     lock: RwLock<()>,
     domain_loader: SleepMutex<DomainLoader>,
+    flag: AtomicBool,
     counter: PerCpuCounter,
 }
 impl SchedulerDomainProxy {
@@ -33,6 +30,7 @@ impl SchedulerDomainProxy {
             domain: RcuData::new(Box::new(domain)),
             lock: RwLock::new(()),
             domain_loader: SleepMutex::new(domain_loader),
+            flag: AtomicBool::new(false),
             counter: PerCpuCounter::new(),
         }
     }
@@ -57,38 +55,59 @@ impl ProxyBuilder for SchedulerDomainProxy {
 }
 impl Basic for SchedulerDomainProxy {
     fn domain_id(&self) -> u64 {
-        self.domain.get().domain_id()
+        if self.flag.load(core::sync::atomic::Ordering::SeqCst) {
+            self.__domain_id_with_lock()
+        } else {
+            self.__domain_id_no_lock()
+        }
     }
     fn is_active(&self) -> bool {
-        self.domain.get().is_active()
+        true
     }
 }
 impl SchedulerDomain for SchedulerDomainProxy {
     fn init(&self) -> AlienResult<()> {
-        self.domain.get().init()
+        self.domain.read_directly(|domain| domain.init())
     }
     fn add_task(&self, scheduling_info: DBox<TaskSchedulingInfo>) -> AlienResult<()> {
-        if static_branch_likely!(SCHEDULER_DOMAIN_PROXY_KEY) {
+        if self.flag.load(core::sync::atomic::Ordering::SeqCst) {
             return self.__add_task_with_lock(scheduling_info);
         }
         self.__add_task_no_lock(scheduling_info)
     }
     fn fetch_task(&self, info: DBox<TaskSchedulingInfo>) -> AlienResult<DBox<TaskSchedulingInfo>> {
-        if static_branch_likely!(SCHEDULER_DOMAIN_PROXY_KEY) {
+        if self.flag.load(core::sync::atomic::Ordering::SeqCst) {
             return self.__fetch_task_with_lock(info);
         }
         self.__fetch_task_no_lock(info)
     }
 }
 impl SchedulerDomainProxy {
-    fn __add_task(&self, scheduling_info: DBox<TaskSchedulingInfo>) -> AlienResult<()> {
-        let r_domain = self.domain.get();
-        let id = r_domain.domain_id();
-        let old_id = scheduling_info.move_to(id);
+    fn __domain_id(&self) -> u64 {
+        self.domain.read_directly(|domain| domain.domain_id())
+    }
 
-        r_domain.add_task(scheduling_info).map(|r| {
-            r.move_to(old_id);
-            r
+    fn __domain_id_no_lock(&self) -> u64 {
+        self.counter.inc();
+        let r = self.__domain_id();
+        self.counter.dec();
+        r
+    }
+    fn __domain_id_with_lock(&self) -> u64 {
+        let lock = self.lock.read();
+        let r = self.__domain_id();
+        drop(lock);
+        r
+    }
+
+    fn __add_task(&self, scheduling_info: DBox<TaskSchedulingInfo>) -> AlienResult<()> {
+        self.domain.read_directly(|domain| {
+            let id = domain.domain_id();
+            let old_id = scheduling_info.move_to(id);
+            domain.add_task(scheduling_info).map(|r| {
+                r.move_to(old_id);
+                r
+            })
         })
     }
     fn __add_task_no_lock(&self, scheduling_info: DBox<TaskSchedulingInfo>) -> AlienResult<()> {
@@ -108,13 +127,13 @@ impl SchedulerDomainProxy {
         &self,
         info: DBox<TaskSchedulingInfo>,
     ) -> AlienResult<DBox<TaskSchedulingInfo>> {
-        let r_domain = self.domain.get();
-        let id = r_domain.domain_id();
-        let old_id = info.move_to(id);
-
-        r_domain.fetch_task(info).map(|r| {
-            r.move_to(old_id);
-            r
+        self.domain.read_directly(|domain| {
+            let id = domain.domain_id();
+            let old_id = info.move_to(id);
+            domain.fetch_task(info).map(|r| {
+                r.move_to(old_id);
+                r
+            })
         })
     }
     fn __fetch_task_no_lock(
@@ -137,6 +156,73 @@ impl SchedulerDomainProxy {
         res
     }
 }
+
+impl SchedulerDomainProxy {
+    pub fn replace(
+        &self,
+        new_domain: Box<dyn SchedulerDomain>,
+        loader: DomainLoader,
+    ) -> AlienResult<()> {
+        // stage1: get the sleep lock and change to updating state
+        let mut loader_guard = self.domain_loader.lock();
+        let old_id = self.domain_id();
+
+        let tick = TimeTick::new("Task Sync");
+        self.flag.store(true, core::sync::atomic::Ordering::SeqCst);
+
+        // why we need to synchronize_sched here?
+        sync_cpus();
+
+        // stage2: get the write lock and wait for all readers to finish
+        let w_lock = self.lock.write();
+        // wait if there are readers which are reading the old domain but no read lock
+        // todo!( "wait for all reader to finish");
+        while self.all_counter() > 0 {
+            // println!(
+            //     "Wait for all reader to finish: {}",
+            //     self.all_counter() as isize
+            // );
+        }
+        drop(tick);
+
+        let tick = TimeTick::new("Reinit and state transfer");
+
+        // stage3: init the new domain before swap
+        let new_domain_id = new_domain.domain_id();
+        new_domain.init().unwrap();
+
+        drop(tick);
+
+        let tick = TimeTick::new("Domain swap");
+        // stage4: swap the domain and change to normal state
+        let old_domain = self.domain.update_directly(Box::new(new_domain));
+
+        // change to normal state
+        self.flag.store(false, core::sync::atomic::Ordering::SeqCst);
+
+        drop(tick);
+
+        let tick = TimeTick::new("Recycle resources");
+
+        // stage5: recycle all resources
+        let real_domain = Box::into_inner(old_domain);
+        // forget the old domain, it will be dropped by the `free_domain_resource`
+        forget(real_domain);
+
+        // todo!(how to recycle the old domain)
+        // We should not free the shared data here, because the shared data will be used
+        // in new domain.
+        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
+        drop(tick);
+
+        // stage6: release all locks
+        *loader_guard = loader;
+        drop(w_lock);
+        drop(loader_guard);
+        Ok(())
+    }
+}
+
 #[derive(Debug)]
 struct SchedulerDomainEmptyImpl;
 impl SchedulerDomainEmptyImpl {
@@ -163,71 +249,5 @@ impl SchedulerDomain for SchedulerDomainEmptyImpl {
     #[doc = " The next task to run"]
     fn fetch_task(&self, _info: DBox<TaskSchedulingInfo>) -> AlienResult<DBox<TaskSchedulingInfo>> {
         Err(AlienError::ENOSYS)
-    }
-}
-
-impl SchedulerDomainProxy {
-    pub fn replace(
-        &self,
-        new_domain: Box<dyn SchedulerDomain>,
-        loader: DomainLoader,
-    ) -> AlienResult<()> {
-        // stage1: get the sleep lock and change to updating state
-        let tick = TimeTick::new("Task Sync");
-        let mut loader_guard = self.domain_loader.lock();
-
-        k_static_branch_enable!(SCHEDULER_DOMAIN_PROXY_KEY);
-
-        // why we need to synchronize_sched here?
-        synchronize_sched();
-
-        // stage2: get the write lock and wait for all readers to finish
-        let w_lock = self.lock.write();
-        // wait if there are readers which are reading the old domain but no read lock
-        // todo!( "wait for all reader to finish");
-        while self.all_counter() > 0 {
-            // println!(
-            //     "Wait for all reader to finish: {}",
-            //     self.all_counter() as isize
-            // );
-        }
-        drop(tick);
-
-        let tick = TimeTick::new("Reinit and state transfer");
-        let old_id = self.domain_id();
-
-        // stage3: init the new domain before swap
-        let new_domain_id = new_domain.domain_id();
-        new_domain.init().unwrap();
-
-        drop(tick);
-
-        let tick = TimeTick::new("Domain swap");
-        // stage4: swap the domain and change to normal state
-        let old_domain = self.domain.swap(Box::new(new_domain));
-
-        // change to normal state
-        k_static_branch_disable!(SCHEDULER_DOMAIN_PROXY_KEY);
-
-        drop(tick);
-
-        let tick = TimeTick::new("Recycle resources");
-
-        // stage5: recycle all resources
-        let real_domain = Box::into_inner(old_domain);
-        // forget the old domain, it will be dropped by the `free_domain_resource`
-        forget(real_domain);
-
-        // todo!(how to recycle the old domain)
-        // We should not free the shared data here, because the shared data will be used
-        // in new domain.
-        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
-        drop(tick);
-
-        // stage6: release all locks
-        *loader_guard = loader;
-        drop(w_lock);
-        drop(loader_guard);
-        Ok(())
     }
 }

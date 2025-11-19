@@ -10,10 +10,4 @@ panic = "abort"
 
 
 [target.riscv64gc-unknown-linux-musl]
-rustflags = [
-    "-L/opt/riscv-musl/lib/gcc/riscv64-linux-musl/11.2.1/",
-    "-L/opt/riscv-musl/riscv64-linux-musl/lib",
-    "-C", "target-feature=+crt-static",
-    "-C", "link-arg=-lgcc"
-]
-linker = "riscv64-linux-musl-gcc"
+linker = "riscv64-linux-musl-cc"

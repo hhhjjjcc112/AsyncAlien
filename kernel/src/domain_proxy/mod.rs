@@ -6,10 +6,8 @@ use core::{any::Any, cell::UnsafeCell, fmt::Debug, mem::forget, net::SocketAddrV
 use arch::hart_id;
 use config::CPU_NUM;
 use interface::*;
-use jtable::*;
 use ksync::{Mutex, RwLock};
 use mem::free_frames;
-use paste::paste;
 use pconst::{
     epoll::EpollEvent,
     io::{PollEvents, RtcTime, SeekFrom},
@@ -24,11 +22,12 @@ use crate::{
     domain_helper::{free_domain_resource, FreeShared},
     domain_loader::loader::DomainLoader,
     error::{AlienError, AlienResult},
-    sync::{synchronize_sched, RcuData, SRcuLock, SleepMutex},
+    sync::{sync_cpus, RcuData, SleepMutex},
     task::yield_now,
     timer::TimeTick,
     *,
 };
+
 pub trait ProxyBuilder {
     type T;
     fn build(domain: Self::T, domain_loader: DomainLoader) -> Self;
@@ -103,10 +102,31 @@ impl Basic for DevFsDomainEmptyImpl {
 }
 impl Basic for DevFsDomainProxy {
     fn domain_id(&self) -> u64 {
-        self.domain.get().domain_id()
+        if self.flag.load(Ordering::SeqCst) {
+            return self.__domain_id_with_lock();
+        }
+        self.__domain_id_no_lock()
     }
     fn is_active(&self) -> bool {
-        self.domain.get().is_active()
+        true
+    }
+}
+
+impl DevFsDomainProxy {
+    fn __domain_id(&self) -> u64 {
+        self.domain.read_directly(|domain| domain.domain_id())
+    }
+    fn __domain_id_no_lock(&self) -> u64 {
+        self.counter.inc();
+        let r = self.__domain_id();
+        self.counter.dec();
+        r
+    }
+    fn __domain_id_with_lock(&self) -> u64 {
+        let lock = self.lock.read();
+        let r = self.__domain_id();
+        drop(lock);
+        r
     }
 }
 
@@ -118,37 +138,46 @@ impl BlkDomainProxy {
     ) -> AlienResult<()> {
         // stage1: get the sleep lock and change to updating state
         let mut loader_guard = self.domain_loader.lock();
+        let old_id = self.domain_id();
 
+        let tick = TimeTick::new("Task Sync");
         // stage2: get the write lock and wait for all readers to finish
         let w_lock = self.lock.write();
 
-        static_branch_enable!(BLKDOMAINPROXY_KEY);
+        self.flag.store(true, Ordering::SeqCst);
 
-        // why we need to synchronize_sched here?
-        synchronize_sched();
+        sync_cpus();
 
         // wait if there are readers which are reading the old domain but no read lock
         while self.all_counter() > 0 {
-            // println!("Wait for all reader to finish");
+            println!("Wait for all reader to finish");
             // yield_now();
         }
+        drop(tick);
 
-        let old_id = self.domain_id();
-
+        let tick = TimeTick::new("Reinit and state transfer");
         // stage3: init the new domain before swap
         let device_info = self.resource.get().unwrap();
         let info = device_info.as_ref().downcast_ref::<Range<usize>>().unwrap();
+
+        let new_domain_id = new_domain.domain_id();
         new_domain.init(info).unwrap();
+        drop(tick);
 
+        let tick = TimeTick::new("Domain swap");
         // stage4: swap the domain and change to normal state
-        let old_domain = self.domain.swap(Box::new(new_domain));
+        let old_domain = self.domain.update_directly(Box::new(new_domain));
         // change to normal state
-        static_branch_disable!(BLKDOMAINPROXY_KEY);
+        self.flag.store(false, Ordering::SeqCst);
+        drop(tick);
 
+        let tick = TimeTick::new("Recycle resources");
         // stage5: recycle all resources
         let real_domain = Box::into_inner(old_domain);
         forget(real_domain);
-        free_domain_resource(old_id, FreeShared::Free, free_frames);
+
+        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
+        drop(tick);
 
         // stage6: release all locks
         *loader_guard = loader;
@@ -157,34 +186,3 @@ impl BlkDomainProxy {
         Ok(())
     }
 }
-
-// impl ShadowBlockDomainProxy {
-//     pub fn replace(
-//         &self,
-//         new_domain: Box<dyn ShadowBlockDomain>,
-//         loader: DomainLoader,
-//     ) -> AlienResult<()> {
-//         let mut loader_guard = self.domain_loader.lock();
-//         let old_id = self.domain_id();
-//
-//         // init the new domain before swap
-//         let resource = self.resource.get().unwrap();
-//         let info = resource.as_ref().downcast_ref::<String>().unwrap();
-//         new_domain.init(info).unwrap();
-//
-//         let old_domain = self.domain.swap(Box::new(new_domain));
-//         // synchronize the reader which is reading the old domain
-//         // println!("srcu synchronize");
-//         self.srcu_lock.synchronize();
-//         // println!("srcu synchronize end");
-//
-//         // forget the old domain
-//         // it will be dropped by the `free_domain_resource`
-//         let real_domain = Box::into_inner(old_domain);
-//         forget(real_domain);
-//
-//         free_domain_resource(old_id, FreeShared::Free);
-//         *loader_guard = loader;
-//         Ok(())
-//     }
-// }

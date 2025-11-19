@@ -10,7 +10,7 @@ mem = { path = "../base/mem" }
 platform = { path = "../base/platform" }
 riscv = "0.11"
 log = "0"
-xmas-elf = "0.9"
+xmas-elf = "0.10"
 pconst = { git = "https://github.com/os-module/pconst.git", features = [
     "special_error",
 ] }
@@ -36,13 +36,6 @@ libflate = { workspace = true }
 core2 = { version = "0.4", default-features = false }
 fdt = { git = "https://github.com/repnop/fdt" }
 hashbrown = "0.14.5"
-
-
-#jtable = { git = "https://github.com/os-module/eebpf.git" }
-jtable = { path = "../base/jtable" }
-naked-function = "0.1.5"
-paste = "1.0.15"
-
 unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", default-features = false, features = [
     "unwinder",
     "fde-gnu-eh-frame-hdr",
@@ -52,7 +45,7 @@ unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", de
 
 
 [features]
-default = ["rust-unwind","time-tick"]
+default = ["rust-unwind", "time-tick", "test"]
 rust-unwind = ["dep:unwinding"]
 bench = []
 test = []
