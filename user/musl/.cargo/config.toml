@@ -5,9 +5,10 @@ target = "riscv64gc-unknown-linux-musl"
 [profile.release]
 lto = true
 strip = true
-opt-level = 3  # Optimize for size.
+opt-level = 3   # Optimize for size.
 panic = "abort"
 
 
 [target.riscv64gc-unknown-linux-musl]
+rustflags = ["-C", "target-feature=+crt-static"]
 linker = "riscv64-linux-musl-cc"
