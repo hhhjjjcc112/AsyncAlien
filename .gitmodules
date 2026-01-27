@@ -6,3 +6,75 @@
 	path = domain-lib
 	url = git@github.com:hhhjjjcc/domain-lib.git
 	branch = main
+[submodule "utils/inventory"]
+	path = utils/inventory
+	url = https://github.com/os-module/inventory
+	branch = master
+[submodule "utils/kernel-sync"]
+	path = utils/kernel-sync
+	url = https://github.com/os-module/kernel-sync
+	branch = main
+[submodule "utils/lose-net-stack"]
+	path = utils/lose-net-stack
+	url = https://github.com/os-module/lose-net-stack
+	branch = new_feature
+[submodule "utils/memory_addr"]
+	path = utils/memory_addr
+	url = https://github.com/os-module/memory_addr
+	branch = main
+[submodule "utils/page-table"]
+	path = utils/page-table
+	url = https://github.com/os-module/page-table
+	branch = main
+[submodule "utils/pager"]
+	path = utils/pager
+	url = https://github.com/os-module/pager
+	branch = main
+[submodule "utils/pconst"]
+	path = utils/pconst
+	url = https://github.com/os-module/pconst.git
+	branch = main
+[submodule "utils/plic"]
+	path = utils/plic
+	url = https://github.com/os-module/plic
+	branch = dev
+[submodule "utils/rtc"]
+	path = utils/rtc
+	url = https://github.com/os-module/rtc
+	branch = dev
+[submodule "utils/rust-fatfs"]
+	path = utils/rust-fatfs
+	url = https://github.com/os-module/rust-fatfs.git
+	branch = main
+[submodule "utils/safe-virtio-drivers"]
+	path = utils/safe-virtio-drivers
+	url = https://github.com/os-module/safe-virtio-drivers
+	branch = main
+[submodule "utils/simplegui"]
+	path = utils/simplegui
+	url = https://github.com/os-module/simplegui
+	branch = main
+[submodule "utils/small-index"]
+	path = utils/small-index
+	url = https://github.com/os-module/small-index
+	branch = main
+[submodule "utils/syscall-table"]
+	path = utils/syscall-table
+	url = https://github.com/os-module/syscall-table.git
+	branch = main
+[submodule "utils/uart16550"]
+	path = utils/uart16550
+	url = https://github.com/os-module/uart16550
+	branch = main
+[submodule "utils/virt2slint"]
+	path = utils/virt2slint
+	url = https://github.com/os-module/virt2slint
+	branch = main
+[submodule "utils/visionfive2-sd"]
+	path = utils/visionfive2-sd
+	url = https://github.com/os-module/visionfive2-sd.git
+	branch = main
+[submodule "utils/vmspace"]
+	path = utils/vmspace
+	url = https://github.com/os-module/vmspace
+	branch = main
