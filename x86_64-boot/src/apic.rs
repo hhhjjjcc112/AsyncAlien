@@ -1,4 +1,4 @@
-use core::{fmt::write, mem::MaybeUninit};
+use core::mem::MaybeUninit;
 
 use x2apic::lapic::{LocalApic, LocalApicBuilder, xapic_base};
 use x86_64::instructions::port::Port;
@@ -45,12 +45,25 @@ pub fn init_primary_apic() {
     let mut apic = builder.build().unwrap();
     unsafe {
         apic.enable();
+        #[allow(static_mut_refs)]
         LOCAL_APIC.write(apic);
     }
 }
 
 pub fn init_secondary_apic() {
     unsafe {
-        LOCAL_APIC.assume_init_mut().enable();
+        get_local_apic().enable();
     }
 }
+
+pub unsafe fn get_local_apic() -> &'static mut LocalApic {
+    #[allow(static_mut_refs)]
+    unsafe { LOCAL_APIC.assume_init_mut() }
+}
+
+pub fn is_x2apic() -> bool {
+    unsafe { IS_X2APIC }
+}
+
+
+

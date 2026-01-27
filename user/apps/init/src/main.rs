@@ -10,7 +10,7 @@ use Mstd::{
     thread::m_yield,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> isize {
     println!("Init process is running");
     if fork() == 0 {

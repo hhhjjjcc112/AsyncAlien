@@ -1,8 +1,8 @@
-use crate::println;
+use crate::error;
 
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
-    println!("Kernel panic: {}", _info);
+    error!("Kernel Panic: {}", _info);
     loop {
         core::hint::spin_loop();
     }

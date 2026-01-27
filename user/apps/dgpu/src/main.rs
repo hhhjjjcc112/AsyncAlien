@@ -4,7 +4,7 @@
 use domain_helper::DomainHelperBuilder;
 use Mstd::{domain::DomainTypeRaw, println};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> isize {
     let builder = DomainHelperBuilder::new()
         .ty(DomainTypeRaw::GpuDomain)

@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(naked_functions)]
 #[macro_use]
 pub mod console;
 mod common_riscv;
@@ -23,7 +22,7 @@ use crate::common_riscv::sbi::hart_start;
 #[cfg(vf2)]
 use crate::starfive2_riscv::*;
 
-extern "C" {
+unsafe extern "C" {
     fn sbss();
     fn ebss();
 }
@@ -31,7 +30,8 @@ extern "C" {
 /// 清空.bss段
 fn clear_bss() {
     unsafe {
-        core::slice::from_raw_parts_mut(sbss as usize as *mut u8, ebss as usize - sbss as usize)
+        core::slice::from_raw_parts_mut(
+            sbss as *const () as *mut u8, ebss as *const () as usize - sbss as *const () as usize)
             .fill(0);
     }
 }
@@ -51,13 +51,13 @@ fn init_other_hart(hart_id: usize) {
     let start_hart = if cfg!(vf2) { 1 } else { 0 };
     for i in start_hart..::config::CPU_NUM {
         if i != hart_id {
-            let res = hart_start(i, _start_secondary as usize, 0);
+            let res = hart_start(i, _start_secondary as *const () as usize, 0);
             assert_eq!(res.error, 0);
         }
     }
 }
 
-extern "C" {
+unsafe extern "C" {
     fn main(hart_id: usize);
     fn _start_secondary();
 }

@@ -12,7 +12,7 @@ use Mstd::{
     println,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(_: usize, argv: Vec<String>) -> isize {
     if argv.len() != 2 {
         println!("Usage: dlog [new]/[old]");

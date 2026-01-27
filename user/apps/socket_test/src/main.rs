@@ -14,7 +14,7 @@ const INTADDR: u32 = 2130706433; //127.0.0.1
 const PORT: u16 = 8899;
 const BUF_SIZE: usize = 1024;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() {
     println!("socket_tests...");
     tcp_test();

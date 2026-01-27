@@ -16,7 +16,7 @@ use Mstd::{
 const BEGIN: &str = "BEGIN:I'm qemu client, begin to send data";
 const END: &str = "END:I'm qemu client, end to send data";
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(_: usize, argv: Vec<String>) -> isize {
     if argv.len() != 2 {
         println!("Usage: ./client <string>");

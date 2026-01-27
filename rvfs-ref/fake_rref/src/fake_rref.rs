@@ -18,7 +18,7 @@ impl SharedHeapAlloc for MYSharedHeapAllocator {
         type_id: TypeId,
         drop_fn: fn(TypeId, *mut u8),
     ) -> Option<SharedHeapAllocation> {
-        let ptr = alloc(layout);
+        let ptr = unsafe { alloc(layout) };
         if ptr.is_null() {
             return None;
         }
@@ -27,7 +27,7 @@ impl SharedHeapAlloc for MYSharedHeapAllocator {
             layout.size(),
             ptr as usize
         );
-        let domain_id_pointer = alloc(Layout::new::<u64>()) as *mut u64;
+        let domain_id_pointer = unsafe { alloc(Layout::new::<u64>()) } as *mut u64;
         let res = SharedHeapAllocation {
             value_pointer: ptr,
             domain_id_pointer,
@@ -48,11 +48,11 @@ impl SharedHeapAlloc for MYSharedHeapAllocator {
                 allocation.layout.size()
             );
             assert_eq!(allocation.value_pointer, ptr);
-            dealloc(allocation.value_pointer, allocation.layout);
-            dealloc(
+            unsafe { dealloc(allocation.value_pointer, allocation.layout) };
+            unsafe { dealloc(
                 allocation.domain_id_pointer as *mut u8,
                 Layout::new::<u64>(),
-            );
+            ) };
         } else {
             panic!("The data has been dropped");
         }

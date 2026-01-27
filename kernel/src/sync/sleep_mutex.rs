@@ -14,7 +14,7 @@ impl<T> SleepMutex<T> {
         }
     }
 
-    pub fn lock(&self) -> MutexGuard<T> {
+    pub fn lock(&self) -> MutexGuard<'_, T> {
         loop {
             match self.mutex.try_lock() {
                 Some(guard) => return guard,

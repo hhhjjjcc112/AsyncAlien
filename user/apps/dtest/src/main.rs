@@ -8,7 +8,7 @@ use Mstd::{
     println,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> isize {
     let builder = DomainHelperBuilder::new()
         .ty(DomainTypeRaw::ShadowBlockDomain)

@@ -128,7 +128,7 @@ fn create_app() -> MainWindow {
     main_window
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() {
     let window = slint::platform::software_renderer::MinimalSoftwareWindow::new(Default::default());
     slint::platform::set_platform(Box::new(MyPlatform::new(window.clone()))).unwrap();

@@ -32,12 +32,12 @@ pub use vmm::{
 type AlienError = LinuxErrno;
 type AlienResult<T> = Result<T, AlienError>;
 
-extern "C" {
+unsafe extern "C" {
     fn sheap();
 }
 pub fn init_memory_system(memory_end: usize, is_first_cpu: bool) {
     if is_first_cpu {
-        frame::init_frame_allocator(sheap as usize + KERNEL_HEAP_SIZE, memory_end);
+        frame::init_frame_allocator(sheap as *const () as usize + KERNEL_HEAP_SIZE, memory_end);
         data::relocate_removable_data();
         println!("Frame allocator init success");
         println!("Talloc allocator init success");
@@ -59,10 +59,10 @@ pub struct TalcAllocator;
 
 unsafe impl GlobalAlloc for TalcAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        HEAP_ALLOCATOR.alloc(layout)
+        unsafe { HEAP_ALLOCATOR.alloc(layout) }
     }
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        HEAP_ALLOCATOR.dealloc(ptr, layout);
+        unsafe { HEAP_ALLOCATOR.dealloc(ptr, layout) };
     }
 }
 
@@ -72,7 +72,7 @@ impl MyAllocator {
     fn new() -> Self {
         let talck = Talc::new(ErrOnOom).lock::<Mutex<()>>();
         unsafe {
-            let heap = core::slice::from_raw_parts_mut(sheap as usize as *mut u8, KERNEL_HEAP_SIZE);
+            let heap = core::slice::from_raw_parts_mut(sheap as *const () as *mut u8, KERNEL_HEAP_SIZE);
             let _res = talck.lock().claim(heap.as_mut().into()).unwrap();
         }
 
@@ -86,6 +86,6 @@ unsafe impl GlobalAlloc for MyAllocator {
         ptr
     }
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        self.0.deallocate(NonNull::new(ptr).unwrap(), layout);
+        unsafe { self.0.deallocate(NonNull::new(ptr).unwrap(), layout) };
     }
 }

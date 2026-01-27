@@ -141,7 +141,7 @@ impl<T: RamFsProvider + 'static, R: VfsRawMutex + 'static> VfsInode for RamFsDir
         let (_, inode_number) = self.inode.children.lock().get(index).unwrap().clone();
         let inode = sb.get_inode(inode_number).unwrap();
 
-        macro_rules! gen {
+        macro_rules! generate {
             ($name:ident) => {{
                 let inode = inode
                     .downcast_arc::<$name<T, R>>()
@@ -154,9 +154,9 @@ impl<T: RamFsProvider + 'static, R: VfsRawMutex + 'static> VfsInode for RamFsDir
             }};
         }
         let link_count = if inode.inode_type() == VfsNodeType::File {
-            gen!(RamFsFileInode)
+            generate!(RamFsFileInode)
         } else if inode.inode_type() == VfsNodeType::SymLink {
-            gen!(RamFsSymLinkInode)
+            generate!(RamFsSymLinkInode)
         } else {
             return Err(VfsError::Invalid);
         };

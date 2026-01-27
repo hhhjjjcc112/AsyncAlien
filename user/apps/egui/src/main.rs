@@ -38,7 +38,7 @@ impl GPUDevice for GpuDevice {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() {
     println!("embedded graphics demo");
     simplegui::init_gpu(Arc::new(Mutex::new(GpuDevice::new())));

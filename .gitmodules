@@ -1,8 +1,8 @@
 [submodule "domains"]
 	path = domains
-	url = git@github.com:os-module/domains.git
+	url = git@github.com:hhhjjjcc/domains.git
 	branch = main
 [submodule "domain-lib"]
 	path = domain-lib
-	url = git@github.com:os-module/domain-lib.git
+	url = git@github.com:hhhjjjcc/domain-lib.git
 	branch = main

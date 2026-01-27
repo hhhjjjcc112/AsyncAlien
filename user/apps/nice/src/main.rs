@@ -12,7 +12,7 @@ use Mstd::{
 
 const MAX_COUNT: i32 = 8;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> isize {
     let prio = -2;
     for i in 0..MAX_COUNT {

@@ -46,7 +46,7 @@ pub fn register_plic_domain(plic_domain: Arc<dyn PLICDomain>) {
 global_asm!(include_str!("./kernel_v.asm"));
 global_asm!(include_str!("./trampoline.asm"));
 
-extern "C" {
+unsafe extern "C" {
     fn kernel_v();
     fn user_v();
     fn user_r();
@@ -66,8 +66,8 @@ pub fn init_trap_subsystem() {
 #[inline]
 pub fn set_kernel_trap_entry() {
     unsafe {
-        sscratch::write(kernel_trap_vector as usize);
-        stvec::write(kernel_v as usize, TrapMode::Direct);
+        sscratch::write(kernel_trap_vector as *const () as usize);
+        stvec::write(kernel_v as *const () as usize, TrapMode::Direct);
     }
 }
 
@@ -81,7 +81,7 @@ fn set_user_trap_entry() {
 
 /// 只有在内核态下才能进入这个函数
 /// 避免嵌套中断发生这里不会再开启中断
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn kernel_trap_vector(sp: usize) {
     let sstatus = sstatus::read();
     let spp = sstatus.spp();
@@ -95,7 +95,7 @@ pub fn kernel_trap_vector(sp: usize) {
 }
 
 /// 用户态陷入处理
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn user_trap_vector() {
     let sstatus = sstatus::read();
     let spp = sstatus.spp();
@@ -122,14 +122,14 @@ pub fn user_trap_vector() {
         trap_return();
     }
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn trap_return() -> ! {
     // signal_handler();
     // arch::interrupt_disable();
     set_user_trap_entry();
     let task_domain = task_domain!();
     let (user_satp, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
-    let restore_va = user_r as usize - user_v as usize + TRAMPOLINE;
+    let restore_va = user_r as *const () as usize - user_v as *const () as usize + TRAMPOLINE;
     unsafe {
         asm!(
         "fence.i",

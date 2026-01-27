@@ -8,7 +8,7 @@ use Mstd::{
     time::get_time_ms,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> isize {
     for _ in 0..2 {
         let pid = fork();

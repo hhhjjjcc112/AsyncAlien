@@ -24,7 +24,7 @@ use Mstd::{
 
 slint::include_modules!();
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn fmod(x: f64, y: f64) -> f64 {
     libm::fmod(x, y)
 }
@@ -73,7 +73,7 @@ fn create_slint_app() -> MainWindow {
     main_window
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() {
     let window = slint::platform::software_renderer::MinimalSoftwareWindow::new(Default::default());
     slint::platform::set_platform(Box::new(MyPlatform::new(window.clone()))).unwrap();

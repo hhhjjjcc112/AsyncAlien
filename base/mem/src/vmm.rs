@@ -16,7 +16,7 @@ use crate::frame::{FrameTracker, VmmPageAllocator};
 pub static KERNEL_SPACE: Lazy<Arc<RwLock<VmSpace<VmmPageAllocator>>>> =
     Lazy::new(|| Arc::new(RwLock::new(VmSpace::<VmmPageAllocator>::new())));
 
-extern "C" {
+unsafe extern "C" {
     fn stext();
     fn srodata();
     fn sdata();
@@ -34,31 +34,31 @@ extern "C" {
 pub fn kernel_info(memory_end: usize) -> usize {
     println!(
         "kernel text:          {:#x}-{:#x}",
-        stext as usize, srodata as usize
+        stext as *const () as usize, srodata as *const () as usize
     );
     println!(
         "kernel rodata:        {:#x}-{:#x}",
-        srodata as usize, sdata as usize
+        srodata as *const () as usize, sdata as *const () as usize
     );
     println!(
         "kernel init_array:    {:#x}-{:#x}",
-        sinit as usize, einit as usize
+        sinit as *const () as usize, einit as *const () as usize
     );
     println!(
         "kernel data:          {:#x}-{:#x}",
-        sdata as usize, sbss as usize
+        sdata as *const () as usize, sbss as *const () as usize
     );
     println!(
         "kernel bss:           {:#x}-{:#x}",
-        sbss as usize, sheap as usize
+        sbss as *const () as usize, sheap as *const () as usize
     );
     // println!("kernel eh_frame:      {:#x}-{:#x}", kernel_eh_frame as usize, kernel_eh_frame_end as usize);
     // println!("kernel eh_frame_hdr:  {:#x}-{:#x}", kernel_eh_frame_hdr as usize, kernel_eh_frame_hdr_end as usize);
     println!(
         "kernel heap:          {:#x}-{:#x}",
-        sheap as usize, memory_end
+        sheap as *const () as usize, memory_end
     );
-    sheap as usize
+    sheap as *const () as usize
 }
 
 static KERNEL_MAP_MAX: AtomicUsize = AtomicUsize::new(0);
@@ -66,20 +66,20 @@ pub fn build_kernel_address_space(memory_end: usize) {
     kernel_info(memory_end);
     let mut kernel_space = KERNEL_SPACE.write();
     let text_area = VmAreaEqual::new(
-        stext as _..srodata as _,
+        stext as *const () as _..srodata as *const () as _,
         MappingFlags::READ | MappingFlags::EXECUTE | MappingFlags::WRITE,
     );
-    let rodata_area = VmAreaEqual::new(srodata as _..sdata as _, MappingFlags::READ);
+    let rodata_area = VmAreaEqual::new(srodata as *const () as _..sdata as *const () as _, MappingFlags::READ);
     let sdata_area = VmAreaEqual::new(
-        sdata as _..sbss as _,
+        sdata as *const () as _..sbss as *const () as _,
         MappingFlags::READ | MappingFlags::WRITE,
     );
     let sbss_area = VmAreaEqual::new(
-        sbss as _..sheap as _,
+        sbss as *const () as _..sheap as *const () as _,
         MappingFlags::READ | MappingFlags::WRITE,
     );
     let free_area = VmAreaEqual::new(
-        sheap as _..memory_end,
+        sheap as *const () as _..memory_end,
         MappingFlags::READ | MappingFlags::WRITE,
     );
 

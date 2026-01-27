@@ -1,7 +1,7 @@
 [package]
 name = "platform"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,7 +10,7 @@ log = "0"
 arch = { path = "../../domain-lib/arch" }
 config = { path = "../../domain-lib/config" }
 spin = "0"
-fdt = { git = "https://github.com/repnop/fdt" }
+fdt = "0.1.5"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vf2)','cfg(qemu_riscv)'] }

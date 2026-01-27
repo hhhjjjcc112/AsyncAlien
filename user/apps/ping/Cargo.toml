@@ -1,8 +1,8 @@
 [package]
 name = "ping"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 Mstd = {path = "../../userlib" }
-pconst = { git = "https://github.com/os-module/pconst.git" }
+pconst = { path = "../../../utils/pconst" }

@@ -32,7 +32,7 @@ pub fn init_frame_allocator(start: usize, end: usize) {
         .expect("init frame allocator failed");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn alloc_frames(num: usize) -> *mut u8 {
     assert_eq!(num.next_power_of_two(), num);
     let start_page = FRAME_ALLOCATOR
@@ -43,7 +43,7 @@ pub fn alloc_frames(num: usize) -> *mut u8 {
     start_addr as *mut u8
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn free_frames(addr: *mut u8, num: usize) {
     assert_eq!(num.next_power_of_two(), num);
     let start = addr as usize >> FRAME_BITS;
@@ -60,7 +60,7 @@ pub struct FrameTracker {
     dealloc: bool,
 }
 
-extern "C" {
+unsafe extern "C" {
     fn strampoline();
 }
 
@@ -73,7 +73,7 @@ impl FrameTracker {
         }
     }
     pub fn create_trampoline() -> Self {
-        let trampoline_phy_addr = strampoline as usize;
+        let trampoline_phy_addr = strampoline as *const () as usize;
         assert_eq!(trampoline_phy_addr % FRAME_SIZE, 0);
         Self {
             start_page: trampoline_phy_addr >> FRAME_BITS,

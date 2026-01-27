@@ -8,7 +8,7 @@ use alloc::vec::Vec;
 
 use Mstd::time::sleep;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(_argc: usize, argv: Vec<String>) {
     let sleep_time = &argv[1];
     let sleep_time: usize = sleep_time.parse().unwrap();

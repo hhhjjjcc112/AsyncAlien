@@ -1,10 +1,6 @@
-#![feature(naked_functions)]
 #![feature(box_into_inner)]
-#![feature(trait_upcasting)]
 #![feature(allocator_api)]
-#![feature(alloc_layout_extra)]
 #![feature(ptr_metadata)]
-#![feature(let_chains)]
 #![allow(clippy::declare_interior_mutable_const)]
 #![no_std]
 #![no_main]
@@ -36,7 +32,7 @@ use core::{
 /// 多核启动标志
 static STARTED: AtomicBool = AtomicBool::new(false);
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(hart_id: usize) {
     if STARTED
         .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)

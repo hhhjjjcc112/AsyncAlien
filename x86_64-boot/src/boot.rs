@@ -2,7 +2,7 @@ use core::arch::global_asm;
 
 use x86_64::registers::control::{Cr0Flags, Cr4Flags, EferFlags};
 
-use crate::{console, rust_main};
+use crate::{rust_main, rust_secondary_main};
 
 // (bits 1, 16: memory information, address fields in header)
 const MULTIBOOT_HEADER_FLAGS: usize = 0x0001_0002;
@@ -21,7 +21,7 @@ const CR4: u64 = Cr4Flags::PHYSICAL_ADDRESS_EXTENSION.bits()
 // EFER寄存器，用于启用长模式和NXE功能
 const EFER: u64 = EferFlags::LONG_MODE_ENABLE.bits() | EferFlags::NO_EXECUTE_ENABLE.bits();
 // 启动栈
-const BOOT_STACK_SIZE: usize = 0x40000; 
+pub const BOOT_STACK_SIZE: usize = 0x40000; 
 #[unsafe(link_section = ".bss.stack")]
 static mut BOOT_STACK: [u8; BOOT_STACK_SIZE] = [0; BOOT_STACK_SIZE];
 // 物理内存与虚拟内存的偏移量
@@ -49,21 +49,16 @@ fn current_cpu_id() -> usize {
         .map_or(0, |finfo| finfo.initial_local_apic_id() as usize)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main_entry(magic: usize, mbi: usize) {
-    console::init_console();
-    if magic != MULTIBOOT_BOOTLOADER_MAGIC {
-        panic!("Invalid multiboot magic: {:#x}", magic);
-    } else {
+    if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         rust_main(current_cpu_id(), mbi);
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn secondary_entry(magic: usize) {
-    if magic != MULTIBOOT_BOOTLOADER_MAGIC {
-        panic!("Invalid multiboot magic: {:#x}", magic);
-    } else {
-        crate::rust_secondary_main(current_cpu_id());
+    if magic == MULTIBOOT_BOOTLOADER_MAGIC {
+        rust_secondary_main(current_cpu_id());
     }
 }

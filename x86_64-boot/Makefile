@@ -1,6 +1,6 @@
 TARGET := x86_64-unknown-none
-KERNEL_ELF := ../target/$(TARGET)/release/x86_64-boot
-KERNEL_BIN := ../target/$(TARGET)/release/kernel.bin
+KERNEL_ELF := target/$(TARGET)/release/x86_64-boot
+KERNEL_BIN := target/$(TARGET)/release/kernel.bin
 
 .PHONY: all build clean run
 
@@ -20,7 +20,8 @@ run: build
 	@echo "Starting QEMU..."
 	@qemu-system-x86_64 \
 		-machine q35 \
-		-smp 1 \
+		-cpu qemu64,+invtsc \
+		-smp 12 \
 		-kernel $(KERNEL_ELF) \
 		-nographic \
 		-serial mon:stdio

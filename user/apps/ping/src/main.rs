@@ -9,7 +9,7 @@ use Mstd::{
     socket::{bind, recvfrom, sendto, socket},
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() {
     println!("Test socket");
     let server = socket(Domain::AF_INET, SocketType::SOCK_DGRAM, 0);

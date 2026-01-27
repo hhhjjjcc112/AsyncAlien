@@ -7,7 +7,7 @@ use alloc::{string::String, vec::Vec};
 use domain_helper::DomainHelperBuilder;
 use Mstd::{domain::DomainTypeRaw, println};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(_: usize, argv: Vec<String>) -> isize {
     if argv.len() != 2 {
         println!("Usage: dtask [new]/[old]");

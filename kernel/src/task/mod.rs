@@ -24,7 +24,7 @@ use crate::{
 
 global_asm!(include_str!("switch.asm"));
 
-extern "C" {
+unsafe extern "C" {
     fn __switch(now: *mut TaskContext, next: *const TaskContext);
 }
 

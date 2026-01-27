@@ -2,7 +2,6 @@
 #![feature(linkage)]
 #![allow(unused)]
 #![allow(non_snake_case)]
-#![feature(naked_functions)]
 extern crate alloc;
 
 use alloc::{
@@ -35,8 +34,8 @@ pub mod gui;
 pub mod sync;
 
 #[cfg(not(feature = "std"))]
-#[no_mangle]
-#[naked]
+#[unsafe(no_mangle)]
+#[unsafe(naked)]
 extern "C" fn _start() -> ! {
     unsafe {
         core::arch::naked_asm!(
@@ -47,7 +46,7 @@ extern "C" fn _start() -> ! {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn _start_rust(argc_ptr: usize) {
     let argc = unsafe { (argc_ptr as *const usize).read_volatile() };
     let argv = argc_ptr + core::mem::size_of::<usize>();
@@ -72,7 +71,7 @@ fn parse_args(argc: usize, argv: usize) -> Vec<String> {
 }
 
 #[linkage = "weak"]
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(argc: usize, argv: Vec<String>) -> i32 {
     panic!("Cannot find main!");
 }

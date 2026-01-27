@@ -186,7 +186,7 @@ pub fn get_cwd(buf: &mut [u8]) -> Result<&str, IoError> {
     if len == -1 {
         return Err(IoError::BufferTooSmall);
     } else {
-        let res = buf.iter().enumerate().find(|(_, &x)| x == 0);
+        let res = buf.iter().enumerate().find(|&(_, &x)| x == 0);
         let len = if res.is_none() {
             buf.len()
         } else {

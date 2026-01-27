@@ -59,7 +59,7 @@ impl CoreFunction for DomainSyscall {
         unwind();
     }
     fn sys_trampoline_addr(&self) -> usize {
-        strampoline as usize
+        strampoline as *const () as usize
     }
 
     fn sys_kernel_satp(&self) -> usize {
@@ -67,11 +67,11 @@ impl CoreFunction for DomainSyscall {
     }
 
     fn sys_trap_from_user(&self) -> usize {
-        crate::trap::user_trap_vector as usize
+        crate::trap::user_trap_vector as *const () as usize
     }
 
     fn sys_trap_to_user(&self) -> usize {
-        crate::trap::trap_return as usize
+        crate::trap::trap_return as *const () as usize
     }
 
     fn blk_crash_trick(&self) -> bool {
@@ -336,7 +336,7 @@ impl CoreFunction for DomainSyscall {
     }
 }
 
-extern "C" {
+unsafe extern "C" {
     fn strampoline();
 }
 static BLK_CRASH: AtomicBool = AtomicBool::new(true);
