@@ -2,4 +2,5 @@
 profile = "minimal"
 channel = "nightly-2026-01-23"
 components = ["rust-src", "llvm-tools", "rustfmt", "clippy"]
+targets = ["riscv64gc-unknown-linux-musl"]
 
