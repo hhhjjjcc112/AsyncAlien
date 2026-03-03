@@ -19,7 +19,6 @@ pager = { path = "../../utils/pager", default-features = false, optional = true 
 spin = "0"
 log = "0"
 
-
 [features]
 default = ["pager_bitmap",]
 pager_buddy = ["pager/buddy"]

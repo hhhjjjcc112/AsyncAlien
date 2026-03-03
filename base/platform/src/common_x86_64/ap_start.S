@@ -39,7 +39,6 @@ ap_start32:
     jmp     eax
 
 .balign 8
-# .type multiboot_header, STT_OBJECT
 .Lap_tmp_gdt_desc:
     .short .Lap_tmp_gdt_end - .Lap_tmp_gdt - 1  # limit
     .long pa_ap_gdt                             # base

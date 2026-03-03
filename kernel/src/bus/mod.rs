@@ -66,9 +66,9 @@ pub fn init_with_dtb() -> AlienResult<()> {
         devices.push(CommonDeviceType::Ramdisk(info));
     }
 
-    #[cfg(vf2)]
+    #[cfg(plat_vf2)]
     {
-        #[cfg(not(vf2_sd))]
+        #[cfg(not(plat_vf2_sd))]
         {
             let ramdisk_start = RAMDISK.as_ptr() as usize;
             let len = RAMDISK.len();
@@ -87,7 +87,7 @@ pub fn init_with_dtb() -> AlienResult<()> {
         };
         devices.push(CommonDeviceType::LoopBack(fake_nic));
     }
-    #[cfg(all(vf2, vf2_sd))]
+    #[cfg(all(plat_vf2, plat_vf2_sd))]
     dtb.probe_sd().map(|ty| {
         devices.push(ty);
     });
@@ -107,5 +107,5 @@ pub fn init_with_dtb() -> AlienResult<()> {
 
 #[cfg(feature = "bench")]
 static RAMDISK: &'static [u8] = &[0u8; 1024];
-#[cfg(all(vf2, not(vf2_sd)))]
+#[cfg(all(plat_vf2, not(plat_vf2_sd)))]
 static RAMDISK: &'static [u8] = include_bytes!("../../../build/sdcard.img");

@@ -5,7 +5,7 @@ mod scheduler;
 use alloc::sync::Arc;
 use core::arch::global_asm;
 
-use arch::hart_id;
+use arch::cpu_id;
 use basic::{sync::Once, task::TaskContext};
 use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
@@ -22,7 +22,11 @@ use crate::{
     task::{processor::current_task, resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},
 };
 
-global_asm!(include_str!("switch.asm"));
+// Architecture-specific task switch assembly
+#[cfg(target_arch = "riscv64")]
+global_asm!(include_str!("switch_riscv.asm"));
+#[cfg(target_arch = "x86_64")]
+global_asm!(include_str!("switch_x86_64.asm"));
 
 unsafe extern "C" {
     fn __switch(now: *mut TaskContext, next: *const TaskContext);
@@ -80,9 +84,9 @@ pub fn synchronize_rcu() {
     drop(guard);
     loop {
         let mut guard = task.lock();
-        let cpu_id = hart_id();
+        let current_cpu = cpu_id();
         let mut cpus_allowed = guard.scheduling_info.as_ref().unwrap().cpus_allowed;
-        cpus_allowed &= !(1 << cpu_id);
+        cpus_allowed &= !(1 << current_cpu);
         if cpus_allowed == CPU_OK {
             // println!("synchronize_rcu done");
             guard.scheduling_info.as_mut().unwrap().cpus_allowed = old_cpus_allowed;
@@ -95,8 +99,8 @@ pub fn synchronize_rcu() {
     }
 }
 
-#[cfg(vf2)]
+#[cfg(plat_vf2)]
 const CPU_OK: usize = 1;
 
-#[cfg(not(vf2))]
+#[cfg(not(plat_vf2))]
 const CPU_OK: usize = 0;

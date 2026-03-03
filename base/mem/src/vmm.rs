@@ -2,7 +2,9 @@ use alloc::{boxed::Box, sync::Arc, vec, vec::Vec};
 use core::sync::atomic::AtomicUsize;
 
 use arch::sfence_vma_all;
-use config::{FRAME_BITS, FRAME_SIZE, TRAMPOLINE};
+#[cfg(not(target_arch = "x86_64"))]
+use config::FRAME_BITS;
+use config::{FRAME_SIZE, TRAMPOLINE};
 use ksync::RwLock;
 use log::info;
 use page_table::MappingFlags;
@@ -123,8 +125,19 @@ pub fn kernel_pgd() -> usize {
     KERNEL_SPACE.read().root_paddr()
 }
 
-pub fn kernel_satp() -> usize {
+pub fn kernel_page_table_token() -> usize {
+    #[cfg(target_arch = "x86_64")]
+    {
+        kernel_pgd()
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
     8usize << 60 | (kernel_pgd() >> FRAME_BITS)
+    }
+}
+
+pub fn kernel_satp() -> usize {
+    kernel_page_table_token()
 }
 
 pub fn query_kernel_space(addr: usize) -> Option<usize> {

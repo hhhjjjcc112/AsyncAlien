@@ -73,6 +73,8 @@ impl<T> RcuData<T> {
         unsafe {
             #[cfg(target_arch = "riscv64")]
             asm!("fence rw,w",);
+            #[cfg(target_arch = "x86_64")]
+            asm!("mfence", options(nostack, preserves_flags));
             // update the ptr
             self.data_ptr.get().write_volatile(data_ptr);
         }

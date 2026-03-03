@@ -24,21 +24,28 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("fifo_scheduler", DomainTypeRaw::SchedulerDomain),
     ("task", DomainTypeRaw::TaskDomain),
     ("vfs", DomainTypeRaw::VfsDomain),
-    #[cfg(qemu_riscv)]
+    // RISC-V QEMU devices
+    #[cfg(plat_qemu_riscv)]
     ("uart16550", DomainTypeRaw::UartDomain),
-    #[cfg(qemu_riscv)]
+    #[cfg(plat_qemu_riscv)]
     ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain),
+    // x86-64 QEMU devices
+    #[cfg(plat_qemu_x86_64)]
+    ("uart16550", DomainTypeRaw::UartDomain),  // COM port, same driver
+    #[cfg(plat_qemu_x86_64)]
+    ("virtio_pci_block", DomainTypeRaw::BlkDeviceDomain),  // VirtIO PCI block
+    // Common domains
     ("net_stack", DomainTypeRaw::NetDomain),
     ("logger", DomainTypeRaw::LogDomain),
     ("domainfs", DomainTypeRaw::FsDomain),
-    #[cfg(all(vf2, not(vf2_sd)))]
+    #[cfg(all(plat_vf2, not(plat_vf2_sd)))]
     ("mem_block", DomainTypeRaw::BlkDeviceDomain),
     #[cfg(feature = "bench")]
     ("mem_block", DomainTypeRaw::BlkDeviceDomain),
-    #[cfg(vf2)]
+    #[cfg(plat_vf2)]
     ("uart8250", DomainTypeRaw::UartDomain),
-    #[cfg(all(vf2, vf2_sd))]
-    ("vf2_sd", DomainTypeRaw::BlkDeviceDomain),
+    #[cfg(all(plat_vf2, plat_vf2_sd))]
+    ("plat_vf2_sd", DomainTypeRaw::BlkDeviceDomain),
 ];
 
 pub fn init_domains() {

@@ -2,7 +2,7 @@ use alloc::sync::Arc;
 use core::{arch::asm, hint::spin_loop};
 
 use basic::{
-    arch::{hart_id, CpuLocal},
+    arch::{cpu_id, CpuLocal},
     sync::Mutex,
 };
 use config::CPU_NUM;
@@ -44,15 +44,19 @@ const CPU_ONE: CpuLocal<Cpu> = CpuLocal::new(Cpu::empty());
 static CPUS: [CpuLocal<Cpu>; CPU_NUM] = [CPU_ONE; CPU_NUM];
 
 pub fn current_cpu() -> &'static mut Cpu {
-    CPUS[hart_id()].as_mut()
+    CPUS[cpu_id()].as_mut()
 }
 
 pub fn current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
-    CPUS[hart_id()].current()
+    CPUS[cpu_id()].current()
 }
 
 pub fn current_tid() -> Option<usize> {
-    // current_task().map(|task| task.lock().tid())
+    current_tid_impl()
+}
+
+#[cfg(target_arch = "riscv64")]
+fn current_tid_impl() -> Option<usize> {
     let mut tp: usize;
     unsafe {
         asm!(
@@ -60,19 +64,31 @@ pub fn current_tid() -> Option<usize> {
             out(reg) tp,
         )
     }
-    tp = tp >> 32;
-    if tp == 0 {
+    let tid = tp >> 32;
+    if tid == 0 {
         None
     } else {
-        Some(tp)
+        Some(tid)
     }
 }
 
-pub fn take_current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
-    CPUS[hart_id()].as_mut().take_current()
+#[cfg(target_arch = "x86_64")]
+fn current_tid_impl() -> Option<usize> {
+    // On x86-64, we use GS base or a dedicated per-CPU variable
+    // For now, read from per-CPU structure
+    current_task().map(|task| task.lock().tid())
 }
 
+pub fn take_current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
+    CPUS[cpu_id()].as_mut().take_current()
+}
+
+/// Set thread pointer register
+/// 
+/// - RISC-V: Sets the `tp` register
+/// - x86-64: Sets GS base (or uses per-CPU variable)
 #[inline(always)]
+#[cfg(target_arch = "riscv64")]
 fn set_tp(tp: usize) {
     unsafe {
         asm!("mv tp, {}", in(reg) tp, options(nostack));
@@ -80,11 +96,22 @@ fn set_tp(tp: usize) {
 }
 
 #[inline(always)]
+#[cfg(target_arch = "x86_64")]
+fn set_tp(_tp: usize) {
+    // On x86-64, thread-local state is tracked via per-CPU data
+    // The CPU ID can be read via CPUID/APIC, TID via task structure
+}
+
+/// Create thread pointer value from task ID
+/// 
+/// Creates a combined value storing both TID and CPU ID.
+/// - RISC-V: Upper 32 bits = TID, lower 32 bits = hart_id
+/// - x86-64: Same format using APIC ID
+#[inline(always)]
 fn tp_from_tid(tid: usize) -> usize {
-    let hart_id = hart_id(); // lower 32 bits
-                             // tid:hart_id
-                             // 32:32
-    (tid << 32) | hart_id
+    let current_cpu = cpu_id(); // Get current CPU ID
+    // tid:cpu_id format (32:32 bits)
+    (tid << 32) | current_cpu
 }
 
 pub fn schedule() {

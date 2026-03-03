@@ -3,7 +3,7 @@ mod scheduler;
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::{any::Any, cell::UnsafeCell, fmt::Debug, mem::forget, net::SocketAddrV4, ops::Range};
 
-use arch::hart_id;
+use arch::cpu_id;
 use config::CPU_NUM;
 use interface::*;
 use ksync::{Mutex, RwLock};
@@ -50,13 +50,13 @@ impl PerCpuCounter {
         }
     }
     pub fn inc(&self) {
-        let v = read_once!(self.counter[hart_id()].get());
-        write_once!(self.counter[hart_id()].get(), v + 1);
+        let v = read_once!(self.counter[cpu_id()].get());
+        write_once!(self.counter[cpu_id()].get(), v + 1);
     }
     pub fn dec(&self) {
-        let v = read_once!(self.counter[hart_id()].get());
+        let v = read_once!(self.counter[cpu_id()].get());
         // assert!(v as isize - 1 >= 0);
-        write_once!(self.counter[hart_id()].get(), v - 1);
+        write_once!(self.counter[cpu_id()].get(), v - 1);
     }
     pub fn all(&self) -> usize {
         let mut sum = 0;

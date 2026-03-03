@@ -1,4 +1,9 @@
+//! RISC-V SBI (Supervisor Binary Interface) implementation
+//!
+//! This module is only compiled for RISC-V targets.
+
 #![allow(unused)]
+
 use core::arch::asm;
 
 const SBI_CONSOLE_PUT_CHAR: usize = 1;

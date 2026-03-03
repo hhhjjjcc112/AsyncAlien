@@ -1,6 +1,6 @@
 use core::cell::UnsafeCell;
 
-use arch::hart_id;
+use arch::cpu_id;
 use config::CPU_NUM;
 use corelib::yield_now;
 use ksync::Mutex;
@@ -49,8 +49,8 @@ impl SRcuLock {
     pub fn read_lock(&self) -> usize {
         let idx = read_once!(self.completed.get()) & 0x1;
         barrier();
-        let hart_id = hart_id();
-        let array = &self.per_cpu_data[hart_id];
+        let current_cpu = cpu_id();
+        let array = &self.per_cpu_data[current_cpu];
         let v = read_once!(array.c[idx].get()) + 1;
         write_once!(array.c[idx].get(), v);
         srcu_barrier();
@@ -59,8 +59,8 @@ impl SRcuLock {
 
     pub fn read_unlock(&self, idx: usize) {
         srcu_barrier();
-        let hart_id = hart_id();
-        let array = &self.per_cpu_data[hart_id];
+        let current_cpu = cpu_id();
+        let array = &self.per_cpu_data[current_cpu];
         // array.c[idx] -= 1;
         // assert!(read_once!(array.c[idx].get()) - 1 >= 0, "{}",read_once!(array.c[idx].get()) - 1);
         let val = read_once!(array.c[idx].get()) - 1;

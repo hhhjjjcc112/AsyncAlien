@@ -23,3 +23,5 @@ rust-project.json
 build
 user/initrd/
 domain-lib/target/
+reference
+AGENTS.md

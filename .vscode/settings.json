@@ -1,5 +1,35 @@
 {
     "rust-analyzer.files.exclude": [
         "user/**"
+    ],
+    // ============================================================================
+    // 架构选择: 修改下面的配置切换 rust-analyzer 检查的目标架构
+    // 选项: "riscv64" 或 "x86_64"
+    // ============================================================================
+    
+    // ---- RISC-V 64 配置 (取消注释以启用) ----
+    // "rust-analyzer.cargo.target": "riscv64gc-unknown-none-elf",
+    // "rust-analyzer.cargo.extraEnv": {
+    //     "RUSTFLAGS": "--cfg getrandom_backend=\"custom\" --cfg plat_qemu_riscv",
+    //     "PLATFORM": "plat_qemu_riscv"
+    // },
+    
+    // ---- x86-64 配置 (当前启用) ----
+    "rust-analyzer.cargo.target": "./tools/x86_64.json",
+    "rust-analyzer.cargo.extraEnv": {
+        "RUSTFLAGS": "--cfg getrandom_backend=\"custom\" --cfg plat_qemu_x86_64",
+        "PLATFORM": "plat_qemu_x86_64"
+    },
+    
+    // 通用配置
+    "rust-analyzer.cargo.buildScripts.enable": true,
+    "rust-analyzer.cargo.buildScripts.overrideCommand": null,
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.check.extraArgs": [
+        "-Z", "build-std=core,alloc",
+        "-Z", "build-std-features=compiler-builtins-mem"
+    ],
+    "rust-analyzer.diagnostics.disabled": [
+        "unresolved-proc-macro"
     ]
 }

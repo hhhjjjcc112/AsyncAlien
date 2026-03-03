@@ -125,7 +125,6 @@ ap_entry64:
     .quad .Ltmp_pdpt_high - {phys_virt_offset} + 0x3  # PRESENT | WRITABLE | paddr(tmp_pdpt)
     .zero 8 * 255
 
-# FIXME: may not work on macOS using hvf as the CPU does not support 1GB page (pdpe1gb)
 .Ltmp_pdpt_low:
 .set i, 0
 .rept 512

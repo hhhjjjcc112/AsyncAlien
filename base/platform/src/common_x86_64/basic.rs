@@ -1,0 +1,87 @@
+//! Machine information for x86-64
+//!
+//! Provides machine configuration based on static config and runtime detection.
+
+use core::{fmt::Debug, ops::Range};
+
+/// Machine information structure
+/// 
+/// For x86-64, PLIC and CLINT are replaced with APIC concepts,
+/// but we keep the fields for interface compatibility.
+#[derive(Clone)]
+pub struct MachineInfo {
+    /// Machine model name
+    pub model: [u8; 32],
+    /// Number of CPUs
+    pub smp: usize,
+    /// Physical memory range
+    pub memory: Range<usize>,
+    /// Interrupt controller range (Local APIC on x86)
+    pub plic: Range<usize>,
+    /// Timer controller range (not used on x86, APIC timer is integrated)
+    pub clint: Range<usize>,
+    /// Initrd range (if loaded by bootloader)
+    pub initrd: Option<Range<usize>>,
+    /// Boot arguments
+    pub bootargs: Option<[u8; 255]>,
+    /// Boot arguments length
+    pub bootargs_len: usize,
+}
+
+impl Debug for MachineInfo {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let index = self.model.iter().position(|&x| x == 0).unwrap_or(32);
+        let model = core::str::from_utf8(&self.model[..index]).unwrap_or("x86_64");
+        writeln!(f, "Machine: {}", model)?;
+        writeln!(f, "SMP:     {} CPUs", self.smp)?;
+        writeln!(f, "Memory:  {:#x}..{:#x}", self.memory.start, self.memory.end)?;
+        writeln!(f, "APIC:    {:#x}..{:#x}", self.plic.start, self.plic.end)?;
+        if let Some(ref initrd) = self.initrd {
+            writeln!(f, "Initrd:  {:#x}..{:#x}", initrd.start, initrd.end)?;
+        }
+        if let Some(ref args) = self.bootargs {
+            let bootargs = core::str::from_utf8(&args[..self.bootargs_len]).unwrap_or("");
+            if !bootargs.is_empty() {
+                writeln!(f, "Bootargs: {}", bootargs)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Create machine info from boot information (Multiboot pointer)
+pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
+    // Initialize memory regions from Multiboot
+    super::mem::init_from_multiboot(multiboot_ptr);
+    
+    // Get CPU count from CPUID
+    let smp = get_cpu_count();
+    
+    // Build machine info
+    let mut model = [0u8; 32];
+    let name = b"qemu-x86_64-pc";
+    model[..name.len()].copy_from_slice(name);
+    
+    MachineInfo {
+        model,
+        smp,
+        memory: super::mem::memory_range(),
+        // Local APIC address
+        plic: 0xfee0_0000..0xfee0_1000,
+        // IO APIC address (not used as timer, but for compatibility)
+        clint: 0xfec0_0000..0xfec0_1000,
+        initrd: None, // TODO: parse from Multiboot modules
+        bootargs: None, // TODO: parse from Multiboot command line
+        bootargs_len: 0,
+    }
+}
+
+/// Get number of logical CPUs from CPUID
+fn get_cpu_count() -> usize {
+    raw_cpuid::CpuId::new()
+        .get_feature_info()
+        .map_or(1, |finfo| {
+            let count = finfo.max_logical_processor_ids() as usize;
+            if count == 0 { 1 } else { count }
+        })
+}

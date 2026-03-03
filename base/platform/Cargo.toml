@@ -11,6 +11,26 @@ arch = { path = "../../domain-lib/arch" }
 config = { path = "../../domain-lib/config" }
 spin = "0"
 fdt = "0.1.5"
+heapless = "0.8"
+lazyinit = "0.2"
+memory_addr = "0.4"
+bitflags = "2"
+
+# x86-64 specific dependencies
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+x86_64 = "0.15.4"
+x86 = "0.52.0"
+x2apic = "0.5.0"
+raw-cpuid = "11.6.0"
+uart_16550 = "0.4.0"
+x86_rtc = "0.1.1"
+multiboot = "0.8.0"
+int_ratio = "0.1"
+kspin = "0.1"
+
+# RISC-V specific dependencies
+[target.'cfg(target_arch = "riscv64")'.dependencies]
+riscv = "0.11"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vf2)','cfg(qemu_riscv)'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(plat_vf2)','cfg(plat_qemu_riscv)','cfg(plat_qemu_x86_64)'] }

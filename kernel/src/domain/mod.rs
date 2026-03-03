@@ -40,10 +40,12 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     let plic_address = plic_device.address_range();
     let plic_info = PlicInfo {
         device_info: plic_address.start.as_usize()..plic_address.end.as_usize(),
-        #[cfg(qemu_riscv)]
+        #[cfg(plat_qemu_riscv)]
         ty: PlicType::Qemu,
-        #[cfg(vf2)]
+        #[cfg(plat_vf2)]
         ty: PlicType::SiFive,
+        #[cfg(plat_qemu_x86_64)]
+        ty: PlicType::Apic,  // x86-64 uses APIC/IOAPIC instead of PLIC
     };
     plic.init_by_box(Box::new(plic_info))?;
     register_domain!(
@@ -137,7 +139,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
             }
             "sdcard" => {
                 let (sdcard, domain_file_info) =
-                    create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "vf2_sd")?;
+                    create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "plat_vf2_sd")?;
                 sdcard.init_by_box(Box::new(address..address + size))?;
                 register_domain!(
                     "block",

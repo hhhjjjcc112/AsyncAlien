@@ -8,7 +8,6 @@ edition = "2024"
 [dependencies]
 mem = { path = "../base/mem" }
 platform = { path = "../base/platform" }
-riscv = "0.11"
 log = "0"
 xmas-elf = "0.10"
 pconst = { path = "../utils/pconst", features = [
@@ -43,6 +42,12 @@ unwinding = { version="0.2.8", default-features = false, features = [
     "personality",
 ], optional = true }
 
+# Architecture-specific dependencies
+[target.'cfg(target_arch = "riscv64")'.dependencies]
+riscv = "0.11"
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+
 
 [features]
 default = ["rust-unwind", "time-tick", "test"]
@@ -54,7 +59,8 @@ time-tick = []
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [
-    'cfg(vf2)',
-    'cfg(qemu_riscv)',
-    'cfg(vf2_sd)',
+    'cfg(plat_vf2)',
+    'cfg(plat_qemu_riscv)',
+    'cfg(plat_qemu_x86_64)',
+    'cfg(plat_vf2_sd)',
 ] }
