@@ -108,6 +108,7 @@ help:
 	@echo ""
 	@echo "Main Targets:"
 	@echo "  make run                Build and run in QEMU"
+	@echo "  make ready              Build everything but don't run QEMU"
 	@echo "  make build              Build kernel only"
 	@echo "  make vf2                Build and deploy to VF2 via TFTP"
 	@echo "  make domains            Build all domains"
@@ -129,6 +130,10 @@ help:
 	@echo "  make ARCH=riscv64 run"
 	@echo "  make ARCH=x86_64 build SMP=4"
 	@echo "  make vf2 VF2_SD=y       Build for VF2 with SD card"
+
+# Build everything but don't run QEMU (same as run without the QEMU step)
+ready: domains sdcard initrd build
+	@echo "Build complete. Ready to run with 'make fake_run' or 'make run'"
 
 build:
 	@echo "Building..."

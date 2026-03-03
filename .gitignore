@@ -24,4 +24,5 @@ build
 user/initrd/
 domain-lib/target/
 reference
+diskfs
 AGENTS.md

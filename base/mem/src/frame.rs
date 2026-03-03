@@ -8,10 +8,20 @@ use config::{FRAME_BITS, FRAME_SIZE};
 use ksync::Mutex;
 use log::trace;
 use memory_addr::{PhysAddr, VirtAddr};
-use page_table::{NotLeafPage, PagingIf, Rv64PTE, ENTRY_COUNT};
 use pager::{PageAllocator, PageAllocatorExt};
 use platform::println;
 use ptable::PhysPage;
+
+#[cfg(target_arch = "x86_64")]
+use page_table::{NotLeafPage, PagingIf, X64PTE, ENTRY_COUNT};
+#[cfg(not(target_arch = "x86_64"))]
+use page_table::{NotLeafPage, PagingIf, Rv64PTE, ENTRY_COUNT};
+
+// Architecture-specific type alias
+#[cfg(target_arch = "x86_64")]
+pub type ArchPTE = X64PTE;
+#[cfg(not(target_arch = "x86_64"))]
+pub type ArchPTE = Rv64PTE;
 
 #[cfg(feature = "pager_bitmap")]
 pub static FRAME_ALLOCATOR: Mutex<pager::Bitmap<0>> = Mutex::new(pager::Bitmap::new());
@@ -159,7 +169,7 @@ pub fn alloc_frame_trackers(count: usize) -> FrameTracker {
 
 pub struct VmmPageAllocator;
 
-impl NotLeafPage<Rv64PTE> for FrameTracker {
+impl NotLeafPage<ArchPTE> for FrameTracker {
     fn phys_addr(&self) -> PhysAddr {
         PhysAddr::from(self.start_page << FRAME_BITS)
     }
@@ -175,19 +185,19 @@ impl NotLeafPage<Rv64PTE> for FrameTracker {
         }
     }
 
-    fn as_pte_slice<'a>(&self) -> &'a [Rv64PTE] {
+    fn as_pte_slice<'a>(&self) -> &'a [ArchPTE] {
         let ptr = self.start();
         unsafe { core::slice::from_raw_parts(ptr as _, ENTRY_COUNT) }
     }
 
-    fn as_pte_mut_slice<'a>(&self) -> &'a mut [Rv64PTE] {
+    fn as_pte_mut_slice<'a>(&self) -> &'a mut [ArchPTE] {
         let ptr = self.start();
         unsafe { core::slice::from_raw_parts_mut(ptr as _, ENTRY_COUNT) }
     }
 }
 
-impl PagingIf<Rv64PTE> for VmmPageAllocator {
-    fn alloc_frame() -> Option<Box<dyn NotLeafPage<Rv64PTE>>> {
+impl PagingIf<ArchPTE> for VmmPageAllocator {
+    fn alloc_frame() -> Option<Box<dyn NotLeafPage<ArchPTE>>> {
         let frame = alloc_frame_trackers(1);
         Some(Box::new(frame))
     }
