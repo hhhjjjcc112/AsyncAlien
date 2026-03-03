@@ -1,0 +1,24 @@
+[package]
+name = "pconst"
+version = "0.1.0"
+edition = "2024"
+authors = ["chenlinfeng <chenlinfeng25@outlook.com>"]
+description = "Data structures used by Linux system calls"
+keywords = ["linux", "system-call", "data-structure"]
+readme = "README.md"
+documentation = "https://github.com/kern-crates/pconst/blob/main/README.md"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pod = { git = "https://github.com/asterinas/pod", rev = "d7dba56" }
+int-enum = "1"
+bitflags = "1.3.2"
+syscall-table = { path = "../syscall-table" ,optional = true }
+
+[features]
+default = []
+trick = ["syscall-table"]
+special_error = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [] }

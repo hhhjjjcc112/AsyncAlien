@@ -1,0 +1,9 @@
+[package]
+name = "vmspace"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+page_table = { path = "../page-table", package = "page-table" }
+memory_addr = { path ="../memory_addr" }
+pod = { git = "https://github.com/asterinas/pod", rev = "d7dba56" }

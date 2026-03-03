@@ -1,0 +1,21 @@
+[package]
+name = "lose-net-stack"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+log = ["dep:log"]
+
+[dependencies]
+log = { version = "0.4", optional = true }
+bitflags = "2.4"
+spin = "0.9.8"
+low_level_op = { path = "./low_level_op" }
+
+
+ [workspace]
+ members = [
+     # ".",
+     "low_level_op",
+     "example"
+ ]
