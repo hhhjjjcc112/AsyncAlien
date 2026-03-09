@@ -56,10 +56,15 @@ impl Debug for MachineInfo {
     }
 }
 
-/// Get machine information from a device-tree
-pub fn machine_info_from_dtb(ptr: usize) -> MachineInfo {
+/// 从 boot_info 指针解析机器信息（RISC-V 下即 DTB 指针）
+pub fn machine_info_from_boot_info(ptr: usize) -> MachineInfo {
     let fdt = unsafe { Fdt::from_ptr(ptr as *const u8).unwrap() };
     walk_dt(fdt)
+}
+
+#[deprecated(note = "use machine_info_from_boot_info")]
+pub fn machine_info_from_dtb(ptr: usize) -> MachineInfo {
+    machine_info_from_boot_info(ptr)
 }
 
 // Walk the device-tree and get machine information

@@ -1,7 +1,9 @@
 VERSION = 1.33.1
 BB = busybox
-COMPILER = riscv64-linux-musl-
-ARCH = riscv64
+ARCH ?= riscv64
+COMPILER_riscv64 = riscv64-linux-musl-
+COMPILER_x86_64 = x86_64-linux-musl-
+COMPILER = $(COMPILER_$(ARCH))
 initrd = initramfs
 
 

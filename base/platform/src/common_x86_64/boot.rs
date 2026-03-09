@@ -64,9 +64,13 @@ pub fn current_cpu_id() -> usize {
 /// Main entry point called from assembly
 #[unsafe(no_mangle)]
 fn main_entry(magic: usize, mbi: usize) {
+    // 早期启动标记，确认已进入 Rust 入口。
+    println!("[x86_boot] main_entry magic={:#x} mbi={:#x}", magic, mbi);
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         // Call platform initialization
         crate::platform_init_with_boot_info(current_cpu_id(), mbi);
+    } else {
+        println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
     }
 }
 

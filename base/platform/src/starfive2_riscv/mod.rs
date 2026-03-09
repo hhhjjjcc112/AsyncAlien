@@ -8,7 +8,9 @@ use crate::traits::{ConsoleIf, MachineInfo, MiscIf, PowerIf, PlatformCallRet};
 
 pub const FDT: &[u8] = include_bytes!("../../../../tools/jh7110-visionfive-v2.dtb");
 
-pub static DTB: Once<usize> = Once::new();
+pub static BOOT_INFO: Once<usize> = Once::new();
+#[deprecated(note = "use BOOT_INFO")]
+pub use BOOT_INFO as DTB;
 
 static INITRD: &'static [u8] = include_bytes!("../../../../build/initramfs.cpio.gz");
 
@@ -25,7 +27,7 @@ impl ConsoleIf for Vf2Platform {
 
     fn getchar() -> Option<u8> {
         let ch = crate::common_riscv::sbi::console_getchar();
-        if ch == '\0' || ch == '\xff' {
+        if ch == '\0' || ch as u8 == 0xFF {
             None
         } else {
             Some(ch as u8)
@@ -79,15 +81,16 @@ impl MiscIf for Vf2Platform {
     fn init_boot_info(_ptr: usize) {
         // VF2 uses embedded DTB
         let dtb_ptr = FDT.as_ptr() as usize;
-        DTB.call_once(|| dtb_ptr);
+        BOOT_INFO.call_once(|| dtb_ptr);
     }
 
     fn boot_info_ptr() -> usize {
-        *DTB.get().unwrap_or(&0)
+        *BOOT_INFO.get().unwrap_or(&0)
     }
 
     fn machine_info() -> Self::MachineInfo {
-        let mut info = crate::common_riscv::basic::machine_info_from_dtb(*DTB.get().unwrap());
+        let mut info =
+            crate::common_riscv::basic::machine_info_from_boot_info(*BOOT_INFO.get().unwrap());
         info.initrd = Some(Range {
             start: INITRD.as_ptr() as usize,
             end: INITRD.as_ptr() as usize + INITRD.len(),

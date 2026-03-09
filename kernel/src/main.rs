@@ -8,6 +8,26 @@
 #![allow(internal_features)]
 mod panic;
 
+// Two-layer cfg guards: architecture + platform.
+#[cfg(not(any(target_arch = "riscv64", target_arch = "x86_64")))]
+compile_error!("Unsupported architecture. Expected target_arch = riscv64 or x86_64");
+
+#[cfg(not(any(plat_qemu_riscv, plat_vf2, plat_qemu_x86_64)))]
+compile_error!("No valid platform selected! Use --cfg plat_qemu_riscv, --cfg plat_vf2, or --cfg plat_qemu_x86_64");
+
+#[cfg(any(
+    all(plat_qemu_riscv, plat_vf2),
+    all(plat_qemu_riscv, plat_qemu_x86_64),
+    all(plat_vf2, plat_qemu_x86_64)
+))]
+compile_error!("Multiple platforms selected! Select exactly one platform cfg");
+
+#[cfg(all(target_arch = "x86_64", not(plat_qemu_x86_64)))]
+compile_error!("ARCH x86_64 requires PLATFORM=plat_qemu_x86_64");
+
+#[cfg(all(target_arch = "riscv64", not(any(plat_qemu_riscv, plat_vf2))))]
+compile_error!("ARCH riscv64 requires PLATFORM=plat_qemu_riscv or plat_vf2");
+
 #[macro_use]
 extern crate platform;
 #[macro_use]
@@ -48,7 +68,7 @@ fn main(boot_cpu_id: usize) {
         println!("{:#?}", machine_info);
         mem::init_memory_system(machine_info.memory.end, true);
         arch::allow_access_user_memory();
-        bus::init_with_dtb().unwrap();
+        bus::init_with_boot_info().unwrap();
         trap::init_trap_subsystem();
 
         domain::load_domains().unwrap();

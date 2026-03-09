@@ -1,8 +1,12 @@
 GUI ?=n
+ARCH ?= riscv64
+TARGET_riscv64 := riscv64gc-unknown-none-elf
+TARGET_x86_64 := x86_64-unknown-none
+TARGET := $(TARGET_$(ARCH))
 APPS := $(shell ls -d */)
-compile := cargo build --release
+compile := cargo build --release --target $(TARGET)
 mode := release
-target := ../../target/riscv64gc-unknown-none-elf/$(mode)/
+target := ../../target/$(TARGET)/$(mode)/
 APPS_NAME := $(shell ls -d */ | cut -d '/' -f 1)
 FSMOUNT := ../../diskfs
 

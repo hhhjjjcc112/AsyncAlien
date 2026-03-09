@@ -47,6 +47,7 @@ unwinding = { version="0.2.8", default-features = false, features = [
 riscv = "0.11"
 
 [target.'cfg(target_arch = "x86_64")'.dependencies]
+x86 = "0.52.0"
 
 
 [features]

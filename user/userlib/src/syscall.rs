@@ -1,6 +1,4 @@
-use core::arch::asm;
-
-use crate::{syscall, syscall_id};
+use crate::{arch, syscall, syscall_id};
 
 syscall_id!(SYSCALL_SETXATTR, 5);
 syscall_id!(SYSCALL_LSETXATTR, 6);
@@ -85,20 +83,7 @@ syscall_id!(SYSCALL_FRAME_FLUSH, 2001);
 syscall_id!(SYSCALL_EVENT, 2002);
 syscall_id!(SYSCALL_SYSTEMSHUTDOWN, 2003);
 fn syscall(id: usize, args: [usize; 6]) -> isize {
-    let mut ret: isize;
-    unsafe {
-        asm!(
-        "ecall",
-        inlateout("x10") args[0] => ret,
-        in("x11") args[1],
-        in("x12") args[2],
-        in("x13") args[3],
-        in("x14") args[4],
-        in("x15") args[5],
-        in("x17") id
-        );
-    }
-    ret
+    arch::syscall(id, args)
 }
 
 syscall!(sys_read, SYSCALL_READ, usize, *mut u8, usize);

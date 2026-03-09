@@ -60,3 +60,21 @@ pub const DEVICE_SPACE: &[(&str, usize, usize)] = &[
     ("hpet", 0xfed0_0000, 0x1000),
     ("pci_ecam", 0xb000_0000, 0x1000_0000),
 ];
+
+/// Dynamic ACPI-discovered device ranges.
+/// Falls back to static `DEVICE_SPACE` if ACPI was not initialized.
+pub fn device_space_dynamic() -> heapless::Vec<(&'static str, usize, usize), 16> {
+    let mut out = heapless::Vec::new();
+    let list = crate::common_x86_64::acpi::device_list();
+    if list.entries.is_empty() {
+        for (name, base, size) in DEVICE_SPACE {
+            let _ = out.push((*name, *base, *size));
+        }
+        return out;
+    }
+
+    for entry in list.entries.iter() {
+        let _ = out.push((entry.name, entry.base, entry.size));
+    }
+    out
+}

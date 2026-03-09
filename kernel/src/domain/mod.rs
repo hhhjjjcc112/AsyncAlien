@@ -1,7 +1,7 @@
 mod init;
 
 extern crate alloc;
-use alloc::{boxed::Box, string::ToString, sync::Arc};
+use alloc::{boxed::Box, string::{String, ToString}, sync::Arc};
 
 use basic::bus::mmio::VirtioMmioDeviceType;
 use corelib::AlienResult;
@@ -55,7 +55,8 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
         true
     );
 
-    let mut nic_irq = 0;
+    let mut nic_irq: Option<u32> = None;
+    let mut nic_name: Option<String> = None;
 
     for device in platform_bus.common_devices().iter() {
         let address = device.address().as_usize();
@@ -135,7 +136,8 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     false
                 );
                 let irq = device.irq();
-                nic_irq = irq.unwrap();
+                nic_irq = irq;
+                nic_name = Some("nic-1".to_string());
             }
             "sdcard" => {
                 let (sdcard, domain_file_info) =
@@ -172,7 +174,8 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     false
                 );
                 let irq = device.irq();
-                nic_irq = irq.unwrap();
+                nic_irq = irq;
+                nic_name = Some("nic-1".to_string());
             }
             VirtioMmioDeviceType::Block => {
                 let (blk_driver, domain_file_info) = create_domain!(
@@ -243,18 +246,73 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
             }
         }
     }
+
+    #[cfg(target_arch = "x86_64")]
     {
-        let (net_stack, domain_file_info) =
-            create_domain!(NetDomainProxy, DomainTypeRaw::NetDomain, "net_stack")?;
-        net_stack.init_by_box(Box::new("nic-1".to_string()))?;
-        register_domain!(
-            "net_stack",
-            domain_file_info,
-            DomainType::NetDomain(net_stack),
-            true
-        );
-        // register irq
-        plic.register_irq(nic_irq as _, &DVec::from_slice("net_stack".as_bytes()))?
+        for (dev, kind) in crate::bus::pci::virtio_pci_devices() {
+            match kind {
+                crate::bus::pci::VirtioPciKind::Block => {
+                    log::info!(
+                        "x86 virtio-pci block detected at {:02x}:{:02x}.{}",
+                        dev.bus,
+                        dev.device,
+                        dev.function
+                    );
+                }
+                crate::bus::pci::VirtioPciKind::Net
+                | crate::bus::pci::VirtioPciKind::Input
+                | crate::bus::pci::VirtioPciKind::Gpu
+                | crate::bus::pci::VirtioPciKind::Other => {
+                    log::warn!(
+                        "x86 virtio-pci {:?} at {:02x}:{:02x}.{} is discovered but not bound yet",
+                        kind,
+                        dev.bus,
+                        dev.device,
+                        dev.function
+                    );
+                }
+            }
+        }
+
+        if crate::bus::pci::has_virtio_block() {
+            if let Some(cfg_space) = crate::bus::pci::pci_config_space() {
+                let (blk_driver, domain_file_info) = create_domain!(
+                    BlkDomainProxy,
+                    DomainTypeRaw::BlkDeviceDomain,
+                    "virtio_mmio_block"
+                )?;
+                blk_driver.init_by_box(Box::new(cfg_space))?;
+                println!(
+                    "dev capacity: {:?}MB",
+                    blk_driver.get_capacity()? * 512 / 1024 / 1024
+                );
+                register_domain!(
+                    "block",
+                    domain_file_info,
+                    DomainType::BlkDeviceDomain(blk_driver),
+                    false
+                );
+            }
+        }
+    }
+
+    {
+        if let Some(nic_name) = nic_name {
+            let (net_stack, domain_file_info) =
+                create_domain!(NetDomainProxy, DomainTypeRaw::NetDomain, "net_stack")?;
+            net_stack.init_by_box(Box::new(nic_name))?;
+            register_domain!(
+                "net_stack",
+                domain_file_info,
+                DomainType::NetDomain(net_stack),
+                true
+            );
+            if let Some(irq) = nic_irq {
+                plic.register_irq(irq as _, &DVec::from_slice("net_stack".as_bytes()))?;
+            }
+        } else {
+            warn!("No NIC domain is available, skip net_stack init");
+        }
     }
     // create shadow block and cache block device
     {

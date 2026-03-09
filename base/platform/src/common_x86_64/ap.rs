@@ -50,13 +50,13 @@ fn setup_startup_page(stack_top: usize) {
         core::ptr::copy_nonoverlapping(
             ap_start as *const u8,
             start_page.as_mut_ptr() as *mut u8,
-            ap_end as usize - ap_start as usize,
+            ap_end as *const () as usize - ap_start as *const () as usize,
         )
     }
 
     // Set AP entry point and stack top at the end of the page
     start_page[0x1000 / 8 - 2] = stack_top as u64;
-    start_page[0x1000 / 8 - 1] = ap_entry32 as usize as u64;
+    start_page[0x1000 / 8 - 1] = ap_entry32 as *const () as usize as u64;
 }
 
 /// Get number of logical CPUs

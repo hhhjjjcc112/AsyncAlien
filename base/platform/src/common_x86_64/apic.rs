@@ -16,8 +16,6 @@ pub mod vectors {
     pub const APIC_ERROR_VECTOR: u8 = 0xf2;
 }
 
-const IO_APIC_BASE: usize = 0xFEC00000;
-
 static mut LOCAL_APIC: MaybeUninit<LocalApic> = MaybeUninit::uninit();
 static mut IS_X2APIC: bool = false;
 static IO_APIC: Once<Mutex<IoApic>> = Once::new();
@@ -70,8 +68,9 @@ pub fn init_primary_apic() {
     }
 
     // Initialize I/O APIC
-    log::info!("Initializing I/O APIC at {:#x}...", IO_APIC_BASE);
-    let io_apic = unsafe { IoApic::new((IO_APIC_BASE as u64) + (PHYS_VIRT_OFFSET as u64)) };
+    let io_apic_base = crate::common_x86_64::acpi::device_info().ioapic_base;
+    log::info!("Initializing I/O APIC at {:#x}...", io_apic_base);
+    let io_apic = unsafe { IoApic::new((io_apic_base as u64) + (PHYS_VIRT_OFFSET as u64)) };
     IO_APIC.call_once(|| Mutex::new(io_apic));
 }
 

@@ -1,0 +1,4441 @@
+[minimal-x86] build kernel only
+Building...
+ARCH: x86_64
+PLATFORM: plat_qemu_x86_64
+TARGET: x86_64-unknown-none
+SMP: 1
+VF2_SD: n
+PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG=debug cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default
+[minimal-x86] run qemu
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x0..0x7ffdd000
+APIC:    0xfee00000..0xfee01000
+
+[0] Page start:0x42f5,end:0x7ffdd,count:0x7bce8
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x297000
+[0] kernel rodata:        0x297000-0x2ac000
+[0] kernel init_array:    0x2ac000-0x2ac000
+[0] kernel data:          0x2ac000-0x2f1000
+[0] kernel bss:           0x2f1000-0x2f5000
+[0] kernel heap:          0x2f5000-0x7ffdd000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Skip paging switch on x86_64 bring-up
+[0] [x86] begin acpi/pci device init
+[0] [x86] acpi/pci device init done
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] line 54, file kernel/src/domain/init.rs: Initrd data is not initialized
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+7FF910B0+7FEF10B0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] ACPI device: local_apic @ 0xfee00000 size=0x1000
+[0] ACPI device: io_apic @ 0xfec00000 size=0x1000
+[0] ACPI device: hpet @ 0xfed00000 size=0x1000
+[0] Init logger Some("debug")
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+S

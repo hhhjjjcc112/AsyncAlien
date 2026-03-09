@@ -31,5 +31,11 @@
     ],
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-proc-macro"
-    ]
+    ],
+    "chat.tools.terminal.autoApprove": {
+        "make": true,
+        "cargo info": true,
+        "cargo check": true,
+        "timeout": true
+    }
 }

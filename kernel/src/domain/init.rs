@@ -33,7 +33,7 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     #[cfg(plat_qemu_x86_64)]
     ("uart16550", DomainTypeRaw::UartDomain),  // COM port, same driver
     #[cfg(plat_qemu_x86_64)]
-    ("virtio_pci_block", DomainTypeRaw::BlkDeviceDomain),  // VirtIO PCI block
+    ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain), // x86 下由驱动内部走 PCI 传输
     // Common domains
     ("net_stack", DomainTypeRaw::NetDomain),
     ("logger", DomainTypeRaw::LogDomain),

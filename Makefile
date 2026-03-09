@@ -1,30 +1,62 @@
-## Architecture selection: riscv64 (default), x86_64, or vf2
+## Architecture and platform selection
+## ARCH: riscv64 (default), x86_64, or legacy vf2
+## PLATFORM: plat_qemu_riscv / plat_qemu_x86_64 / plat_vf2
 ARCH ?= riscv64
+PLATFORM ?=
 
 # Validate ARCH value
 VALID_ARCHS := riscv64 x86_64 vf2
 ifeq ($(filter $(ARCH),$(VALID_ARCHS)),)
-    $(error Invalid ARCH=$(ARCH). Valid values are: $(VALID_ARCHS))
+$(error Invalid ARCH=$(ARCH). Valid values are: $(VALID_ARCHS))
 endif
 
+# Validate PLATFORM value when explicitly provided
+VALID_PLATFORMS := plat_qemu_riscv plat_qemu_x86_64 plat_vf2
+ifneq ($(strip $(PLATFORM)),)
+ifeq ($(filter $(PLATFORM),$(VALID_PLATFORMS)),)
+$(error Invalid PLATFORM=$(PLATFORM). Valid values are: $(VALID_PLATFORMS))
+endif
+endif
+
+# Normalize arch selection (keep legacy ARCH=vf2 compatible)
 ifeq ($(ARCH),x86_64)
-    TARGET := x86_64-unknown-none
-    TARGET_CONFIG := ./tools/x86_64.json
-    TARGET2 := x86_64
-    QEMU := qemu-system-x86_64
-    PLATFORM := plat_qemu_x86_64
+	ARCH_KIND := x86_64
+	PLATFORM_DEFAULT := plat_qemu_x86_64
 else ifeq ($(ARCH),vf2)
-    TARGET := riscv64gc-unknown-none-elf
-    TARGET_CONFIG := ./tools/riscv64.json
-    TARGET2 := riscv64
-    QEMU := qemu-system-riscv64
-    PLATFORM := plat_vf2
-else ifeq ($(ARCH),riscv64)
-    TARGET := riscv64gc-unknown-none-elf
-    TARGET_CONFIG := ./tools/riscv64.json
-    TARGET2 := riscv64
-    QEMU := qemu-system-riscv64
-    PLATFORM := plat_qemu_riscv
+	ARCH_KIND := riscv64
+	PLATFORM_DEFAULT := plat_vf2
+else
+	ARCH_KIND := riscv64
+	PLATFORM_DEFAULT := plat_qemu_riscv
+endif
+
+# Fill default platform if not provided
+ifeq ($(strip $(PLATFORM)),)
+	PLATFORM := $(PLATFORM_DEFAULT)
+endif
+
+# Validate ARCH + PLATFORM combinations
+ifeq ($(ARCH_KIND),x86_64)
+ifneq ($(PLATFORM),plat_qemu_x86_64)
+$(error ARCH=x86_64 only supports PLATFORM=plat_qemu_x86_64)
+endif
+else
+VALID_RISCV_PLATFORMS := plat_qemu_riscv plat_vf2
+ifeq ($(filter $(PLATFORM),$(VALID_RISCV_PLATFORMS)),)
+$(error ARCH=$(ARCH) only supports PLATFORM in $(VALID_RISCV_PLATFORMS))
+endif
+endif
+
+ifeq ($(ARCH_KIND),x86_64)
+	TARGET := x86_64-unknown-none
+	TARGET_CONFIG := ./tools/x86_64.json
+	TARGET2 := x86_64
+	QEMU := qemu-system-x86_64
+else
+	TARGET := riscv64gc-unknown-none-elf
+	TARGET_CONFIG := ./tools/riscv64.json
+	TARGET2 := riscv64
+	QEMU := qemu-system-riscv64
 endif
 
 PROFILE := release
@@ -32,6 +64,8 @@ KERNEL := target/$(TARGET2)/$(PROFILE)/kernel
 NET ?= y
 SMP ?= 2
 MEMORY_SIZE := 2048M
+X86_CPU ?= Icelake-Server,+x2apic
+X86_UINTR_CPU ?= max,+x2apic,+uintr
 LOG ?=
 GUI ?=n
 FS ?=fat
@@ -50,7 +84,7 @@ space:= $(empty) $(empty)
 
 QEMU_ARGS :=
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH_KIND),x86_64)
     # x86_64 QEMU args
     ifeq ($(GUI),y)
         QEMU_ARGS += -device virtio-gpu-pci \
@@ -102,9 +136,14 @@ help:
 	@echo "AsyncAlien Build System"
 	@echo ""
 	@echo "Architecture Selection:"
-	@echo "  make ARCH=riscv64 ...   Build for RISC-V 64-bit QEMU (default)"
-	@echo "  make ARCH=x86_64 ...    Build for x86-64 QEMU"
-	@echo "  make ARCH=vf2 ...       Build for VisionFive 2 board"
+	@echo "  make ARCH=riscv64 ...                           Build for RISC-V 64-bit (default)"
+	@echo "  make ARCH=x86_64 ...                            Build for x86-64"
+	@echo "  make ARCH=vf2 ...                               Legacy alias for VF2"
+	@echo ""
+	@echo "Platform Selection:"
+	@echo "  make ARCH=riscv64 PLATFORM=plat_qemu_riscv ... Build for RISC-V QEMU"
+	@echo "  make ARCH=riscv64 PLATFORM=plat_vf2 ...        Build for VisionFive 2"
+	@echo "  make ARCH=x86_64 PLATFORM=plat_qemu_x86_64 ... Build for x86-64 QEMU"
 	@echo ""
 	@echo "Main Targets:"
 	@echo "  make run                Build and run in QEMU"
@@ -122,14 +161,16 @@ help:
 	@echo "Options:"
 	@echo "  SMP=n                   Number of CPUs (default: 2)"
 	@echo "  NET=y/n                 Enable network (default: y)"
+	@echo "  X86_CPU=...             x86 CPU model/features (default: Icelake-Server,+x2apic)"
 	@echo "  GUI=y/n                 Enable GUI (default: n)"
 	@echo "  LOG=level               Log level"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make ARCH=riscv64 run"
-	@echo "  make ARCH=x86_64 build SMP=4"
-	@echo "  make vf2 VF2_SD=y       Build for VF2 with SD card"
+	@echo "  make ARCH=riscv64 PLATFORM=plat_qemu_riscv run"
+	@echo "  make ARCH=x86_64 PLATFORM=plat_qemu_x86_64 build SMP=4"
+	@echo "  make ARCH=x86_64 run_uintr X86_UINTR_CPU=\"max,+x2apic,+uintr\""
+	@echo "  make ARCH=riscv64 PLATFORM=plat_vf2 build VF2_SD=y"
 
 # Build everything but don't run QEMU (same as run without the QEMU step)
 ready: domains sdcard initrd build
@@ -146,18 +187,18 @@ build:
 	PLATFORM=$(PLATFORM) RUSTFLAGS='--cfg getrandom_backend="custom" --cfg $(PLATFORM)' LOG=$(LOG) cargo build --release -p kernel --target $(TARGET_CONFIG) $(BUILD_CFG) --features $(FEATURES)
 
 vf2:
-	@$(MAKE) ARCH=vf2 build
+	@$(MAKE) ARCH=riscv64 PLATFORM=plat_vf2 build
 	rust-objcopy --strip-all target/riscv64/release/kernel -O binary ./testos.bin
 	cp ./testos.bin  $(TFTPBOOT)
 	rm ./testos.bin
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH_KIND),x86_64)
 # x86_64 run target
 run: domains sdcard initrd build
 	$(QEMU) \
             -m $(MEMORY_SIZE) \
             -smp $(SMP) \
-            -cpu Icelake-Server,+x2apic \
+			-cpu $(X86_CPU) \
             -kernel $(KERNEL) \
             $(QEMU_ARGS) \
             -serial mon:stdio
@@ -166,10 +207,16 @@ fake_run:
 	$(QEMU) \
             -m $(MEMORY_SIZE) \
             -smp $(SMP) \
-            -cpu Icelake-Server,+x2apic \
+			-cpu $(X86_CPU) \
             -kernel $(KERNEL) \
             $(QEMU_ARGS) \
             -serial mon:stdio
+
+run_uintr: X86_CPU := $(X86_UINTR_CPU)
+run_uintr: run
+
+fake_run_uintr: X86_CPU := $(X86_UINTR_CPU)
+fake_run_uintr: fake_run
 else
 # riscv64 run target
 run: domains sdcard initrd build
@@ -222,11 +269,11 @@ mount:
 
 domains:
 	@if [ ! -d "build" ]; then mkdir build; fi
-	cd domains && cargo domain build-all -l "$(LOG)" -o $(abspath build)
+	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) cargo domain build-all -l "$(LOG)" -o $(abspath build)
 	@make initrd
 
 domain:
-	cd domains && cargo domain build -n $(name) -l "$(LOG)" -o $(abspath build)
+	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) cargo domain build -n $(name) -l "$(LOG)" -o $(abspath build)
 	@make initrd
 
 initrd:
@@ -240,12 +287,12 @@ initrd:
 	@rm -rf ./initrd
 
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH_KIND),x86_64)
 gdb-server: domains build sdcard
 	@$(QEMU) \
             -m $(MEMORY_SIZE) \
             -smp $(SMP) \
-            -cpu Icelake-Server,+x2apic \
+			-cpu $(X86_CPU) \
             -kernel $(KERNEL) \
             $(QEMU_ARGS) \
             -serial mon:stdio \
@@ -272,7 +319,7 @@ clean:
 	rm build/init/g*
 	cargo clean
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH_KIND),x86_64)
 kernel_asm:
 	@objdump -d $(KERNEL) > kernel.asm
 	@vim kernel.asm
@@ -288,4 +335,4 @@ check:
 	@cargo fmt
 	@cargo clippy -p kernel --target $(TARGET_CONFIG)  -- -D warnings
 
-.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check
+.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check run_uintr fake_run_uintr

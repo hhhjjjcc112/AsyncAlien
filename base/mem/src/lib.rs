@@ -43,9 +43,18 @@ pub fn init_memory_system(memory_end: usize, is_first_cpu: bool) {
         println!("Talloc allocator init success");
         vmm::build_kernel_address_space(memory_end);
         println!("Build kernel address space success");
-        activate_paging_mode(vmm::kernel_pgd() >> FRAME_BITS);
-        println!("Activate paging mode success");
+        #[cfg(target_arch = "riscv64")]
+        {
+            activate_paging_mode(vmm::kernel_pgd() >> FRAME_BITS);
+            println!("Activate paging mode success");
+        }
+        #[cfg(target_arch = "x86_64")]
+        {
+            // x86_64 移植早期先沿用引导页表，避免切 CR3 后卡死。
+            println!("Skip paging switch on x86_64 bring-up");
+        }
     } else {
+        #[cfg(target_arch = "riscv64")]
         activate_paging_mode(vmm::kernel_pgd() >> FRAME_BITS);
     }
 }

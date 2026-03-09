@@ -1,4 +1,7 @@
-TARGET = riscv64gc-unknown-linux-musl
+ARCH ?= riscv64
+TARGET_riscv64 := riscv64gc-unknown-linux-musl
+TARGET_x86_64 := x86_64-unknown-linux-musl
+TARGET := $(TARGET_$(ARCH))
 compile := cargo build --release -Z build-std=core,std,panic_abort
 mode := release
 target := ../../target/$(TARGET)/$(mode)/

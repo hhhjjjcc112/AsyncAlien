@@ -8,9 +8,10 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use core::arch::asm;
 
 use crate::{heap::init_heap, process::exit, syscall::__system_shutdown};
+
+mod arch;
 
 pub mod common;
 pub mod fs;
@@ -32,19 +33,6 @@ pub mod domain;
 #[cfg(feature = "gui")]
 pub mod gui;
 pub mod sync;
-
-#[cfg(not(feature = "std"))]
-#[unsafe(no_mangle)]
-#[unsafe(naked)]
-extern "C" fn _start() -> ! {
-    unsafe {
-        core::arch::naked_asm!(
-            "mv a0,sp
-            call _start_rust
-            ",
-        )
-    }
-}
 
 #[unsafe(no_mangle)]
 fn _start_rust(argc_ptr: usize) {

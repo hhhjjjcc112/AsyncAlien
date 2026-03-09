@@ -4,14 +4,42 @@ use std::{env, fs, fs::File, io::Write, path::Path};
 const VALID_PLATFORMS: [&str; 3] = ["plat_qemu_riscv", "plat_qemu_x86_64", "plat_vf2"];
 
 fn main() {
+    println!("cargo::rustc-check-cfg=cfg(plat_qemu_riscv)");
+    println!("cargo::rustc-check-cfg=cfg(plat_qemu_x86_64)");
+    println!("cargo::rustc-check-cfg=cfg(plat_vf2)");
+    println!("cargo::rustc-check-cfg=cfg(plat_vf2_sd)");
+
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").ok().unwrap_or_default();
+
     let outdir = env::var("OUT_DIR").unwrap();
     let link_script = Path::new(&outdir).join("link.lds");
     let mut script = File::create(&link_script).unwrap();
-    let platform = option_env!("PLATFORM").unwrap_or("plat_qemu_riscv");
+    let platform = env::var("PLATFORM").ok().unwrap_or_else(|| match target_arch.as_str() {
+        "x86_64" => "plat_qemu_x86_64".to_string(),
+        "riscv64" => "plat_qemu_riscv".to_string(),
+        _ => "plat_qemu_riscv".to_string(),
+    });
     
     // Validate platform
-    if !VALID_PLATFORMS.contains(&platform) {
+    if !VALID_PLATFORMS.contains(&platform.as_str()) {
         panic!("Invalid PLATFORM='{}'. Valid values are: {:?}", platform, VALID_PLATFORMS);
+    }
+
+    match target_arch.as_str() {
+        "x86_64" | "riscv64" => {}
+        other => panic!("Unsupported target architecture '{}'. Expected x86_64 or riscv64", other),
+    }
+
+    let is_valid_combo = match target_arch.as_str() {
+        "x86_64" => platform == "plat_qemu_x86_64",
+        "riscv64" => matches!(platform.as_str(), "plat_qemu_riscv" | "plat_vf2"),
+        _ => false,
+    };
+    if !is_valid_combo {
+        panic!(
+            "Invalid ARCH/PLATFORM combination: target_arch='{}', PLATFORM='{}'",
+            target_arch, platform
+        );
     }
     
     // Choose linker script based on platform
@@ -39,11 +67,11 @@ fn main() {
         script.write_all(ld.as_bytes()).unwrap();
     }
 
-    let plat_vf2_sd = option_env!("VF2_SD").unwrap_or("n");
+    let plat_vf2_sd = env::var("VF2_SD").ok().unwrap_or_else(|| "n".to_string());
     if plat_vf2_sd == "y" {
         println!("cargo:rustc-cfg=plat_vf2_sd");
     }
 
     println!("cargo:rustc-link-arg=-T{}", &link_script.display());
-    println!("cargo::rustc-cfg={}", platform);
+    println!("cargo::rustc-cfg={}", platform.as_str());
 }

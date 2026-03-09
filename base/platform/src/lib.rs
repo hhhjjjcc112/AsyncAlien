@@ -1,8 +1,26 @@
 #![no_std]
 
-// Compile-time check: ensure exactly one platform is selected
+// Compile-time checks for two-level cfg model.
+// Level 1: architecture cfg (target_arch = riscv64 / x86_64)
+// Level 2: platform cfg (plat_qemu_riscv / plat_qemu_x86_64 / plat_vf2)
+#[cfg(not(any(target_arch = "riscv64", target_arch = "x86_64")))]
+compile_error!("Unsupported architecture. Expected target_arch = riscv64 or x86_64");
+
 #[cfg(not(any(plat_qemu_riscv, plat_vf2, plat_qemu_x86_64)))]
 compile_error!("No valid platform selected! Use --cfg plat_qemu_riscv, --cfg plat_vf2, or --cfg plat_qemu_x86_64");
+
+#[cfg(any(
+    all(plat_qemu_riscv, plat_vf2),
+    all(plat_qemu_riscv, plat_qemu_x86_64),
+    all(plat_vf2, plat_qemu_x86_64)
+))]
+compile_error!("Multiple platforms selected! Select exactly one platform cfg");
+
+#[cfg(all(target_arch = "x86_64", not(plat_qemu_x86_64)))]
+compile_error!("ARCH x86_64 requires PLATFORM=plat_qemu_x86_64");
+
+#[cfg(all(target_arch = "riscv64", not(any(plat_qemu_riscv, plat_vf2))))]
+compile_error!("ARCH riscv64 requires PLATFORM=plat_qemu_riscv or plat_vf2");
 
 #[macro_use]
 pub mod console;
@@ -19,9 +37,9 @@ pub use traits::{
     PowerIf, TimeIf,
 };
 
-#[cfg(plat_qemu_x86_64)]
+#[cfg(target_arch = "x86_64")]
 mod common_x86_64;
-#[cfg(any(plat_qemu_riscv, plat_vf2))]
+#[cfg(target_arch = "riscv64")]
 mod common_riscv;
 mod logger;
 #[cfg(plat_qemu_riscv)]
@@ -51,13 +69,13 @@ pub use qemu_riscv::config;
 pub use starfive2_riscv::config;
 
 // Export MachineInfo type based on platform
-#[cfg(plat_qemu_x86_64)]
+#[cfg(target_arch = "x86_64")]
 pub type PlatformInfo = common_x86_64::basic::MachineInfo;
-#[cfg(any(plat_qemu_riscv, plat_vf2))]
+#[cfg(target_arch = "riscv64")]
 pub type PlatformInfo = common_riscv::basic::MachineInfo;
 
 // Export APIC functionality for x86-64
-#[cfg(plat_qemu_x86_64)]
+#[cfg(target_arch = "x86_64")]
 pub mod apic {
     pub use crate::common_x86_64::apic::*;
 }
@@ -67,12 +85,12 @@ pub mod apic {
 // ============================================================================
 
 /// Set a one-shot timer
-#[cfg(any(plat_qemu_riscv, plat_vf2))]
+#[cfg(target_arch = "riscv64")]
 pub fn set_timer(time: usize) {
     crate::common_riscv::sbi::set_timer(time);
 }
 
-#[cfg(plat_qemu_x86_64)]
+#[cfg(target_arch = "x86_64")]
 pub fn set_timer(time: usize) {
     crate::common_x86_64::services::set_timer(time);
 }
@@ -132,14 +150,15 @@ pub fn platform_init_with_boot_info(hart_id: usize, boot_info: usize) {
     unsafe { main(hart_id) }
 }
 
+#[deprecated(note = "use platform_init_with_boot_info")]
 pub fn platform_init(hart_id: usize, dtb: usize) {
     platform_init_with_boot_info(hart_id, dtb)
 }
 
-#[cfg(plat_qemu_x86_64)]
+#[cfg(target_arch = "x86_64")]
 fn init_other_hart(_hart_id: usize) {}
 
-#[cfg(any(plat_qemu_riscv, plat_vf2))]
+#[cfg(target_arch = "riscv64")]
 fn init_other_hart(hart_id: usize) {
     let start_hart = if cfg!(plat_vf2) { 1 } else { 0 };
     for i in start_hart..::config::CPU_NUM {
@@ -152,10 +171,11 @@ fn init_other_hart(hart_id: usize) {
 
 unsafe extern "C" {
     fn main(hart_id: usize);
-    #[cfg(any(plat_qemu_riscv, plat_vf2))]
+    #[cfg(target_arch = "riscv64")]
     fn _start_secondary();
 }
 
+#[deprecated(note = "use platform_boot_info_ptr")]
 pub fn platform_dtb_ptr() -> usize {
     platform_boot_info_ptr()
 }

@@ -6,7 +6,9 @@ use spin::Once;
 use crate::common_riscv::basic::MachineInfo as RiscvMachineInfo;
 use crate::traits::{ConsoleIf, MachineInfo, MiscIf, PowerIf, PlatformCallRet};
 
-pub static DTB: Once<usize> = Once::new();
+pub static BOOT_INFO: Once<usize> = Once::new();
+#[deprecated(note = "use BOOT_INFO")]
+pub use BOOT_INFO as DTB;
 
 /// QEMU RISC-V platform type
 pub struct QemuRiscvPlatform;
@@ -101,15 +103,15 @@ impl MiscIf for QemuRiscvPlatform {
     type MachineInfo = RiscvMachineInfo;
 
     fn init_boot_info(ptr: usize) {
-        DTB.call_once(|| ptr);
+        BOOT_INFO.call_once(|| ptr);
     }
 
     fn boot_info_ptr() -> usize {
-        *DTB.get().unwrap_or(&0)
+        *BOOT_INFO.get().unwrap_or(&0)
     }
 
     fn machine_info() -> Self::MachineInfo {
-        crate::common_riscv::basic::machine_info_from_dtb(*DTB.get().unwrap())
+        crate::common_riscv::basic::machine_info_from_boot_info(*BOOT_INFO.get().unwrap())
     }
 }
 

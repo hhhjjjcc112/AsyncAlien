@@ -5,7 +5,12 @@ target = "riscv64gc-unknown-none-elf"
 # 使用我们的 linker script 来进行链接
 [target.riscv64gc-unknown-none-elf]
 rustflags = [
-    "-Clink-arg=-Tuser/apps/linker.ld",
+    "-Clink-arg=-Tuser/apps/linker/riscv64.ld",
+]
+
+[target.x86_64-unknown-none]
+rustflags = [
+    "-Clink-arg=-Tuser/apps/linker/x86_64.ld",
 ]
 
 

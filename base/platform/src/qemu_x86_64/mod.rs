@@ -91,6 +91,13 @@ impl MiscIf for QemuX86Platform {
 
     fn init_boot_info(ptr: usize) {
         BOOT_INFO.call_once(|| ptr);
+
+        // Discover x86 peripherals via ACPI tables (MADT/HPET).
+        crate::common_x86_64::acpi::init();
+        for dev in crate::common_x86_64::acpi::device_list().entries.iter() {
+            // 早期阶段优先直接输出，避免 logger 尚未初始化导致日志丢失。
+            println!("ACPI device: {} @ {:#x} size={:#x}", dev.name, dev.base, dev.size);
+        }
         
         // Initialize APIC
         apic::init_primary_apic();

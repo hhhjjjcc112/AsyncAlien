@@ -1,15 +1,27 @@
 use alloc::collections::VecDeque;
 
-use basic::io::SafeIORegion;
-
 use crate::bus::CommonDeviceInfo;
 
 pub struct PciBus {
     common_devices: VecDeque<PciCommonDevice>,
 }
-#[derive(Debug)]
+
+#[derive(Debug, Clone, Copy)]
+pub struct PciDeviceId {
+    pub bus: u8,
+    pub device: u8,
+    pub function: u8,
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub class_code: u8,
+    pub subclass: u8,
+    pub prog_if: u8,
+    pub header_type: u8,
+}
+
+#[derive(Debug, Clone)]
 pub struct PciCommonDevice {
-    io_region: SafeIORegion,
+    dev_id: PciDeviceId,
     info: CommonDeviceInfo,
 }
 
@@ -25,5 +37,23 @@ impl PciBus {
 
     pub fn register_driver(&mut self) {
         // self.drivers.push(driver);
+    }
+
+    pub fn common_devices(&self) -> &VecDeque<PciCommonDevice> {
+        &self.common_devices
+    }
+}
+
+impl PciCommonDevice {
+    pub fn new(dev_id: PciDeviceId, info: CommonDeviceInfo) -> Self {
+        Self { dev_id, info }
+    }
+
+    pub fn dev_id(&self) -> PciDeviceId {
+        self.dev_id
+    }
+
+    pub fn info(&self) -> &CommonDeviceInfo {
+        &self.info
     }
 }
