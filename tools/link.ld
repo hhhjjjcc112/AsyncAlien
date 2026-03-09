@@ -1,4 +1,4 @@
-OUTPUT_ARCH(riscv)
+OUTPUT_ARCH({{arch}})
 ENTRY(_start)
 BASE_ADDRESS = 0x80200000;
 

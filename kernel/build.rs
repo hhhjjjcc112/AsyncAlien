@@ -42,13 +42,14 @@ fn main() {
         );
     }
     
-    // Choose linker script based on platform
-    let ld_path = if platform == "plat_qemu_x86_64" {
-        Path::new("../tools/link_x86_64.ld")
-    } else {
-        Path::new("../tools/link.ld")
-    };
+    let ld_path = Path::new("../tools/link.ld");
     let ld = fs::read_to_string(ld_path).unwrap();
+    // 根据架构替换链接脚本中的占位符
+    let ld = if target_arch == "x86_64" {
+        ld.replace("{{arch}}", "i386:x86-64")
+    } else {
+        ld.replace("{{arch}}", "riscv")
+    };
     
     if platform == "plat_vf2" {
         let base_addr = 0x40200000;

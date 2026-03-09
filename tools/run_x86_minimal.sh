@@ -11,7 +11,7 @@ SMP="${SMP:-2}"
 MEMORY_SIZE="${MEMORY_SIZE:-2048M}"
 LOG_LEVEL="${LOG:-}"
 ENABLE_NET="${NET:-n}"
-X86_CPU="${X86_CPU:-max,+x2apic,+uintr}"
+X86_CPU="${X86_CPU:-max,+x2apic}"
 
 echo "[minimal-x86] build kernel only"
 make build ARCH=x86_64 LOG="$LOG_LEVEL"
