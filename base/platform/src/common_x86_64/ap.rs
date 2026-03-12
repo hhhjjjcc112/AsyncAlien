@@ -1,6 +1,4 @@
-//! AP (Application Processor) startup for x86-64
-//!
-//! Handles starting secondary CPUs using INIT-SIPI-SIPI sequence.
+//! x86_64 从核启动流程。
 
 use core::{arch::global_asm, time::Duration};
 
@@ -12,19 +10,19 @@ use crate::common_x86_64::{
     time::busy_wait,
 };
 
-/// AP startup page index (at 0x6000)
+/// AP 启动页索引（0x6000）。
 const AP_START_PAGE_IDX: usize = 6;
-/// AP startup page physical address
+/// AP 启动页物理地址。
 const AP_START_PAGE_ADDR: usize = AP_START_PAGE_IDX * 0x1000;
 
-/// Maximum number of CPUs supported
+/// 支持的最大 CPU 数。
 const MAX_CPUS: usize = 32;
 
-/// AP startup stacks
+/// AP 启动栈区。
 #[unsafe(link_section = ".bss.stack")]
 static mut AP_STARTUP_STACKS: [u8; BOOT_STACK_SIZE * MAX_CPUS] = [0; BOOT_STACK_SIZE * MAX_CPUS];
 
-// Include AP startup assembly
+// 引入 AP 启动汇编。
 global_asm!(
     include_str!("ap_start.S"),
     start_page_paddr = const AP_START_PAGE_ADDR,
@@ -36,7 +34,7 @@ unsafe extern "C" {
     fn ap_entry32();
 }
 
-/// Setup the AP startup page with code and stack pointer
+/// 设置 AP 启动页代码与栈顶。
 fn setup_startup_page(stack_top: usize) {
     let start_page = unsafe {
         core::slice::from_raw_parts_mut(
@@ -45,7 +43,7 @@ fn setup_startup_page(stack_top: usize) {
         )
     };
 
-    // Copy AP startup code to the low memory page
+    // 将 AP 启动代码拷到低地址页。
     unsafe {
         core::ptr::copy_nonoverlapping(
             ap_start as *const u8,
@@ -54,19 +52,19 @@ fn setup_startup_page(stack_top: usize) {
         )
     }
 
-    // Set AP entry point and stack top at the end of the page
+    // 在页尾写入 AP 入口和栈顶。
     start_page[0x1000 / 8 - 2] = stack_top as u64;
     start_page[0x1000 / 8 - 1] = ap_entry32 as *const () as usize as u64;
 }
 
-/// Get number of logical CPUs
+/// 获取逻辑 CPU 数量。
 pub fn cpu_num() -> usize {
     raw_cpuid::CpuId::new()
         .get_feature_info()
         .map_or(1, |finfo| finfo.max_logical_processor_ids() as usize)
 }
 
-/// Start all AP (Application Processor) CPUs
+/// 启动全部 AP。
 pub fn start_aps() {
     let num_cpus = cpu_num().min(MAX_CPUS).min(CPU_NUM);
     log::info!("Starting {} APs...", num_cpus.saturating_sub(1));
@@ -88,22 +86,22 @@ pub fn start_aps() {
         };
 
         unsafe {
-            // Send INIT IPI
+            // 发送 INIT IPI。
             apic.send_init_ipi(target_apic_id);
             busy_wait(Duration::from_millis(10)); // 10ms
 
-            // Send SIPI (twice for reliability)
+            // 发送 SIPI（两次提高可靠性）。
             apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
             busy_wait(Duration::from_micros(200)); // 200us
             apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
         }
 
-        // Wait for AP to start
+        // 等待 AP 拉起。
         busy_wait(Duration::from_millis(10));
     }
 }
 
-/// Start a specific secondary CPU
+/// 启动指定从核。
 pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) -> (isize, isize) {
     if cpu_id >= MAX_CPUS || cpu_id >= CPU_NUM {
         return (-1, 0);

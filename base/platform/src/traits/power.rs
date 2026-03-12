@@ -1,50 +1,28 @@
-//! Power management interface
-//!
-//! Provides system power control and SMP boot capabilities.
+//! 电源与多核启动接口。
 
-use super::PlatformCallRet;
-
-/// Power management trait
-///
-/// Platform implementations provide power control and multi-core boot.
+/// 电源管理抽象。
 pub trait PowerIf {
-    /// System shutdown (never returns)
-    fn system_off() -> !;
+    /// 关机，不返回。
+    fn shutdown() -> !;
 
-    /// System reboot (never returns)
-    fn system_reboot() -> ! {
-        // Default: just shutdown
-        Self::system_off()
+    /// 重启，不返回。
+    fn reboot() -> ! {
+        // 默认退化为关机。
+        Self::shutdown()
     }
 
-    /// Bootstrap a secondary CPU core
-    ///
-    /// Arguments:
-    /// - `cpu_id`: The logical CPU ID (0, 1, ..., N-1)
-    /// - `start_addr`: The physical address where the CPU should start executing
-    /// - `opaque`: Optional argument passed to the secondary CPU
-    ///
-    /// Returns: PlatformCallRet with error code and value
-    ///
-    /// On RISC-V: Uses SBI HSM hart_start
-    /// On x86-64: Uses INIT-SIPI-SIPI sequence via APIC
-    fn cpu_boot(cpu_id: usize, start_addr: usize, opaque: usize) -> PlatformCallRet;
+    /// 启动从核。
+    fn start_secondary_cpu(cpu_id: usize, start_addr: usize, opaque: usize);
 
-    /// Get the number of CPU cores available
-    fn cpu_num() -> usize;
+    /// 返回可用 CPU 数量。
+    fn cpu_count() -> usize;
 
-    /// Get the current CPU ID
+    /// 返回当前 CPU ID。
     fn current_cpu_id() -> usize;
 
-    /// Halt the current CPU (wait for interrupt)
-    fn cpu_halt();
+    /// 停机等待中断。
+    fn halt();
 
-    /// Remote instruction cache fence
-    ///
-    /// Flush instruction cache on specified CPUs.
-    /// On RISC-V: FENCE.I via SBI RFENCE
-    /// On x86-64: No-op (x86 has coherent I-cache)
-    fn remote_fence_i(cpu_mask: usize, cpu_mask_base: usize) -> PlatformCallRet {
-        PlatformCallRet::success(0)
-    }
+    /// 刷新目标 CPU 的指令可见性（x86 上通常为空操作）。
+    fn flush_cache(cpu_mask: usize, cpu_mask_base: usize);
 }

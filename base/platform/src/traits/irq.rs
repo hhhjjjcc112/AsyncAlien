@@ -1,49 +1,43 @@
-//! Interrupt request (IRQ) handling interface
-//!
-//! Provides interrupt management abstraction.
+//! IRQ 管理接口。
 
-/// Target specification for inter-processor interrupts (IPIs)
+/// IPI 目标描述。
 #[derive(Debug, Clone, Copy)]
 pub enum IpiTarget {
-    /// Send to a specific CPU
+    /// 单播到指定 CPU。
     Unicast { cpu_id: usize },
-    /// Send to all CPUs except self
+    /// 广播，可选择排除当前 CPU。
     Broadcast { exclude_self: bool },
-    /// Send to CPUs matching mask
+    /// 按掩码发送。
     Multicast { mask: usize, mask_base: usize },
 }
 
-/// IRQ management trait
-///
-/// Platform implementations provide interrupt controller abstraction.
+/// IRQ 控制器抽象。
 pub trait IrqIf {
-    /// The maximum IRQ number supported
+    /// 支持的最大 IRQ 号。
     const MAX_IRQ_NUM: usize;
 
-    /// Enable or disable a specific IRQ line
+    /// 开关指定 IRQ 线。
     fn set_enable(irq: usize, enabled: bool);
 
-    /// Get the IRQ number currently being handled (if any)
-    /// Called during interrupt handling to determine which IRQ triggered
+    /// 获取当前正在处理的 IRQ 号。
     fn current_irq() -> Option<usize>;
 
-    /// Acknowledge/complete an IRQ (end of interrupt)
+    /// 完成一次 IRQ 处理（EOI）。
     fn ack_irq(irq: usize);
 
-    /// Send an inter-processor interrupt (IPI)
+    /// 发送 IPI。
     fn send_ipi(target: IpiTarget);
 
-    /// Initialize the interrupt controller for primary CPU
+    /// 初始化主核 IRQ 控制器。
     fn init_primary();
 
-    /// Initialize the interrupt controller for secondary CPU
+    /// 初始化从核 IRQ 控制器。
     fn init_secondary(cpu_id: usize);
 
-    /// Dispatch and handle the current interrupt
-    /// Returns the IRQ number that was handled, if any
+    /// 分发当前中断，返回已处理的 IRQ 号。
     fn dispatch() -> Option<usize> {
         if let Some(irq) = Self::current_irq() {
-            // Handle the IRQ here (call registered handler)
+            // 具体处理流程由上层中断框架负责。
             Self::ack_irq(irq);
             Some(irq)
         } else {

@@ -1,6 +1,4 @@
-//! Local APIC and I/O APIC initialization and management for x86-64
-//!
-//! Supports both xAPIC and x2APIC modes.
+//! x86_64 的 Local APIC 与 I/O APIC 管理。
 
 use core::mem::MaybeUninit;
 
@@ -26,13 +24,13 @@ fn cpu_has_x2apic() -> bool {
         .map_or(false, |finfo| finfo.has_x2apic())
 }
 
-/// Initialize the Local APIC for the primary (BSP) CPU
+/// 初始化主核（BSP）的 Local APIC。
 pub fn init_primary_apic() {
     log::info!("Initializing Primary APIC...");
     let is_x2apic = cpu_has_x2apic();
     unsafe {
         IS_X2APIC = is_x2apic;
-        // Disable 8259A PIC
+        // 关闭 8259A PIC。
         core::arch::asm!(
             "out dx, al",
             in("dx") 0x21_u16,
@@ -67,42 +65,42 @@ pub fn init_primary_apic() {
         LOCAL_APIC.write(apic);
     }
 
-    // Initialize I/O APIC
+    // 初始化 I/O APIC。
     let io_apic_base = crate::common_x86_64::acpi::device_info().ioapic_base;
     log::info!("Initializing I/O APIC at {:#x}...", io_apic_base);
     let io_apic = unsafe { IoApic::new((io_apic_base as u64) + (PHYS_VIRT_OFFSET as u64)) };
     IO_APIC.call_once(|| Mutex::new(io_apic));
 }
 
-/// Initialize APIC for secondary (AP) CPUs
+/// 初始化从核（AP）的 APIC。
 pub fn init_secondary_apic() {
     unsafe {
         get_local_apic().enable();
     }
 }
 
-/// Get mutable reference to local APIC
+/// 获取 Local APIC 可变引用。
 ///
 /// # Safety
-/// Must be called after init_primary_apic or init_secondary_apic
+/// 必须在 APIC 初始化后调用。
 pub unsafe fn get_local_apic() -> &'static mut LocalApic {
     #[allow(static_mut_refs)]
     unsafe { LOCAL_APIC.assume_init_mut() }
 }
 
-/// Check if running in x2APIC mode
+/// 是否运行在 x2APIC 模式。
 pub fn is_x2apic() -> bool {
     unsafe { IS_X2APIC }
 }
 
-/// Get current CPU ID from APIC
+/// 获取当前 CPU ID。
 pub fn current_cpu_id() -> usize {
     raw_cpuid::CpuId::new()
         .get_feature_info()
         .map_or(0, |finfo| finfo.initial_local_apic_id() as usize)
 }
 
-/// Send End-Of-Interrupt to APIC
+/// 发送 APIC EOI。
 pub fn eoi() {
     unsafe {
         get_local_apic().end_of_interrupt();
@@ -110,14 +108,12 @@ pub fn eoi() {
 }
 
 // ============================================================================
-// I/O APIC IRQ Management
+// I/O APIC IRQ 管理
 // ============================================================================
 
-/// Enable or disable an IRQ in the I/O APIC
-/// 
-/// For vectors below APIC_TIMER_VECTOR, this controls I/O APIC routing.
+/// 开关 I/O APIC 的 IRQ 路由。
 pub fn set_irq_enable(vector: usize, enabled: bool) {
-    // Don't affect Local APIC interrupts
+    // 不影响 Local APIC 自身中断。
     if vector < vectors::APIC_TIMER_VECTOR as usize {
         if let Some(ioapic) = IO_APIC.get() {
             let mut ioapic = ioapic.lock();
@@ -132,7 +128,7 @@ pub fn set_irq_enable(vector: usize, enabled: bool) {
     }
 }
 
-/// Get raw APIC ID for IPI targeting
+/// 获取用于 IPI 目标的原始 APIC ID。
 pub fn raw_apic_id(cpu_id: u8) -> u32 {
     if is_x2apic() {
         cpu_id as u32
@@ -141,7 +137,7 @@ pub fn raw_apic_id(cpu_id: u8) -> u32 {
     }
 }
 
-/// Send IPI to another CPU
+/// 向指定 CPU 发送 IPI。
 pub fn send_ipi(target_cpu: usize, vector: u8) {
     let apic_id = raw_apic_id(target_cpu as u8);
     unsafe {
@@ -149,14 +145,14 @@ pub fn send_ipi(target_cpu: usize, vector: u8) {
     }
 }
 
-/// Send IPI to self
+/// 向自身发送 IPI。
 pub fn send_ipi_self(vector: u8) {
     unsafe {
         get_local_apic().send_ipi_self(vector);
     }
 }
 
-/// Send IPI to all other CPUs
+/// 向除自身外的所有 CPU 发送 IPI。
 pub fn send_ipi_all_excluding_self(vector: u8) {
     use x2apic::lapic::IpiAllShorthand;
     unsafe {
@@ -164,7 +160,7 @@ pub fn send_ipi_all_excluding_self(vector: u8) {
     }
 }
 
-/// Get the I/O APIC maximum redirection entry count
+/// 获取 I/O APIC 最大重定向项数。
 pub fn ioapic_max_entries() -> u8 {
     if let Some(ioapic) = IO_APIC.get() {
         let mut ioapic = ioapic.lock();
@@ -174,18 +170,16 @@ pub fn ioapic_max_entries() -> u8 {
     }
 }
 
-/// Configure I/O APIC redirection entry for an IRQ
-/// 
-/// Maps a hardware IRQ to a specific interrupt vector and target CPU.
+/// 配置 I/O APIC 重定向项。
 pub fn configure_irq(irq: u8, vector: u8, dest_cpu: u8) {
     if let Some(ioapic) = IO_APIC.get() {
         let mut ioapic = ioapic.lock();
         unsafe {
-            // Set up the redirection entry
+            // 配置重定向项。
             let mut entry = ioapic.table_entry(irq);
             entry.set_vector(vector);
             entry.set_dest(dest_cpu);
-            // Set delivery mode to Fixed (0), physical destination
+            // 投递模式为 Fixed，物理目标。
             entry.set_mode(x2apic::ioapic::IrqMode::Fixed);
             entry.set_flags(
                 x2apic::ioapic::IrqFlags::LEVEL_TRIGGERED 

@@ -1,75 +1,41 @@
-//! Miscellaneous platform interface
-//!
-//! Provides boot information and machine descriptors.
+//! 杂项平台接口（启动信息与机器信息）。
 
 use core::{fmt::Debug, ops::Range};
 
-/// Platform call return value
-#[derive(Debug, Copy, Clone, Default)]
-pub struct PlatformCallRet {
-    /// Error code (0 = success)
-    pub error: isize,
-    /// Return value
-    pub value: isize,
-}
-
-impl PlatformCallRet {
-    /// Create a success return
-    pub const fn success(value: isize) -> Self {
-        Self { error: 0, value }
-    }
-
-    /// Create an error return
-    pub const fn error(error: isize) -> Self {
-        Self { error, value: 0 }
-    }
-
-    /// Check if the call succeeded
-    pub const fn is_success(&self) -> bool {
-        self.error == 0
-    }
-}
-
-/// Machine information trait
-///
-/// Common interface for machine descriptors across platforms.
+/// 机器信息抽象。
 pub trait MachineInfo: Clone + Debug + Send + Sync {
-    /// Get memory start address
+    /// 内存起始地址。
     fn memory_start(&self) -> usize;
 
-    /// Get memory size
+    /// 内存总大小。
     fn memory_size(&self) -> usize;
 
-    /// Get memory range
+    /// 内存地址区间。
     fn memory_range(&self) -> Range<usize> {
         self.memory_start()..self.memory_start() + self.memory_size()
     }
 
-    /// Get number of CPUs
+    /// CPU 数量。
     fn cpu_count(&self) -> usize;
 
-    /// Get initrd range (if any)
+    /// initrd 区间（若存在）。
     fn initrd(&self) -> Option<Range<usize>>;
 
-    /// Get boot arguments (if any)
+    /// 启动参数（若存在）。
     fn bootargs(&self) -> Option<&str>;
 }
 
-/// Miscellaneous platform operations trait
-///
-/// Provides boot/init related operations that don't fit other categories.
+/// 启动阶段相关杂项操作。
 pub trait MiscIf {
-    /// Associated machine info type
+    /// 对应的平台机器信息类型。
     type MachineInfo: MachineInfo;
 
-    /// Initialize boot information
-    /// - On RISC-V: parse DTB (device tree blob)
-    /// - On x86-64: parse Multiboot info
+    /// 解析并初始化启动信息。
     fn init_boot_info(ptr: usize);
 
-    /// Get boot information pointer (DTB or Multiboot address)
+    /// 返回启动信息指针（DTB 或 Multiboot）。
     fn boot_info_ptr() -> usize;
 
-    /// Get basic machine information
+    /// 返回基础机器信息。
     fn machine_info() -> Self::MachineInfo;
 }

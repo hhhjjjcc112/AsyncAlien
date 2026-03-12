@@ -7,22 +7,22 @@ const PLIC: &str = "plic";
 const CLINT: &str = "clint";
 const CHOSE: &str = "chosen";
 
-/// Machine basic information
+/// RISC-V 机器基础信息。
 #[derive(Clone)]
 pub struct MachineInfo {
-    /// Machine model
+    /// 机器型号。
     pub model: [u8; 32],
-    /// Number of CPUs
+    /// CPU 数量。
     pub smp: usize,
-    /// Memory range
+    /// 内存区间。
     pub memory: Range<usize>,
-    /// PLIC information
+    /// PLIC 区间。
     pub plic: Range<usize>,
-    /// CLINT information
+    /// CLINT 区间。
     pub clint: Range<usize>,
-    /// Initrd information
+    /// initrd 区间。
     pub initrd: Option<Range<usize>>,
-    /// Kernel command line
+    /// 内核启动参数。
     pub bootargs: Option<[u8; 255]>,
     pub bootargs_len: usize,
 }
@@ -67,7 +67,7 @@ pub fn machine_info_from_dtb(ptr: usize) -> MachineInfo {
     machine_info_from_boot_info(ptr)
 }
 
-// Walk the device-tree and get machine information
+// 遍历设备树并提取机器信息。
 fn walk_dt(fdt: Fdt) -> MachineInfo {
     let mut machine = MachineInfo {
         model: [0; 32],

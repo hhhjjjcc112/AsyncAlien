@@ -120,7 +120,7 @@ pub fn build_kernel_address_space(memory_end: usize) {
     KERNEL_MAP_MAX.store(memory_end, core::sync::atomic::Ordering::SeqCst);
 }
 
-/// Return the physical address of the root page table.
+/// 返回根页表物理地址。
 pub fn kernel_pgd() -> usize {
     KERNEL_SPACE.read().root_paddr()
 }
@@ -148,15 +148,8 @@ pub fn query_kernel_space(addr: usize) -> Option<usize> {
         .map(|(phy_addr, _, _)| phy_addr.as_usize())
 }
 
-/// Layout:
-///
-/// TRAMPOLINE
-/// |   |
-/// |   |
-/// Guard Page
-/// |   |
-/// |   |
-/// Guard Page
+/// 内核栈布局（高地址到低地址）：
+/// 跳板页 -> 保护页 -> 栈区 -> 保护页。
 pub fn map_kstack_for_task(task_id: usize, pages: usize) -> AlienResult<usize> {
     let kstack_base = TRAMPOLINE - (task_id + 1) * (pages + 1) * FRAME_SIZE;
     let kstack_lower = kstack_base + FRAME_SIZE;
@@ -221,7 +214,7 @@ impl VirtDomainArea {
 pub fn map_domain_region(size: usize) -> VirtDomainArea {
     assert_eq!(size % FRAME_SIZE, 0);
     let virt_start = KERNEL_MAP_MAX.fetch_add(size, core::sync::atomic::Ordering::Relaxed);
-    // alloc physical memory and map to virtual memory
+    // 分配物理页并映射到内核虚拟地址。
     log::error!(
         "[alloc_free_module_region] virt_start: {:#x}, size: {:#x}",
         virt_start,
@@ -239,7 +232,7 @@ pub fn map_domain_region(size: usize) -> VirtDomainArea {
         phy_frames,
     );
     kernel_space.map(VmAreaType::VmArea(vm_area)).unwrap();
-    // flush TLB
+    // 刷新 TLB。
     sfence_vma_all();
     VirtDomainArea::new(virt_start, size)
 }
@@ -263,7 +256,7 @@ pub fn set_memory_x(virt_addr: usize, numpages: usize) -> AlienResult<()> {
             .unwrap();
         addr += FRAME_SIZE;
     }
-    // flush TLB
+    // 刷新 TLB。
     sfence_vma_all();
     Ok(())
 }

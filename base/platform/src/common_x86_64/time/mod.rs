@@ -1,6 +1,4 @@
-//! Time subsystem for x86-64
-//!
-//! Provides TSC-based timing, RTC wallclock, and APIC timer support.
+//! x86_64 时间子系统。
 
 pub mod apic_timer;
 pub mod rtc;
@@ -15,14 +13,14 @@ pub use tsc::{
     NANOS_PER_TICK,
 };
 
-/// Initialize all time-related subsystems
+/// 初始化全部时间相关子系统。
 pub fn init_time() {
     log::info!("Initializing Time Subsystem...");
     init_tsc();
     init_rtc();
 }
 
-/// Busy-wait for a specified duration using TSC
+/// 使用 TSC 自旋等待指定时长。
 pub fn busy_wait(duration: Duration) {
     let start = duration_since_tsc_init();
     while duration_since_tsc_init() - start < duration {
@@ -30,7 +28,7 @@ pub fn busy_wait(duration: Duration) {
     }
 }
 
-/// Get current time in nanoseconds since boot
+/// 获取开机以来的纳秒时间。
 pub fn current_time_nanos() -> u64 {
     let ticks = current_ticks();
     ticks_to_nanos(ticks)

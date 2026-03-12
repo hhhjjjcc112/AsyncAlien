@@ -1,43 +1,40 @@
-//! x86-64 Boot support
-//!
-//! Provides Multiboot boot entry and early initialization.
+//! x86_64 启动支持。
 
 use core::arch::global_asm;
 
 use x86_64::registers::control::{Cr0Flags, Cr4Flags, EferFlags};
 
-/// Multiboot header flags (memory info, address fields)
+/// Multiboot 头标志（内存与地址字段）。
 const MULTIBOOT_HEADER_FLAGS: usize = 0x0001_0002;
-/// Multiboot header magic
+/// Multiboot 头魔数。
 const MULTIBOOT_HEADER_MAGIC: usize = 0x1BAD_B002;
-/// Multiboot bootloader magic (passed by bootloader)
+/// 引导器传入的 Multiboot 魔数。
 pub(crate) const MULTIBOOT_BOOTLOADER_MAGIC: usize = 0x2BAD_B002;
 
-/// CR0 flags: Protected mode, Paging, FPU settings
+/// CR0 位：保护模式、分页、FPU 相关。
 const CR0: u64 = Cr0Flags::PROTECTED_MODE_ENABLE.bits()
     | Cr0Flags::PAGING.bits()
     | Cr0Flags::MONITOR_COPROCESSOR.bits()
     | Cr0Flags::NUMERIC_ERROR.bits()
     | Cr0Flags::WRITE_PROTECT.bits();
 
-/// CR4 flags: PAE, Page Global Enable
+/// CR4 位：PAE 与全局页。
 const CR4: u64 = Cr4Flags::PHYSICAL_ADDRESS_EXTENSION.bits() | Cr4Flags::PAGE_GLOBAL.bits();
 
-/// EFER flags: Long Mode Enable, NX Enable
+/// EFER 位：长模式与 NX。
 const EFER: u64 = EferFlags::LONG_MODE_ENABLE.bits() | EferFlags::NO_EXECUTE_ENABLE.bits();
 
-/// Boot stack size
+/// 启动栈大小。
 pub const BOOT_STACK_SIZE: usize = 0x40000;
 
-/// Physical to virtual address offset
-/// For now, use identity mapping (offset = 0)
+/// 物理到虚拟地址偏移，当前使用恒等映射。
 pub const PHYS_VIRT_OFFSET: u64 = 0;
 
-/// Boot stack
+/// 启动栈。
 #[unsafe(link_section = ".bss.stack")]
 static mut BOOT_STACK: [u8; BOOT_STACK_SIZE] = [0; BOOT_STACK_SIZE];
 
-// Include boot assembly
+// 引入启动汇编。
 global_asm!(
     include_str!("multiboot.S"),
     mb_magic = const MULTIBOOT_BOOTLOADER_MAGIC,
@@ -54,27 +51,27 @@ global_asm!(
     efer = const EFER,
 );
 
-/// Get current CPU ID from APIC
+/// 读取当前 CPU ID。
 pub fn current_cpu_id() -> usize {
     raw_cpuid::CpuId::new()
         .get_feature_info()
         .map_or(0, |finfo| finfo.initial_local_apic_id() as usize)
 }
 
-/// Main entry point called from assembly
+/// 汇编入口转入 Rust 主入口。
 #[unsafe(no_mangle)]
 fn main_entry(magic: usize, mbi: usize) {
     // 早期启动标记，确认已进入 Rust 入口。
     println!("[x86_boot] main_entry magic={:#x} mbi={:#x}", magic, mbi);
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
-        // Call platform initialization
-        crate::platform_init_with_boot_info(current_cpu_id(), mbi);
+        // 进入平台初始化。
+        crate::platform_init(current_cpu_id(), mbi);
     } else {
         println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
     }
 }
 
-/// Secondary CPU entry point called from assembly
+/// 从核汇编入口。
 #[unsafe(no_mangle)]
 fn secondary_entry(_magic: usize) {
     crate::common_x86_64::apic::init_secondary_apic();

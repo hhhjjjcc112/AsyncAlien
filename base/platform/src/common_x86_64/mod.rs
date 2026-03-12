@@ -1,6 +1,4 @@
-//! Common x86-64 platform support
-//!
-//! This module provides shared functionality for all x86-64 platforms.
+//! x86_64 平台公共支持。
 
 pub mod ap;
 pub mod apic;

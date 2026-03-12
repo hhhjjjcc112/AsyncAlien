@@ -7,6 +7,7 @@ use crate::frame::FrameTracker;
 
 pub static INITRD_DATA: Mutex<Option<InitrdData>> = Mutex::new(None);
 
+/// 重定位后的 initrd 数据。
 pub struct InitrdData {
     frames: FrameTracker,
     size: usize,
@@ -26,7 +27,7 @@ pub(super) fn relocate_removable_data() {
         let size = end - start;
         let np = (size + FRAME_SIZE - 1) / FRAME_SIZE;
         let frame_tracker = crate::alloc_frame_trackers(np);
-        // copy data
+        // 将 boot_info 给出的 initrd 搬到可管理页帧中。
         unsafe {
             core::ptr::copy_nonoverlapping(
                 start as *const u8,

@@ -1,26 +1,24 @@
-//! Physical memory information interface
-//!
-//! Provides memory layout information abstraction.
+//! 物理内存信息接口。
 
 use core::ops::Range;
 
 bitflags::bitflags! {
-    /// Flags describing a physical memory region
+    /// 物理内存区域属性。
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct MemRegionFlags: usize {
-        /// Readable
+        /// 可读。
         const READ = 1 << 0;
-        /// Writable
+        /// 可写。
         const WRITE = 1 << 1;
-        /// Executable
+        /// 可执行。
         const EXECUTE = 1 << 2;
-        /// Device memory (MMIO)
+        /// 设备内存（MMIO）。
         const DEVICE = 1 << 4;
-        /// Uncacheable memory
+        /// 不可缓存。
         const UNCACHED = 1 << 5;
-        /// Reserved (not for general allocation)
+        /// 保留区（不参与通用分配）。
         const RESERVED = 1 << 6;
-        /// Free for allocation
+        /// 可分配。
         const FREE = 1 << 7;
     }
 }
@@ -31,24 +29,24 @@ impl Default for MemRegionFlags {
     }
 }
 
-/// Raw memory range: (start_address, size)
+/// 原始区间格式：`(start, size)`。
 pub type RawRange = (usize, usize);
 
-/// A physical memory region descriptor
+/// 物理内存区域描述。
 #[derive(Debug, Clone, Copy)]
 pub struct PhysMemRegion {
-    /// Start physical address
+    /// 起始物理地址。
     pub paddr: usize,
-    /// Size in bytes
+    /// 大小（字节）。
     pub size: usize,
-    /// Region flags
+    /// 区域属性。
     pub flags: MemRegionFlags,
-    /// Region name (for debugging)
+    /// 名称（调试用）。
     pub name: &'static str,
 }
 
 impl PhysMemRegion {
-    /// Create a new RAM region (readable, writable, allocatable)
+    /// 构造 RAM 区域（可读可写可分配）。
     pub const fn new_ram(start: usize, size: usize, name: &'static str) -> Self {
         Self {
             paddr: start,
@@ -58,7 +56,7 @@ impl PhysMemRegion {
         }
     }
 
-    /// Create a new MMIO region (readable, writable, device)
+    /// 构造 MMIO 区域（设备内存）。
     pub const fn new_mmio(start: usize, size: usize, name: &'static str) -> Self {
         Self {
             paddr: start,
@@ -68,7 +66,7 @@ impl PhysMemRegion {
         }
     }
 
-    /// Create a new reserved region (readable, writable, not allocatable)
+    /// 构造保留区域（不可分配）。
     pub const fn new_reserved(start: usize, size: usize, name: &'static str) -> Self {
         Self {
             paddr: start,
@@ -78,39 +76,37 @@ impl PhysMemRegion {
         }
     }
 
-    /// Get the address range
+    /// 返回地址区间。
     pub const fn range(&self) -> Range<usize> {
         self.paddr..(self.paddr + self.size)
     }
 }
 
-/// Physical memory information trait
-///
-/// Platform implementations provide memory layout information.
+/// 平台内存布局抽象。
 pub trait MemIf {
-    /// Physical-to-virtual offset for direct mapping
+    /// 物理地址到虚拟地址的线性映射偏移。
     const PHYS_VIRT_OFFSET: usize;
 
-    /// Returns all physical RAM ranges
+    /// 返回全部物理 RAM 区间。
     fn phys_ram_ranges() -> &'static [RawRange];
 
-    /// Returns reserved physical memory ranges (kernel, DTB, etc.)
+    /// 返回保留物理区间（内核、boot_info 等）。
     fn reserved_ranges() -> &'static [RawRange];
 
-    /// Returns MMIO (device memory) ranges
+    /// 返回 MMIO 区间。
     fn mmio_ranges() -> &'static [RawRange];
 
-    /// Translate physical address to virtual address
+    /// 物理地址转虚拟地址。
     fn phys_to_virt(paddr: usize) -> usize {
         paddr.wrapping_add(Self::PHYS_VIRT_OFFSET)
     }
 
-    /// Translate virtual address to physical address
+    /// 虚拟地址转物理地址。
     fn virt_to_phys(vaddr: usize) -> usize {
         vaddr.wrapping_sub(Self::PHYS_VIRT_OFFSET)
     }
 
-    /// Get total RAM size
+    /// 统计总 RAM 大小。
     fn total_ram_size() -> usize {
         Self::phys_ram_ranges().iter().map(|(_, size)| *size).sum()
     }

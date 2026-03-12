@@ -17,7 +17,7 @@ use page_table::{NotLeafPage, PagingIf, X64PTE, ENTRY_COUNT};
 #[cfg(not(target_arch = "x86_64"))]
 use page_table::{NotLeafPage, PagingIf, Rv64PTE, ENTRY_COUNT};
 
-// Architecture-specific type alias
+// 架构相关页表项类型别名。
 #[cfg(target_arch = "x86_64")]
 pub type ArchPTE = X64PTE;
 #[cfg(not(target_arch = "x86_64"))]

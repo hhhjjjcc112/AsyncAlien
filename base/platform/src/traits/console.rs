@@ -1,37 +1,30 @@
-//! Console I/O interface
-//!
-//! Provides character-level console input/output abstraction.
+//! 控制台字符 I/O 接口。
 
 use core::fmt::{Arguments, Write};
 
-/// Console I/O trait
-///
-/// Platform implementations provide basic character I/O through serial port,
-/// UART, or other console devices.
+/// 控制台 I/O 抽象。
 pub trait ConsoleIf {
-    /// Write a single byte to the console
+    /// 输出单字节。
     fn putchar(ch: u8);
 
-    /// Read a single byte from the console (non-blocking)
-    /// Returns None if no data available
+    /// 非阻塞读单字节，无数据返回 `None`。
     fn getchar() -> Option<u8>;
 
-    /// Write a string slice to the console
+    /// 输出字符串。
     fn write_str(s: &str) {
         for b in s.bytes() {
             Self::putchar(b);
         }
     }
 
-    /// Write a byte slice to the console
+    /// 输出字节切片。
     fn write_bytes(bytes: &[u8]) {
         for &b in bytes {
             Self::putchar(b);
         }
     }
 
-    /// Read bytes from the console into buffer (non-blocking)
-    /// Returns number of bytes actually read
+    /// 非阻塞读取到缓冲区，返回实际读到的字节数。
     fn read_bytes(buf: &mut [u8]) -> usize {
         let mut count = 0;
         for slot in buf.iter_mut() {

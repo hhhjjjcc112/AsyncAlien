@@ -19,22 +19,22 @@ macro_rules! println {
         concat!($fmt, "\n"), $($arg)*));
 }
 
-/// Print with color
+/// 彩色输出。
 ///
-/// The first argument is the color, which should be one of the following:
-/// - 30: Black
-/// - 31: Red
-/// - 32: Green
-/// - 33: Yellow
-/// - 34: Blue
-/// - 35: Magenta
-/// - 36: Cyan
-/// - 37: White
+/// 第一个参数为 ANSI 颜色码：
+/// - 30: 黑
+/// - 31: 红
+/// - 32: 绿
+/// - 33: 黄
+/// - 34: 蓝
+/// - 35: 洋红
+/// - 36: 青
+/// - 37: 白
 ///
-/// # Examples
+/// # 示例
 /// ```rust
 /// use platform::println_color;
-/// println_color!(31, "This is red");
+/// println_color!(31, "这是一条红色日志");
 /// ```
 #[macro_export]
 macro_rules! println_color {

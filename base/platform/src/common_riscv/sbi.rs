@@ -1,6 +1,4 @@
-//! RISC-V SBI (Supervisor Binary Interface) implementation
-//!
-//! This module is only compiled for RISC-V targets.
+//! RISC-V SBI（Supervisor Binary Interface）封装。
 
 #![allow(unused)]
 
@@ -43,21 +41,21 @@ pub fn console_getchar() -> char {
 #[repr(C)]
 #[derive(Debug)]
 pub struct SbiRet {
-    /// Error number
+    /// 错误码。
     pub error: isize,
-    /// Result value
+    /// 返回值。
     pub value: isize,
 }
 
-/// SBI basic extension
+/// SBI 基础扩展。
 pub const EXTENSION_BASE: usize = 0x10;
-/// SBI timer extension
+/// SBI 定时器扩展。
 pub const EXTENSION_TIMER: usize = 0x54494D45;
-/// SBI IPI extension
+/// SBI IPI 扩展。
 pub const EXTENSION_IPI: usize = 0x735049;
-/// SBI RFENCE extension
+/// SBI RFENCE 扩展。
 pub const EXTENSION_RFENCE: usize = 0x52464E43;
-/// SBI HSM extension
+/// SBI HSM 扩展。
 pub const EXTENSION_HSM: usize = 0x48534D;
 // pub const EXTENSION_SRST: usize = 0x53525354;
 const FUNCTION_HSM_HART_START: usize = 0x0;
@@ -65,7 +63,7 @@ const FUNCTION_HSM_HART_START: usize = 0x0;
 // const FUNCTION_HSM_HART_GET_STATUS: usize = 0x2;
 const FUNCTION_HSM_HART_SUSPEND: usize = 0x3;
 
-/// System Reset Extension
+/// SBI 复位扩展。
 pub const EXTENSION_SRST: usize = 0x53525354;
 
 #[inline(always)]
@@ -113,22 +111,19 @@ pub fn send_ipi(hart_mask: usize, hart_mask_base: usize) -> SbiRet {
 }
 
 pub fn remote_fence_i(hart_mask: usize, hart_mask_base: usize) -> SbiRet {
-    // Remote FENCE.I (FID #0)
+    // 远端 FENCE.I（FID #0）。
     sbi_call_5(EXTENSION_RFENCE, 0, [hart_mask, hart_mask_base, 0, 0, 0])
 }
 
-/// Any function wishes to use range of addresses (i.e. start_addr and size), have to abide by the below
-/// constraints on range parameters.
-/// The remote fence function acts as a full TLB flush if
-/// - start_addr and size are both 0
-/// - size is equal to 2^XLEN-1
+/// 远端栅栏使用地址范围时需满足 SBI 约束。
+/// 当 `start_addr=0,size=0` 或 `size=2^XLEN-1` 时，等价于全量 TLB 刷新。
 pub fn remote_sfence_vma(
     hart_mask: usize,
     hart_mask_base: usize,
     start_addr: usize,
     size: usize,
 ) -> SbiRet {
-    // Remote SFENCE.VMA (FID #1)
+    // 远端 SFENCE.VMA（FID #1）。
     sbi_call_5(
         EXTENSION_RFENCE,
         1,

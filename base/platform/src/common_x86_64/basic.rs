@@ -1,6 +1,4 @@
-//! Machine information for x86-64
-//!
-//! Provides machine configuration based on static config and runtime detection.
+//! x86_64 机器信息。
 
 use core::{fmt::Debug, ops::Range};
 
@@ -10,27 +8,26 @@ use super::boot::PHYS_VIRT_OFFSET;
 
 const BOOTARGS_MAX: usize = 255;
 
-/// Machine information structure
-/// 
-/// For x86-64, PLIC and CLINT are replaced with APIC concepts,
-/// but we keep the fields for interface compatibility.
+/// 机器信息结构。
+///
+/// x86_64 下保留 plic/clint 字段，仅用于接口兼容。
 #[derive(Clone)]
 pub struct MachineInfo {
-    /// Machine model name
+    /// 机器型号。
     pub model: [u8; 32],
-    /// Number of CPUs
+    /// CPU 数量。
     pub smp: usize,
-    /// Physical memory range
+    /// 物理内存区间。
     pub memory: Range<usize>,
-    /// Interrupt controller range (Local APIC on x86)
+    /// 中断控制器区间（x86 对应 Local APIC）。
     pub plic: Range<usize>,
-    /// Timer controller range (not used on x86, APIC timer is integrated)
+    /// 定时器控制区间（x86 由 APIC 定时器集成实现）。
     pub clint: Range<usize>,
-    /// Initrd range (if loaded by bootloader)
+    /// initrd 区间（若由引导器加载）。
     pub initrd: Option<Range<usize>>,
-    /// Boot arguments
+    /// 启动参数。
     pub bootargs: Option<[u8; 255]>,
-    /// Boot arguments length
+    /// 启动参数长度。
     pub bootargs_len: usize,
 }
 
@@ -55,16 +52,16 @@ impl Debug for MachineInfo {
     }
 }
 
-/// Create machine info from boot information (Multiboot pointer)
+/// 从 boot_info（Multiboot 指针）构建机器信息。
 pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
-    // Initialize memory regions from Multiboot
+    // 先根据 Multiboot 初始化内存区间。
     super::mem::init_from_multiboot(multiboot_ptr);
     let acpi_info = super::acpi::device_info();
     
-    // Get CPU count from CPUID
+    // 从 CPUID 获取 CPU 数。
     let smp = get_cpu_count();
     
-    // Build machine info
+    // 组装机器信息。
     let mut model = [0u8; 32];
     let name = b"qemu-x86_64-pc";
     model[..name.len()].copy_from_slice(name);
@@ -75,9 +72,9 @@ pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
         model,
         smp,
         memory: super::mem::memory_range(),
-        // Local APIC address from ACPI MADT.
+        // ACPI MADT 提供的 Local APIC 地址。
         plic: acpi_info.lapic_base..(acpi_info.lapic_base + 0x1000),
-        // IO APIC address from ACPI MADT (kept in CLINT slot for compatibility).
+        // ACPI MADT 提供的 IO APIC 地址（放入 clint 槽位做兼容）。
         clint: acpi_info.ioapic_base..(acpi_info.ioapic_base + 0x1000),
         initrd,
         bootargs,
@@ -145,7 +142,7 @@ fn parse_multiboot_extras(multiboot_ptr: usize) -> (Option<Range<usize>>, Option
     (initrd, bootargs, bootargs_len)
 }
 
-/// Get number of logical CPUs from CPUID
+/// 从 CPUID 获取逻辑 CPU 数。
 fn get_cpu_count() -> usize {
     raw_cpuid::CpuId::new()
         .get_feature_info()
