@@ -1,30 +1,24 @@
-# Alien riscv64初始化：
-BSP: OpenSBI -> _start -> platform_init -> main
+# Alien riscv64初始化（原有记录，保留）：
+BSP: OpenSBI -> _start -> main
 
 _start:
 - OpenSBI跳入内核入口，a0传入hart_id，a1传入boot_info_ptr（DTB地址）
 - 保存a0/a1到tp/gp，按hart号从全局栈数组切分本核启动栈
-- 完成最小上下文后调用platform_init(hart_id, boot_info)
-
-platform_init:
-- 清零.bss段
-- 保存boot_info指针并解析machine_info（riscv64下基于DTB）
-- 初始化日志
-- BSP循环调用SBI HSM hart_start启动其他hart，入口为_start_secondary
-- 调用main(hart_id)
+- 不再进入独立platform_init阶段，完成最小上下文后直接进入main(hart_id)
 
 main:
 - 通过STARTED原子变量区分BSP路径和AP路径
-- BSP路径：
-  - 读取platform_machine_info()获取平台在早期保存的机器信息（内存范围、CPU数量、基础设备信息）。
-  - mem::init_memory_system(machine_info.memory.end, true)初始化内存管理，建立后续分配和映射所需的基础状态。
-  - arch::allow_access_user_memory()允许内核在需要时访问用户地址空间。
-  - bus::init_with_boot_info()根据DTB探测并注册平台设备（如UART、PLIC、PCI、VirtIO等）。（riscv64分支走init_with_dtb，探测RTC/UART/PLIC/PCI/VirtIO）
-  - trap::init_trap_subsystem()初始化异常/中断入口并打开中断使能。（设置stvec/sscratch，打开外部中断、时钟中断、全局中断）
-  - domain::load_domains()加载并启动各个内核域与服务域。
-  - 释放STARTED，放行次核
+- BSP路径（先完成关键初始化，再唤醒从核）：
+  - 保存boot_info并读取platform_machine_info()（内存范围、CPU数量、基础设备信息）
+  - mem::init_memory_system(machine_info.memory.end, true)
+  - arch::allow_access_user_memory()
+  - bus::init_with_boot_info()（riscv64分支走init_with_dtb，探测RTC/UART/PLIC/PCI/VirtIO）
+  - trap::init_trap_subsystem()（设置stvec/sscratch，打开外部中断、时钟中断、全局中断）
+  - domain::load_domains()
+  - 启动从核：通过SBI HSM hart_start唤醒其他hart，入口为_start_secondary
+  - 释放STARTED，放行AP继续执行
 - AP路径：
-  - 等待BSP完成关键初始化
+  - 等待BSP完成关键初始化并放行
   - mem::init_memory_system(0, false)
   - arch::allow_access_user_memory()
   - trap::init_trap_subsystem()
@@ -36,15 +30,56 @@ AP: SBI HSM hart_start -> _start_secondary -> main(AP路径)
 
 _start_secondary:
 - 与_start类似：保存tp/gp并切到本核启动栈
-- 进入main(cpu_id)
+- 直接进入main(cpu_id)
 
 main(AP路径):
 - 自旋等待BSP放行
 - 完成本核内存、trap和中断初始化
 - 进入统一调度路径
 
-# Alien x86_64初始化（计划）：
-BSP: GRUB(multiboot1) -> _start -> main_entry -> platform_init -> main
+# Alien riscv64初始化（按当前代码更新）：
+BSP: OpenSBI -> _start -> main
+
+_start:
+- OpenSBI跳入内核入口，a0传入hart_id，a1传入boot_info_ptr（DTB地址）
+- 保存a0/a1到tp/gp，按hart号从全局栈数组切分本核启动栈
+- 完成最小上下文后调用main(cpu_id, info_ptr)
+
+main:
+- 清空.bss段
+- 先执行platform_init_primary(boot_cpu_id, boot_info_ptr)
+  - 保存boot_info并解析machine_info
+  - 初始化日志（x86还会在这里初始化APIC/时钟）
+- BSP主流程：
+  - 读取platform_machine_info()
+  - mem::init_memory_system(machine_info.memory.end, true)
+  - arch::allow_access_user_memory()
+  - bus::init_with_boot_info()（riscv64分支走init_with_dtb）
+  - trap::init_trap_subsystem()
+  - domain::load_domains()
+  - start_other_cpu(boot_cpu_id)：BSP在主初始化完成后再通过SBI HSM唤醒从核
+  - 等待所有从核完成secondary_main的初始化阶段（SECONDARY_INIT_COUNT）
+  - SECONDARY_RUN_RELEASED置true，统一放行从核进入调度
+  - timer::set_next_trigger()
+  - task::run_task()
+
+AP: SBI HSM hart_start -> _start_secondary -> secondary_main
+
+_start_secondary:
+- 与_start类似：保存tp/gp并切到本核启动栈
+- 直接进入secondary_main(cpu_id)
+
+secondary_main:
+- mem::init_memory_system(0, false)
+- arch::allow_access_user_memory()
+- trap::init_trap_subsystem()
+- SECONDARY_INIT_COUNT加1，通知BSP“本核初始化完成”
+- 等待SECONDARY_RUN_RELEASED放行
+- timer::set_next_trigger()
+- task::run_task()
+
+# Alien x86_64初始化（计划，按当前代码结构）：
+BSP: GRUB(multiboot1) -> _start -> main_entry -> main
 
 _start:
 - GRUB加载后进入_start，eax传入magic，ebx传入multiboot info地址
@@ -55,35 +90,26 @@ _start:
 main_entry:
 - 校验multiboot magic
 - 获取当前CPU的local APIC ID作为cpu_id
-- 调用platform_init(cpu_id, mbi)
-
-platform_init:
-- 清零.bss段
-- 保存mbi指针并解析machine_info
-- ACPI初始化并发现设备（MADT/IOAPIC/HPET等）
-- 初始化主核Local APIC和IO APIC，屏蔽8259A，选择x2APIC/xAPIC模式
-- 初始化时间子系统（TSC/RTC）和主核APIC Timer
-- 初始化日志
-- 调用main(cpu_id)
+- 调用main(cpu_id, mbi)
 
 main:
-- 通过STARTED区分BSP和AP路径
-- BSP路径：
+- 清空.bss段
+- main内部先调用platform_init_primary(cpu_id, mbi)
+  - 初始化主核APIC/IOAPIC（屏蔽8259A）
+  - 初始化时间子系统（TSC/RTC）和主核APIC Timer
+  - 保存mbi并解析machine_info
+  - 初始化日志
+- BSP主流程：
   - mem::init_memory_system(machine_info.memory.end, true)
   - bus::init_with_boot_info()（x86分支走init_with_acpi）
   - trap::init_trap_subsystem()（init_idt）
-  - 启动从核：ap::start_aps()
   - domain::load_domains()
-  - 释放STARTED
-- AP路径：
-  - 等待BSP放行
-  - mem::init_memory_system(0, false)
-  - trap::init_trap_subsystem()
+  - start_other_cpu(boot_cpu_id)（实际底层仍走APIC INIT-SIPI-SIPI）
+  - 等待所有从核完成secondary_main初始化，再统一放行
+  - timer::set_next_trigger()（APIC Timer）
+  - task::run_task()
 
-- 设置下一次时钟中断（APIC Timer）
-- 进入task::run_task()开始调度
-
-AP: APIC INIT-SIPI-SIPI -> ap_start(16位) -> ap_start32 -> ap_entry32 -> ap_entry64 -> secondary_entry -> secondary_main -> main(AP路径)
+AP: APIC INIT-SIPI-SIPI -> ap_start(16位) -> ap_start32 -> ap_entry32 -> ap_entry64 -> secondary_entry -> secondary_main
 
 ap_start:
 - AP被SIPI唤醒后在16位实模式执行，清段寄存器并加载临时GDT
@@ -103,4 +129,5 @@ secondary_entry:
 - 调用secondary_main(cpu_id)
 
 secondary_main:
-- 进入main(cpu_id)的AP路径完成后续初始化
+- 完成本核内存与trap初始化后上报SECONDARY_INIT_COUNT
+- 等待BSP统一放行后，再进入timer与task调度

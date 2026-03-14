@@ -28,7 +28,7 @@ pub mod traits;
 
 // 导出公共 trait 与类型。
 pub use traits::{
-    ConsoleIf, IpiTarget, IrqIf,
+    ConsoleIf,
     MemIf, MemRegionFlags, PhysMemRegion, RawRange,
     MachineInfo, MiscIf,
     PowerIf, TimeIf,
@@ -71,7 +71,7 @@ pub type PlatformInfo = common_x86_64::basic::MachineInfo;
 #[cfg(target_arch = "riscv64")]
 pub type PlatformInfo = common_riscv::basic::MachineInfo;
 
-// x86_64 下导出 APIC 能力。
+/// x86_64 APIC 接口导出（兼容 kernel 侧 `platform::apic::*` 调用）。
 #[cfg(target_arch = "x86_64")]
 pub mod apic {
     pub use crate::common_x86_64::apic::*;
@@ -109,7 +109,7 @@ unsafe extern "C" {
 }
 
 /// 清空.bss段
-fn clear_bss() {
+pub fn clear_bss() {
     unsafe {
         core::slice::from_raw_parts_mut(
             sbss as *const () as *mut u8, ebss as *const () as usize - sbss as *const () as usize)
@@ -117,41 +117,53 @@ fn clear_bss() {
     }
 }
 
-pub fn platform_init(cpu_id: usize, info_ptr: usize) {
-    clear_bss();
+/// BSP平台初始化。
+pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
+    // 不需要初始化控制台
     println!("{}", ::config::ALIEN_FLAG);
-    // 启动阶段先解析 boot_info，再发布 machine_info。
+    #[cfg(target_arch = "x86_64")]
+    {
+        use common_x86_64::{apic, time};
+        // 初始化 APIC。
+        apic::init_primary_apic();
+        // 初始化时间子系统（TSC、RTC）。
+        time::init_time();
+        // 初始化 APIC 定时器（依赖 TSC 校准）。
+        time::init_primary_apic_timer();
+    }
     Platform::init_boot_info(info_ptr);
     let machine_info = Platform::machine_info();
     MACHINE_INFO.call_once(|| machine_info);
     logger::init_logger();
-    init_other_cpu(cpu_id);
-    unsafe { main(cpu_id) }
 }
 
-#[cfg(target_arch = "x86_64")]
-fn init_other_cpu(_cpu_id: usize) {}
 
-#[cfg(target_arch = "riscv64")]
-fn init_other_cpu(cpu_id: usize) {
-    // vf2 的启动核不是 0，避免重复拉起。
-    let start_cpu = if cfg!(plat_vf2) { 1 } else { 0 };
-    for i in start_cpu..::config::CPU_NUM {
-        if i != cpu_id {
-            Platform::start_secondary_cpu(i, _start_secondary as *const () as usize, 0);
+pub fn start_other_cpu(cpu_id: usize) {
+    #[cfg(target_arch = "x86_64")] 
+    {
+        let total = platform_machine_info().cpu_count();
+        for i in 0..total {
+            if i != cpu_id {
+                Platform::start_secondary_cpu(i, 0, 0);
+            }
         }
     }
+    #[cfg(target_arch = "riscv64")]
+    {
+        let start_cpu = if cfg!(plat_vf2) { 1 } else { 0 };
+        for i in start_cpu..::config::CPU_NUM {
+            if i != cpu_id {
+                Platform::start_secondary_cpu(i, _start_secondary as *const () as usize, 0);
+            }
+        }
+    }
+    
 }
 
-unsafe extern "C" {
-    fn main(hart_id: usize);
+unsafe extern "Rust" {
+    fn main(hart_id: usize, info_ptr: usize);
     #[cfg(target_arch = "riscv64")]
     fn _start_secondary();
-}
-
-#[deprecated(note = "use platform_boot_info_ptr")]
-pub fn platform_dtb_ptr() -> usize {
-    platform_boot_info_ptr()
 }
 
 pub fn platform_boot_info_ptr() -> usize {

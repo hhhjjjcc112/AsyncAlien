@@ -5,14 +5,12 @@
 #![allow(unused)]
 
 mod console;
-mod irq;
 mod mem;
 mod misc;
 mod power;
 mod time;
 
 pub use console::ConsoleIf;
-pub use irq::{IpiTarget, IrqIf};
 pub use mem::{MemIf, MemRegionFlags, PhysMemRegion, RawRange};
 pub use misc::{MachineInfo, MiscIf};
 pub use power::PowerIf;

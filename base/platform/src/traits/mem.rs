@@ -96,6 +96,9 @@ pub trait MemIf {
     /// 返回 MMIO 区间。
     fn mmio_ranges() -> &'static [RawRange];
 
+    /// 返回页帧分配器使用的物理区间列表。
+    fn alloc_ranges() -> &'static [RawRange];
+
     /// 物理地址转虚拟地址。
     fn phys_to_virt(paddr: usize) -> usize {
         paddr.wrapping_add(Self::PHYS_VIRT_OFFSET)

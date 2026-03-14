@@ -3,20 +3,95 @@
 pub mod config;
 
 use core::ops::Range;
-use multiboot::information::MultibootInfo;
+use heapless::Vec;
 use spin::Once;
 
 use crate::common_x86_64::basic::MachineInfo as X86MachineInfo;
-use crate::common_x86_64::{apic, time};
+use crate::common_x86_64::time;
 use crate::traits::{
-    ConsoleIf, IpiTarget, IrqIf, MachineInfo, MemIf, MiscIf, PowerIf, RawRange,
+    ConsoleIf, MachineInfo, MemIf, MiscIf, PowerIf, RawRange,
     TimeIf,
 };
 
 pub static BOOT_INFO: Once<usize> = Once::new();
+static MAIN_ALLOC_RANGE: Once<RawRange> = Once::new();
+static ALLOC_RANGES: Once<Vec<RawRange, 16>> = Once::new();
 
 /// QEMU x86_64 平台类型。
 pub struct QemuX86Platform;
+
+unsafe extern "C" {
+    fn sheap();
+}
+
+fn kernel_heap_end_paddr() -> usize {
+    let heap_start = sheap as *const () as usize;
+    heap_start
+        .wrapping_sub(crate::common_x86_64::boot::PHYS_VIRT_OFFSET as usize)
+        .saturating_add(::config::KERNEL_HEAP_SIZE)
+}
+
+fn build_alloc_ranges(kernel_heap_end: usize) -> Vec<RawRange, 16> {
+    let mut excludes = Vec::<RawRange, 16>::new();
+    let _ = excludes.push((0, kernel_heap_end));
+    for &(start, size) in crate::common_x86_64::mem::RESERVED_REGIONS {
+        let _ = excludes.push((start, size));
+    }
+    excludes.sort_unstable_by_key(|&(start, _)| start);
+
+    let mut out = Vec::<RawRange, 16>::new();
+    for &(ram_start, ram_size) in crate::common_x86_64::mem::phys_ram_ranges() {
+        if ram_size == 0 {
+            continue;
+        }
+        let ram_end = ram_start.saturating_add(ram_size);
+        let mut cur = ram_start;
+        for &(ex_start, ex_size) in excludes.iter() {
+            let ex_end = ex_start.saturating_add(ex_size);
+            if ex_end <= cur {
+                continue;
+            }
+            if ex_start >= ram_end {
+                break;
+            }
+            if ex_start > cur {
+                let _ = out.push((cur, ex_start - cur));
+            }
+            if ex_end > cur {
+                cur = ex_end;
+            }
+            if cur >= ram_end {
+                break;
+            }
+        }
+        if cur < ram_end {
+            let _ = out.push((cur, ram_end - cur));
+        }
+    }
+    out
+}
+
+fn pick_main_alloc_range(ranges: &[RawRange], fallback_start: usize) -> RawRange {
+    let mut fallback = (fallback_start, 0);
+
+    for &(start, size) in ranges {
+        if size > fallback.1 {
+            fallback = (start, size);
+        }
+    }
+
+    fallback
+}
+
+fn init_platform_state(ptr: usize) {
+    crate::common_x86_64::mem::init_from_multiboot(ptr);
+    let kernel_heap_end = kernel_heap_end_paddr();
+    ALLOC_RANGES.call_once(|| build_alloc_ranges(kernel_heap_end));
+    MAIN_ALLOC_RANGE.call_once(|| {
+        let ranges = ALLOC_RANGES.get().expect("boot info not initialized");
+        pick_main_alloc_range(ranges.as_slice(), kernel_heap_end)
+    });
+}
 
 impl ConsoleIf for QemuX86Platform {
     fn putchar(ch: u8) {
@@ -25,53 +100,6 @@ impl ConsoleIf for QemuX86Platform {
 
     fn getchar() -> Option<u8> {
         crate::common_x86_64::services::console_getchar()
-    }
-}
-
-impl IrqIf for QemuX86Platform {
-    const MAX_IRQ_NUM: usize = 256;
-
-    fn set_enable(irq: usize, enabled: bool) {
-        apic::set_irq_enable(irq, enabled);
-    }
-
-    fn current_irq() -> Option<usize> {
-        None
-    }
-
-    fn ack_irq(_irq: usize) {
-        apic::eoi();
-    }
-
-    fn send_ipi(target: IpiTarget) {
-        match target {
-            IpiTarget::Unicast { cpu_id } => apic::send_ipi(cpu_id, crate::qemu_x86_64::config::IPI_IRQ),
-            IpiTarget::Broadcast { exclude_self } => {
-                let self_id = <Self as PowerIf>::current_cpu_id();
-                for cpu_id in 0..<Self as PowerIf>::cpu_count() {
-                    if exclude_self && cpu_id == self_id {
-                        continue;
-                    }
-                    apic::send_ipi(cpu_id, crate::qemu_x86_64::config::IPI_IRQ);
-                }
-            }
-            IpiTarget::Multicast { mask, mask_base } => {
-                for bit in 0..usize::BITS as usize {
-                    if (mask >> bit) & 1 == 0 {
-                        continue;
-                    }
-                    apic::send_ipi(mask_base + bit, crate::qemu_x86_64::config::IPI_IRQ);
-                }
-            }
-        }
-    }
-
-    fn init_primary() {
-        apic::init_primary_apic();
-    }
-
-    fn init_secondary(_cpu_id: usize) {
-        apic::init_secondary_apic();
     }
 }
 
@@ -88,6 +116,13 @@ impl MemIf for QemuX86Platform {
 
     fn mmio_ranges() -> &'static [RawRange] {
         crate::common_x86_64::mem::mmio_ranges()
+    }
+
+    fn alloc_ranges() -> &'static [RawRange] {
+        ALLOC_RANGES
+            .get()
+            .map(|ranges| ranges.as_slice())
+            .unwrap_or(&[])
     }
 }
 
@@ -171,22 +206,14 @@ impl MiscIf for QemuX86Platform {
 
     fn init_boot_info(ptr: usize) {
         BOOT_INFO.call_once(|| ptr);
+        init_platform_state(ptr);
 
-        // 通过 ACPI 表发现外设（MADT/HPET）。
+        // 初始化 ACPI 设备信息：默认走静态表，必要时可回退动态解析。
         crate::common_x86_64::acpi::init();
         for dev in crate::common_x86_64::acpi::device_list().entries.iter() {
             // 早期阶段优先直接输出，避免 logger 尚未初始化导致日志丢失。
             println!("ACPI device: {} @ {:#x} size={:#x}", dev.name, dev.base, dev.size);
         }
-        
-        // 初始化 APIC。
-        apic::init_primary_apic();
-        
-        // 初始化时间子系统（TSC、RTC）。
-        time::init_time();
-        
-        // 初始化 APIC 定时器（依赖 TSC 校准）。
-        time::init_primary_apic_timer();
     }
 
     fn boot_info_ptr() -> usize {

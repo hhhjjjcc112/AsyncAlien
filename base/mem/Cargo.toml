@@ -10,16 +10,18 @@ config  = { path = "../../domain-lib/config" }
 arch = { path = "../../domain-lib/arch" }
 ksync = { path = "../../domain-lib/ksync" }
 platform = { path = "../platform" }
-page_table = { path = "../../utils/page-table", package = "page-table" }
-memory_addr = { path = "../../utils/memory_addr" }
-ptable = { path = "../../utils/vmspace", package = "vmspace" }
+page_table = { path = "./crates/page-table", package = "page-table" }
+memory_addr = { path = "./crates/memory_addr" }
+ptable = { path = "./crates/vmspace", package = "vmspace" }
 pconst = { path = "../../utils/pconst", features = ["special_error"] }
 talc = { version = "4" }
-pager = { path = "../../utils/pager", default-features = false, optional = true }
+pager = { path = "./crates/pager", default-features = false, optional = true }
 spin = "0"
 log = "0"
+heapless = "0.8"
 
 [features]
 default = ["pager_bitmap",]
 pager_buddy = ["pager/buddy"]
 pager_bitmap = ["pager/bitmap"]
+memory_self_test = []

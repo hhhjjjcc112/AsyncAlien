@@ -65,7 +65,7 @@ fn main_entry(magic: usize, mbi: usize) {
     println!("[x86_boot] main_entry magic={:#x} mbi={:#x}", magic, mbi);
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         // 进入平台初始化。
-        crate::platform_init(current_cpu_id(), mbi);
+        unsafe { crate::main(current_cpu_id(), mbi) };
     } else {
         println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
     }

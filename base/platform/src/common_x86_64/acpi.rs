@@ -21,6 +21,11 @@ use crate::common_x86_64::boot::PHYS_VIRT_OFFSET;
 const DEFAULT_LAPIC_BASE: usize = 0xfee0_0000;
 const DEFAULT_IOAPIC_BASE: usize = 0xfec0_0000;
 
+#[inline]
+fn use_static_acpi() -> bool {
+    crate::qemu_x86_64::config::STATIC_ACPI
+}
+
 #[derive(Clone, Debug)]
 pub struct AcpiDeviceInfo {
     pub lapic_base: usize,
@@ -376,6 +381,10 @@ fn pci_cfg_write32(address: PciAddress, offset: u16, value: u32) {
 }
 
 fn detect_acpi_info() -> AcpiDeviceInfo {
+    if use_static_acpi() {
+        return detect_static_acpi_info();
+    }
+
     let mut info = AcpiDeviceInfo::default();
     let host = AcpiHost;
 
@@ -466,6 +475,30 @@ fn detect_acpi_info() -> AcpiDeviceInfo {
         info.ioapic_base,
         info.hpet_base,
         aml_loaded,
+        info.devices.entries.len()
+    );
+
+    info
+}
+
+fn detect_static_acpi_info() -> AcpiDeviceInfo {
+    let mut info = AcpiDeviceInfo::default();
+
+    for &(name, base, size) in crate::qemu_x86_64::config::DEVICE_SPACE {
+        let _ = info.devices.entries.push(AcpiDeviceEntry { name, base, size });
+        match name {
+            "local_apic" => info.lapic_base = base,
+            "io_apic" => info.ioapic_base = base,
+            "hpet" => info.hpet_base = Some(base),
+            _ => {}
+        }
+    }
+
+    log::info!(
+        "ACPI static device info: LAPIC={:#x}, IOAPIC={:#x}, HPET={:#x?}, devices={}",
+        info.lapic_base,
+        info.ioapic_base,
+        info.hpet_base,
         info.devices.entries.len()
     );
 

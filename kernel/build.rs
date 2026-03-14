@@ -51,8 +51,15 @@ fn main() {
         ld.replace("{{arch}}", "riscv")
     };
     
-    if platform == "plat_vf2" {
-        let base_addr = 0x40200000;
+    let base_addr_override = if target_arch == "x86_64" {
+        Some(0x20_0000usize)
+    } else if platform == "plat_vf2" {
+        Some(0x4020_0000usize)
+    } else {
+        None
+    };
+
+    if let Some(base_addr) = base_addr_override {
         let base_addr = format!("BASE_ADDRESS = {};", base_addr);
         let mut new_config = String::new();
         for line in ld.lines() {

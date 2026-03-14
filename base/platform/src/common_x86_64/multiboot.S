@@ -1,11 +1,4 @@
-.section .text.boot
-.code32
-.global _start
-_start:
-    mov     edi, eax        # arg1: magic: 0x2BADB002
-    mov     esi, ebx        # arg2: multiboot info
-    jmp     bsp_entry32
-
+.section .text.entry
 .balign 4
 .type multiboot_header, STT_OBJECT
 multiboot_header:
@@ -13,10 +6,17 @@ multiboot_header:
     .int    {mb_hdr_flags}                      # flags
     .int    -({mb_hdr_magic} + {mb_hdr_flags})  # checksum
     .int    multiboot_header - {phys_virt_offset}         # header_addr
-    .int    _skernel - {phys_virt_offset}       # load_addr
-    .int    _edata - {phys_virt_offset}         # load_end
-    .int    _ebss - {phys_virt_offset}          # bss_end_addr
+    .int    skernel - {phys_virt_offset}        # load_addr
+    .int    edata - {phys_virt_offset}            # load_end
+    .int    ebss - {phys_virt_offset}            # bss_end_addr
     .int    _start - {phys_virt_offset}         # entry_addr
+
+.code32
+.global _start
+_start:
+    mov     edi, eax        # arg1: magic: 0x2BADB002
+    mov     esi, ebx        # arg2: multiboot info
+    jmp     bsp_entry32
 
 # Common code in 32-bit, prepare states to enter 64-bit.
 .macro ENTRY32_COMMON

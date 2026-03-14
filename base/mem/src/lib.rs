@@ -8,8 +8,8 @@ use core::{
 };
 
 use arch::activate_paging_mode;
-use config::{FRAME_BITS, KERNEL_HEAP_SIZE};
-use platform::println;
+use config::KERNEL_HEAP_SIZE;
+use platform::{MemIf, Platform, println};
 use talc::{ErrOnOom, Talc, Talck};
 mod frame;
 
@@ -25,8 +25,8 @@ use pconst::LinuxErrno;
 pub use ptable::*;
 use spin::Lazy;
 pub use vmm::{
-    kernel_page_table_token, kernel_satp, map_domain_region, map_kstack_for_task, query_kernel_space, set_memory_x,
-    unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
+    kernel_page_table_root_paddr, kernel_page_table_root_ppn, kernel_page_table_token, kernel_satp, map_domain_region,
+    map_kstack_for_task, query_kernel_space, set_memory_x, unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
 };
 
 type AlienError = LinuxErrno;
@@ -35,27 +35,25 @@ type AlienResult<T> = Result<T, AlienError>;
 unsafe extern "C" {
     fn sheap();
 }
-pub fn init_memory_system(memory_end: usize, is_first_cpu: bool) {
+pub fn init_memory_system(is_first_cpu: bool) {
     if is_first_cpu {
-        frame::init_frame_allocator(sheap as *const () as usize + KERNEL_HEAP_SIZE, memory_end);
+        let alloc_ranges = Platform::alloc_ranges();
+        frame::init_frame_allocator_ranges(alloc_ranges);
         data::relocate_removable_data();
         println!("Frame allocator init success");
         println!("Talloc allocator init success");
-        vmm::build_kernel_address_space(memory_end);
+        vmm::build_kernel_address_space();
+        #[cfg(feature = "memory_self_test")]
+        vmm::verify_kernel_page_table_mappings();
         println!("Build kernel address space success");
-        #[cfg(target_arch = "riscv64")]
-        {
-            activate_paging_mode(vmm::kernel_pgd() >> FRAME_BITS);
-            println!("Activate paging mode success");
-        }
-        #[cfg(target_arch = "x86_64")]
-        {
-            // x86_64 移植早期先沿用引导页表，避免切 CR3 后卡死。
-            println!("Skip paging switch on x86_64 bring-up");
-        }
+        activate_paging_mode(vmm::kernel_page_table_root_ppn());
+        #[cfg(feature = "memory_self_test")]
+        vmm::verify_kernel_page_table_activated();
+        println!("Activate paging mode success");
     } else {
-        #[cfg(target_arch = "riscv64")]
-        activate_paging_mode(vmm::kernel_pgd() >> FRAME_BITS);
+        activate_paging_mode(vmm::kernel_page_table_root_ppn());
+        #[cfg(feature = "memory_self_test")]
+        vmm::verify_kernel_page_table_activated();
     }
 }
 

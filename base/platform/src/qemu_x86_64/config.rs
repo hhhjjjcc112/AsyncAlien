@@ -12,6 +12,9 @@ pub const APIC_SPURIOUS_VECTOR: u8 = 0xf1;
 /// APIC 错误中断向量。
 pub const APIC_ERROR_VECTOR: u8 = 0xf2;
 
+/// 是否使用静态 ACPI 设备表（不做运行期 ACPI 表探测）。
+pub const STATIC_ACPI: bool = true;
+
 /// IPI 中断向量。
 pub const IPI_IRQ: u8 = 0xf3;
 
@@ -62,6 +65,13 @@ pub const DEVICE_SPACE: &[(&str, usize, usize)] = &[
 /// 若 ACPI 尚未初始化，则回退到静态设备表。
 pub fn device_space_dynamic() -> heapless::Vec<(&'static str, usize, usize), 16> {
     let mut out = heapless::Vec::new();
+    if STATIC_ACPI {
+        for (name, base, size) in DEVICE_SPACE {
+            let _ = out.push((*name, *base, *size));
+        }
+        return out;
+    }
+
     let list = crate::common_x86_64::acpi::device_list();
     if list.entries.is_empty() {
         for (name, base, size) in DEVICE_SPACE {

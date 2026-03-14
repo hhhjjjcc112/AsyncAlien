@@ -40,12 +40,10 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     let plic_address = plic_device.address_range();
     let plic_info = PlicInfo {
         device_info: plic_address.start.as_usize()..plic_address.end.as_usize(),
-        #[cfg(plat_qemu_riscv)]
+        #[cfg(any(plat_qemu_riscv, plat_qemu_x86_64))]
         ty: PlicType::Qemu,
         #[cfg(plat_vf2)]
         ty: PlicType::SiFive,
-        #[cfg(plat_qemu_x86_64)]
-        ty: PlicType::Apic,  // x86-64 uses APIC/IOAPIC instead of PLIC
     };
     plic.init_by_box(Box::new(plic_info))?;
     register_domain!(
@@ -245,129 +243,6 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                 warn!("unknown device: {:?}", device.device_type());
             }
         }
-    }
-
-    #[cfg(target_arch = "x86_64")]
-    {
-        for (dev, kind) in crate::bus::pci::virtio_pci_devices() {
-            match kind {
-                crate::bus::pci::VirtioPciKind::Block => {
-                    log::info!(
-                        "x86 virtio-pci block detected at {:02x}:{:02x}.{}",
-                        dev.bus,
-                        dev.device,
-                        dev.function
-                    );
-                }
-                crate::bus::pci::VirtioPciKind::Net
-                | crate::bus::pci::VirtioPciKind::Input
-                | crate::bus::pci::VirtioPciKind::Gpu
-                | crate::bus::pci::VirtioPciKind::Other => {
-                    log::warn!(
-                        "x86 virtio-pci {:?} at {:02x}:{:02x}.{} is discovered but not bound yet",
-                        kind,
-                        dev.bus,
-                        dev.device,
-                        dev.function
-                    );
-                }
-            }
-        }
-
-        if crate::bus::pci::has_virtio_block() {
-            if let Some(cfg_space) = crate::bus::pci::pci_config_space() {
-                let (blk_driver, domain_file_info) = create_domain!(
-                    BlkDomainProxy,
-                    DomainTypeRaw::BlkDeviceDomain,
-                    "virtio_mmio_block"
-                )?;
-                blk_driver.init_by_box(Box::new(cfg_space))?;
-                println!(
-                    "dev capacity: {:?}MB",
-                    blk_driver.get_capacity()? * 512 / 1024 / 1024
-                );
-                register_domain!(
-                    "block",
-                    domain_file_info,
-                    DomainType::BlkDeviceDomain(blk_driver),
-                    false
-                );
-            }
-        }
-    }
-
-    {
-        if let Some(nic_name) = nic_name {
-            let (net_stack, domain_file_info) =
-                create_domain!(NetDomainProxy, DomainTypeRaw::NetDomain, "net_stack")?;
-            net_stack.init_by_box(Box::new(nic_name))?;
-            register_domain!(
-                "net_stack",
-                domain_file_info,
-                DomainType::NetDomain(net_stack),
-                true
-            );
-            if let Some(irq) = nic_irq {
-                plic.register_irq(irq as _, &DVec::from_slice("net_stack".as_bytes()))?;
-            }
-        } else {
-            warn!("No NIC domain is available, skip net_stack init");
-        }
-    }
-    // create shadow block and cache block device
-    {
-        let (shadow_blk, domain_file_info) = create_domain!(
-            ShadowBlockDomainProxy,
-            DomainTypeRaw::ShadowBlockDomain,
-            "shadow_blk"
-        )?;
-        shadow_blk.init_by_box(Box::new("block-1".to_string()))?;
-        register_domain!(
-            "shadow_blk",
-            domain_file_info,
-            DomainType::ShadowBlockDomain(shadow_blk),
-            false
-        );
-        let (cache_blk, domain_file_info) = create_domain!(
-            CacheBlkDomainProxy,
-            DomainTypeRaw::CacheBlkDeviceDomain,
-            "cache_blk"
-        )?;
-        cache_blk.init_by_box(Box::new("shadow_blk-1".to_string()))?;
-        register_domain!(
-            "cache_blk",
-            domain_file_info,
-            DomainType::CacheBlkDeviceDomain(cache_blk),
-            false
-        );
-    }
-
-    // create random and null device
-    {
-        let (null_device, domain_file_info) = create_domain!(
-            EmptyDeviceDomainProxy,
-            DomainTypeRaw::EmptyDeviceDomain,
-            "null"
-        )?;
-        null_device.init_by_box(Box::new(()))?;
-        register_domain!(
-            "null",
-            domain_file_info,
-            DomainType::EmptyDeviceDomain(null_device),
-            true
-        );
-        let (random_device, domain_file_info) = create_domain!(
-            EmptyDeviceDomainProxy,
-            DomainTypeRaw::EmptyDeviceDomain,
-            "random"
-        )?;
-        random_device.init_by_box(Box::new(()))?;
-        register_domain!(
-            "random",
-            domain_file_info,
-            DomainType::EmptyDeviceDomain(random_device),
-            true
-        );
     }
     Ok(plic)
 }

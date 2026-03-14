@@ -4,11 +4,11 @@ use core::sync::atomic::AtomicUsize;
 use arch::sfence_vma_all;
 #[cfg(not(target_arch = "x86_64"))]
 use config::FRAME_BITS;
-use config::{FRAME_SIZE, TRAMPOLINE};
+use config::{FRAME_SIZE, KERNEL_HEAP_SIZE, TRAMPOLINE};
 use ksync::RwLock;
 use log::info;
 use page_table::MappingFlags;
-use platform::{config::DEVICE_SPACE, println};
+use platform::{config::DEVICE_SPACE, MemIf, Platform, println};
 use ptable::{PhysPage, VmArea, VmAreaEqual, VmAreaType, VmSpace};
 use spin::Lazy;
 
@@ -33,7 +33,9 @@ unsafe extern "C" {
     // fn kernel_eh_frame_hdr_end();
 }
 
-pub fn kernel_info(memory_end: usize) -> usize {
+pub fn kernel_info() -> usize {
+    let heap_start = sheap as *const () as usize;
+    let heap_end = heap_start + KERNEL_HEAP_SIZE;
     println!(
         "kernel text:          {:#x}-{:#x}",
         stext as *const () as usize, srodata as *const () as usize
@@ -56,17 +58,27 @@ pub fn kernel_info(memory_end: usize) -> usize {
     );
     // println!("kernel eh_frame:      {:#x}-{:#x}", kernel_eh_frame as usize, kernel_eh_frame_end as usize);
     // println!("kernel eh_frame_hdr:  {:#x}-{:#x}", kernel_eh_frame_hdr as usize, kernel_eh_frame_hdr_end as usize);
-    println!(
-        "kernel heap:          {:#x}-{:#x}",
-        sheap as *const () as usize, memory_end
-    );
+    println!("kernel heap:          {:#x}-{:#x}", heap_start, heap_end);
+    for &(start, size) in Platform::alloc_ranges() {
+        println!("kernel alloc range:   {:#x}-{:#x}", start, start + size);
+    }
     sheap as *const () as usize
 }
 
 static KERNEL_MAP_MAX: AtomicUsize = AtomicUsize::new(0);
-pub fn build_kernel_address_space(memory_end: usize) {
-    kernel_info(memory_end);
+
+#[cfg(feature = "memory_self_test")]
+#[path = "../tests/memory_self_test.rs"]
+mod memory_self_test;
+
+#[cfg(feature = "memory_self_test")]
+pub use memory_self_test::{verify_kernel_page_table_activated, verify_kernel_page_table_mappings};
+
+pub fn build_kernel_address_space() {
+    kernel_info();
     let mut kernel_space = KERNEL_SPACE.write();
+    let heap_start = sheap as *const () as usize;
+    let heap_end = heap_start + KERNEL_HEAP_SIZE;
     let text_area = VmAreaEqual::new(
         stext as *const () as _..srodata as *const () as _,
         MappingFlags::READ | MappingFlags::EXECUTE | MappingFlags::WRITE,
@@ -80,8 +92,8 @@ pub fn build_kernel_address_space(memory_end: usize) {
         sbss as *const () as _..sheap as *const () as _,
         MappingFlags::READ | MappingFlags::WRITE,
     );
-    let free_area = VmAreaEqual::new(
-        sheap as *const () as _..memory_end,
+    let heap_area = VmAreaEqual::new(
+        heap_start..heap_end,
         MappingFlags::READ | MappingFlags::WRITE,
     );
 
@@ -103,11 +115,28 @@ pub fn build_kernel_address_space(memory_end: usize) {
         .map(VmAreaType::VmAreaEqual(sbss_area))
         .unwrap();
     kernel_space
-        .map(VmAreaType::VmAreaEqual(free_area))
+        .map(VmAreaType::VmAreaEqual(heap_area))
         .unwrap();
     kernel_space
         .map(VmAreaType::VmArea(trampoline_area))
         .unwrap();
+
+    let mut map_max = heap_end;
+    for &(start, size) in Platform::alloc_ranges() {
+        if size == 0 {
+            continue;
+        }
+        let end = start + size;
+        kernel_space
+            .map(VmAreaType::VmAreaEqual(VmAreaEqual::new(
+                start..end,
+                MappingFlags::READ | MappingFlags::WRITE,
+            )))
+            .unwrap();
+        if end > map_max {
+            map_max = end;
+        }
+    }
 
     for pair in DEVICE_SPACE {
         let io_area = VmAreaEqual::new(
@@ -116,23 +145,34 @@ pub fn build_kernel_address_space(memory_end: usize) {
         );
         kernel_space.map(VmAreaType::VmAreaEqual(io_area)).unwrap();
         println!("map {}: {:#x?}-{:#x?}", pair.0, pair.1, pair.1 + pair.2);
+        map_max = map_max.max(pair.1 + pair.2);
     }
-    KERNEL_MAP_MAX.store(memory_end, core::sync::atomic::Ordering::SeqCst);
+    KERNEL_MAP_MAX.store(map_max, core::sync::atomic::Ordering::SeqCst);
 }
 
 /// 返回根页表物理地址。
-pub fn kernel_pgd() -> usize {
+pub fn kernel_page_table_root_paddr() -> usize {
     KERNEL_SPACE.read().root_paddr()
+}
+
+/// 返回根页表 PPN（用于激活分页）。
+pub fn kernel_page_table_root_ppn() -> usize {
+    kernel_page_table_root_paddr() >> 12
+}
+
+#[allow(dead_code)]
+pub fn kernel_pgd() -> usize {
+    kernel_page_table_root_paddr()
 }
 
 pub fn kernel_page_table_token() -> usize {
     #[cfg(target_arch = "x86_64")]
     {
-        kernel_pgd()
+        kernel_page_table_root_paddr()
     }
     #[cfg(not(target_arch = "x86_64"))]
     {
-    8usize << 60 | (kernel_pgd() >> FRAME_BITS)
+    8usize << 60 | (kernel_page_table_root_paddr() >> FRAME_BITS)
     }
 }
 
