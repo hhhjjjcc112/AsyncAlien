@@ -57,6 +57,7 @@ static SECONDARY_RUN_RELEASED: AtomicBool = AtomicBool::new(false);
 #[unsafe(no_mangle)]
 fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
+    trap::init_trap_subsystem();
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
     println!("Boot CPU {}", boot_cpu_id);
@@ -67,7 +68,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     #[cfg(target_arch = "riscv64")]
     arch::allow_access_user_memory();
     bus::init_with_boot_info().unwrap();
-    trap::init_trap_subsystem();
+    
     domain::load_domains().unwrap();
 
     platform::start_other_cpu(boot_cpu_id);
@@ -89,11 +90,11 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 /// 从核入口：由平台汇编从核入口直接调用。
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
-
+    trap::init_trap_subsystem();
+    platform::platform_init_secondary(cpu_id);
     mem::init_memory_system(false);
     #[cfg(target_arch = "riscv64")]
     arch::allow_access_user_memory();
-    trap::init_trap_subsystem();
     println!("CPU {} start...", cpu_id);
 
     SECONDARY_INIT_COUNT.fetch_add(1, Ordering::AcqRel);

@@ -15,9 +15,9 @@ extern "C" fn _start() -> ! {
 pub(crate) fn syscall(id: usize, args: [usize; 6]) -> isize {
     let mut ret: isize;
     unsafe {
-        // 内核 trapframe 约定：rax=号，rdi/rsi/rdx/r10/r8/r9=参数。
+        // x86_64 syscall ABI：rax=号，rdi/rsi/rdx/r10/r8/r9=参数，rcx/r11 会被硬件覆盖。
         asm!(
-            "int 0x80",
+            "syscall",
             inlateout("rax") id as isize => ret,
             in("rdi") args[0],
             in("rsi") args[1],
@@ -25,6 +25,9 @@ pub(crate) fn syscall(id: usize, args: [usize; 6]) -> isize {
             in("r10") args[3],
             in("r8") args[4],
             in("r9") args[5],
+            lateout("rcx") _,
+            lateout("r11") _,
+            options(nostack),
         );
     }
     ret

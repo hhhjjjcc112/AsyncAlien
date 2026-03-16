@@ -11,42 +11,33 @@ mod exception;
 
 // Architecture-specific implementations
 #[cfg(target_arch = "riscv64")]
-mod riscv;
+mod riscv64;
 #[cfg(target_arch = "x86_64")]
 mod x86_64;
 
 // Re-export architecture-specific items
 #[cfg(target_arch = "riscv64")]
-pub use riscv::*;
+pub use riscv64::*;
 #[cfg(target_arch = "x86_64")]
 pub use x86_64::*;
 
 // Common includes
 use alloc::sync::Arc;
-
-#[cfg(target_arch = "riscv64")]
 use core::arch::global_asm;
 
 use basic::sync::Once;
 use interface::{PLICDomain, SysCallDomain};
 use platform::println;
 
-// ============================================================================
-// Assembly entry points (architecture-specific)
-// ============================================================================
+
 
 #[cfg(target_arch = "riscv64")]
-global_asm!(include_str!("./kernel_v_riscv.asm"));
+global_asm!(include_str!("./riscv64/kernel_v.asm"));
 #[cfg(target_arch = "riscv64")]
-global_asm!(include_str!("./trampoline_riscv.asm"));
+global_asm!(include_str!("./riscv64/trampoline.asm"));
 
-// TODO: x86-64 assembly stubs
-// #[cfg(target_arch = "x86_64")]
-// global_asm!(include_str!("./x86_64_vectors.asm"));
-
-// ============================================================================
-// Domain registrations (shared across architectures)
-// ============================================================================
+#[cfg(target_arch = "x86_64")]
+global_asm!(include_str!("./x86_64/vectors.asm"));
 
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
 pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();
@@ -73,29 +64,13 @@ pub fn register_plic_domain(plic_domain: Arc<dyn PLICDomain>) {
     PLIC_DOMAIN.call_once(|| plic_domain);
 }
 
-// ============================================================================
-// Unified trap subsystem initialization
-// ============================================================================
 
-/// Initialize the trap/interrupt subsystem
-///
-/// This sets up architecture-specific trap handling:
-/// - RISC-V: Configures stvec, enables interrupts via sstatus
-/// - x86-64: Loads IDT, configures APIC
 pub fn init_trap_subsystem() {
     println!("++++ setup interrupt ++++");
+    // 架构相关的trap初始化
+    init_trap();
     
-    #[cfg(target_arch = "riscv64")]
-    {
-        set_kernel_trap_entry();
-    }
-    
-    #[cfg(target_arch = "x86_64")]
-    {
-        init_idt();
-    }
-    
-    // Common interrupt setup
+    // 通用步骤：打开外部中断、时钟中断与全局中断使能。
     arch::external_interrupt_enable();
     arch::timer_interrupt_enable();
     arch::interrupt_enable();

@@ -137,6 +137,17 @@ pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
     logger::init_logger();
 }
 
+pub fn platform_init_secondary(_cpu_id: usize) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        use common_x86_64::{apic, time};
+        // 初始化 APIC。
+        apic::init_secondary_apic();
+        // 初始化 APIC 定时器（依赖 TSC 校准）。
+        time::init_secondary_apic_timer();
+    }
+}
+
 
 pub fn start_other_cpu(cpu_id: usize) {
     #[cfg(target_arch = "x86_64")] 

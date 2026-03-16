@@ -244,6 +244,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
             }
         }
     }
+
     Ok(plic)
 }
 

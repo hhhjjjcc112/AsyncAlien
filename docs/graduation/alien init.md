@@ -94,6 +94,7 @@ main_entry:
 
 main:
 - 清空.bss段
+- trap::init_trap_subsystem()（init_idt）
 - main内部先调用platform_init_primary(cpu_id, mbi)
   - 初始化主核APIC/IOAPIC（屏蔽8259A）
   - 初始化时间子系统（TSC/RTC）和主核APIC Timer
@@ -102,18 +103,17 @@ main:
 - BSP主流程：
   - mem::init_memory_system(machine_info.memory.end, true)
   - bus::init_with_boot_info()（x86分支走init_with_acpi）
-  - trap::init_trap_subsystem()（init_idt）
   - domain::load_domains()
   - start_other_cpu(boot_cpu_id)（实际底层仍走APIC INIT-SIPI-SIPI）
   - 等待所有从核完成secondary_main初始化，再统一放行
   - timer::set_next_trigger()（APIC Timer）
   - task::run_task()
 
-AP: APIC INIT-SIPI-SIPI -> ap_start(16位) -> ap_start32 -> ap_entry32 -> ap_entry64 -> secondary_entry -> secondary_main
+AP: BSP唤醒 -> ap_start -> ap_start32 -> ap_entry32 -> ap_entry64 -> secondary_entry -> secondary_main
 
 ap_start:
 - AP被SIPI唤醒后在16位实模式执行，清段寄存器并加载临时GDT
-- 设置CR0.PE并远跳转到ap_start32
+- 设置寄存器并远跳转到ap_start32
 
 ap_start32:
 - 从启动页尾部读取BSP写入的栈顶和入口地址
