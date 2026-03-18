@@ -63,7 +63,7 @@ impl CoreFunction for DomainSyscall {
     }
 
     fn sys_kernel_satp(&self) -> usize {
-        mem::kernel_satp()
+        mem::kernel_page_table_token()
     }
 
     fn sys_trap_from_user(&self) -> usize {

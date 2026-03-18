@@ -1,6 +1,8 @@
 use alloc::collections::VecDeque;
+use core::ops::Range;
 
 use basic::io::SafeIORegion;
+use mem::PhysAddr;
 
 use crate::bus::CommonDeviceInfo;
 
@@ -25,5 +27,40 @@ impl PciBus {
 
     pub fn register_driver(&mut self) {
         // self.drivers.push(driver);
+    }
+
+    pub fn common_devices(&self) -> &VecDeque<PciCommonDevice> {
+        &self.common_devices
+    }
+}
+
+impl PciCommonDevice {
+    pub(super) fn new(io_region: SafeIORegion, info: CommonDeviceInfo) -> Self {
+        let res = Self { io_region, info };
+        info!(
+            "[PciCommonDevice]: Found PCI ECAM region, addr: {:#x?}",
+            res.address_range()
+        );
+        res
+    }
+
+    pub fn address(&self) -> PhysAddr {
+        self.io_region.phys_addr()
+    }
+
+    pub fn address_range(&self) -> Range<PhysAddr> {
+        self.io_region.phys_addr_range()
+    }
+
+    pub fn io_region(&self) -> &SafeIORegion {
+        &self.io_region
+    }
+
+    pub fn irq(&self) -> Option<u32> {
+        self.info.irq
+    }
+
+    pub fn compatible(&self) -> Option<&str> {
+        self.info.compatible.as_deref()
     }
 }

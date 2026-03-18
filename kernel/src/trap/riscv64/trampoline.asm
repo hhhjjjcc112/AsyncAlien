@@ -1,146 +1,83 @@
-
+.attribute arch, "rv64gc"
 .altmacro
-.section trampsec
-.globl user_v
-.globl user_r
-.align 2
-
-# low-level trap entry
-define __alltraps
+.macro SAVE_GP n
+    sd x\n, \n*8(sp)
+.endm
+.macro LOAD_GP n
+    ld x\n, \n*8(sp)
+.endm
+    .section .text.trampoline
+    .globl user_v
+    .globl user_r
+    .align 3
 user_v:
-        # swap a0 and sscratch
-        csrrw a0, sscratch, a0
+    csrrw sp, sscratch, sp
+    # now sp->*TrapContext in user space, sscratch->user stack
+    # save other general purpose registers
+    sd x1, 1*8(sp)
+    # skip sp(x2), we will save it later
+    # save x3~x31
+    .set n, 3
+    .rept 29
+        SAVE_GP %n
+        .set n, n+1
+    .endr
+    # we can use t0/t1/t2 freely, because they have been saved in TrapContext
+    csrr t0, sstatus
+    csrr t1, sepc
+    sd t1, 32*8(sp)
+    sd t0, 37*8(sp)
+    fsd fs0, 38*8(sp)
+    fsd fs1, 39*8(sp)
+    # read user stack from sscratch and save it in TrapContext
+    csrr t2, sscratch
+    sd t2, 2*8(sp)
+    # load kernel_satp into t0
+    ld t0, 33*8(sp)
+    # load trap_handler into t1
+    ld t1, 35*8(sp)
+    # load tp
+    ld tp,36*8(sp)
+    # move to kernel_sp
+    ld sp, 34*8(sp)
 
-        # save user register
-        # save other general purpose registers
-        sd ra, 40(a0)
-        sd gp, 48(a0)
-        sd tp, 56(a0)
-        sd t0, 64(a0)
-        sd t1, 72(a0)
-        sd t2, 80(a0)
-        sd s0, 88(a0)
-        sd s1, 96(a0)
-        sd a1, 112(a0)
-        sd a2, 120(a0)
-        sd a3, 128(a0)
-        sd a4, 136(a0)
-        sd a5, 144(a0)
-        sd a6, 152(a0)
-        sd a7, 160(a0)
-        sd s2, 168(a0)
-        sd s3, 176(a0)
-        sd s4, 184(a0)
-        sd s5, 192(a0)
-        sd s6, 200(a0)
-        sd s7, 208(a0)
-        sd s8, 216(a0)
-        sd s9, 224(a0)
-        sd s10, 232(a0)
-        sd s11, 240(a0)
-        sd t3, 248(a0)
-        sd t4, 256(a0)
-        sd t5, 264(a0)
-        sd t6, 272(a0)
-        # save user stack pointer in u_trap->regs.sp
-        csrr t0, sscratch
-        sd t0, 16(a0)
+    # load hartid into tp(x4)
+    # ld tp, 36*8(tp)
+    # 保证用户态缓存全部刷新到内存
+    sfence.vma
+    # switch to kernel space
+    csrw satp, t0
+    sfence.vma
+    # jump to trap_handler
+    jr t1
 
-        # save the kernel task trap handler in u_trap->trap_handler
-        ld t1, 288(a0)
-        sd t1, 304(a0)
-
-        # save the user trap before entering user mode in u_trap->epc
-        csrr t2, sepc
-        sd t2, 280(a0)
-
-        # save the kernel stack pointer in u_trap->kernel_sp
-        ld sp, 296(a0)
-        addi sp, sp, 272
-
-        # save user satp in u_trap->user_satp
-        csrr t0, satp
-        sd t0, 312(a0)
-
-        # save kernel satp in u_trap->kernel_satp
-        # csrr t0, satp
-        # sd t0, 320(a0)
-
-        # load trap_handler into t1
-        ld t1, 304(a0)
-
-        # move user trap frame into a0
-        ld a0, -272(sp)
-
-        # save user a0 in u_trap->regs.a0
-        csrrw t0, sscratch, t0
-        sd t0, 104(a0)
-
-        # save user tp in u_trap->regs.tp
-        # csrr t0, tp
-        # sd t0, 56(a0)
-
-        # jump to trap_handler
-        jr t1
-
-# low-level trap return
 user_r:
-        # switch to user page table
-        csrw satp, a1
-        sfence.vma
+    # a0: *TrapContext in user space(Constant); a1: user space token
+    # switch to user space
+    sfence.vma
+    csrw satp, a1
+    sfence.vma
+    csrw sscratch, a0
+    mv sp, a0
+    # now sp points to TrapContext in user space, start restoring based on it
+    # restore sstatus/sepc
+    ld t1, 32*8(sp)
+    ld t0, 37*8(sp)
+    # save cpu_id
+    sd tp, 36*8(sp)
 
-        # put trap frame in sscratch
-        csrw sscratch, a0
+    csrw sepc, t1
+    csrw sstatus, t0
+    # restore general purpose registers except x0/sp
+    ld x1, 1*8(sp)
+    .set n, 3
+    .rept 29
+        LOAD_GP %n
+        .set n, n+1
+    .endr
+    fld fs0, 38*8(sp)
+    fld fs1, 39*8(sp)
 
-        # restore general purpose register except for a0 and a1 and t0
-        ld ra, 40(a0)
-        ld gp, 48(a0)
-        ld tp, 56(a0)
-        ld t0, 64(a0)
-        ld t1, 72(a0)
-        ld t2, 80(a0)
-        ld s0, 88(a0)
-        ld s1, 96(a0)
-        # restore user a0 to t0
-        ld t0, 104(a0)
-        ld a2, 120(a0)
-        ld a3, 128(a0)
-        ld a4, 136(a0)
-        ld a5, 144(a0)
-        ld a6, 152(a0)
-        ld a7, 160(a0)
-        ld s2, 168(a0)
-        ld s3, 176(a0)
-        ld s4, 184(a0)
-        ld s5, 192(a0)
-        ld s6, 200(a0)
-        ld s7, 208(a0)
-        ld s8, 216(a0)
-        ld s9, 224(a0)
-        ld s10, 232(a0)
-        ld s11, 240(a0)
-        ld t3, 248(a0)
-        ld t4, 256(a0)
-        ld t5, 264(a0)
-        ld t6, 272(a0)
-
-        # set SPP to User for user mode
-        li t1, 1 << 8
-        csrrc x0, sstatus, t1
-
-        # set SPIE for interrupt
-        li t1, 1 << 5
-        csrrs x0, sstatus, t1
-
-        # set sepc to the value in trap frame
-        ld t1, 280(a0)
-        csrw sepc, t1
-
-        # set stack pointer to user stack pointer
-        ld sp, 16(a0)
-
-        # swap a0 and sscratch so that a0 is user a0 and sscratch is trapframe
-        csrrw a0, sscratch, t0
-
-        # jump to user mode
-        sret
+    # back to user stack
+    ld sp, 2*8(sp)
+    sret

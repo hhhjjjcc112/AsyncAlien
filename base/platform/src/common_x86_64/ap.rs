@@ -102,9 +102,9 @@ pub fn start_aps() {
 }
 
 /// 启动指定从核。
-pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) -> (isize, isize) {
+pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
     if cpu_id >= MAX_CPUS || cpu_id >= CPU_NUM {
-        return (-1, 0);
+        return;
     }
 
     #[allow(static_mut_refs)]
@@ -125,6 +125,4 @@ pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) ->
         busy_wait(Duration::from_micros(200));
         apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
     }
-
-    (0, 0)
 }

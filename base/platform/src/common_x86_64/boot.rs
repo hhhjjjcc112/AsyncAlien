@@ -51,13 +51,6 @@ global_asm!(
     efer = const EFER,
 );
 
-/// 读取当前 CPU ID。
-pub fn current_cpu_id() -> usize {
-    raw_cpuid::CpuId::new()
-        .get_feature_info()
-        .map_or(0, |finfo| finfo.initial_local_apic_id() as usize)
-}
-
 /// 汇编入口转入 Rust 主入口。
 #[unsafe(no_mangle)]
 fn main_entry(magic: usize, mbi: usize) {
@@ -65,7 +58,7 @@ fn main_entry(magic: usize, mbi: usize) {
     println!("[x86_boot] main_entry magic={:#x} mbi={:#x}", magic, mbi);
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         // 进入平台初始化。
-        unsafe { crate::main(current_cpu_id(), mbi) };
+        unsafe { crate::main(arch::cpu_id_early(), mbi) };
     } else {
         println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
     }
@@ -73,14 +66,12 @@ fn main_entry(magic: usize, mbi: usize) {
 
 /// 从核汇编入口。
 #[unsafe(no_mangle)]
-fn secondary_entry(_magic: usize) {
-    crate::common_x86_64::apic::init_secondary_apic();
-    crate::common_x86_64::time::init_secondary_apic_timer();
-
-    unsafe extern "C" {
-        fn secondary_main(cpu_id: usize);
-    }
-    unsafe {
-        secondary_main(current_cpu_id());
+fn secondary_entry(magic: usize) {
+    println!("[x86_boot] ap boot");
+    if magic == MULTIBOOT_BOOTLOADER_MAGIC {
+        // 进入从核主函数。
+        unsafe { crate::secondary_main(arch::cpu_id_early()) };
+    } else {
+        println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
     }
 }

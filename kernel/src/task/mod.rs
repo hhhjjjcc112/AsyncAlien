@@ -6,7 +6,7 @@ use alloc::sync::Arc;
 use core::arch::global_asm;
 
 use arch::cpu_id;
-use basic::{sync::Once, task::TaskContext};
+use basic::{sync::Once, sync::OnceGet, task::TaskContext};
 use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;

@@ -2,7 +2,10 @@ mod cause;
 mod entry;
 
 pub use entry::{
-    kernel_trap_vector, set_kernel_trap_entry, set_user_trap_entry, trap_return, user_trap_vector,
+    set_kernel_trap_entry, trap_return, user_trap_vector,
+};
+use entry::{
+    kernel_trap_vector, set_user_trap_entry,
 };
 
 pub fn init_trap() {

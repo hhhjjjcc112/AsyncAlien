@@ -1,26 +1,29 @@
 use basic::sync::OnceGet;
-use core::arch::asm;
 use mem::PhysAddr;
 use platform;
+use x86_64::registers::model_specific::Msr;
 
 use crate::{plic_domain, task_domain, timer};
 
-use super::{gdt, syscall, vector, context::X86TrapFrame};
+use super::{
+    context::{fault_address, X86TrapFrame, X86TrapFrameExt}, gdt, idt, syscall, vector,
+};
 
-#[inline]
-pub fn set_kernel_trap_entry() {
-    // x86_64 下 IDT 常驻，无需像 RISC-V 那样切换 stvec。
+unsafe extern "C" {
+    fn x86_trampoline_return(user_cr3: usize, trap_cx_ptr: usize) -> !;
 }
 
-#[inline]
-pub fn set_user_trap_entry() {
-    // x86_64 下用户态与内核态共享同一张 IDT。
-}
+const MSR_KERNEL_GS_BASE: u32 = 0xC000_0102;
 
-#[inline(never)]
 #[unsafe(no_mangle)]
 pub extern "C" fn user_trap_vector() {
-    // 保留统一接口地址，实际 trap 进入点由 IDT 决定。
+    // 从用户入口回到内核分发前，先切回内核 IDT。
+    idt::set_kernel_trap_entry();
+
+    let task_domain = task_domain!();
+    let trap_frame_phy_addr = task_domain.trap_frame_phy_addr().unwrap();
+    let frame = basic::task::TrapFrame::from_raw_phy_ptr(PhysAddr::from(trap_frame_phy_addr));
+    user_trap_handler(frame);
 }
 
 #[unsafe(no_mangle)]
@@ -45,12 +48,13 @@ pub extern "C" fn x86_trap_dispatch(frame: &mut X86TrapFrame) {
     }
 }
 
-#[unsafe(no_mangle)]
 pub fn user_trap_handler(frame: &mut X86TrapFrame) {
-    if frame.is_kernel() {
-        panic!("user_trap_handler: received kernel-mode trap");
-    }
-    set_kernel_trap_entry();
+    // 进入内核处理后，统一使用内核 IDT。
+    idt::set_kernel_trap_entry();
+
+    // 保存用户态 FPU/SSE 状态。
+    frame.save_fx_state();
+
     handle_trap(frame, true);
     trap_return();
 }
@@ -70,7 +74,7 @@ fn handle_trap(frame: &mut X86TrapFrame, from_user: bool) {
             );
         }
         vector::PAGE_FAULT => {
-            let fault_addr = X86TrapFrame::fault_address();
+            let fault_addr = fault_address();
             if from_user {
                 task_domain!()
                     .do_load_page_fault(fault_addr)
@@ -138,42 +142,22 @@ fn send_apic_eoi() {
 
 #[unsafe(no_mangle)]
 pub fn trap_return() -> ! {
-    set_user_trap_entry();
+    // 回用户态前切换为用户入口 IDT，保证下次用户态 trap 先落 trampoline。
+    idt::set_user_trap_entry();
+
     let task_domain = task_domain!();
     let (user_cr3, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
     let trap_frame_phy_addr = task_domain.trap_frame_phy_addr().unwrap();
     let trap_frame = basic::task::TrapFrame::from_raw_phy_ptr(PhysAddr::from(trap_frame_phy_addr));
 
-    // 关键步骤：为后续用户态 -> 内核态切换准备内核栈与 TrapFrame 指针。
-    gdt::write_tss_rsp0(trap_frame.kernel_sp().as_usize());
+    // 恢复用户态 FPU/SSE 状态（切换 CR3 之前，仍使用物理地址访问）。
+    trap_frame.restore_fx_state();
+
+    // TSS.rsp0 指向 TrapFrame 顶部，保证用户态 trap 先写入共享上下文页。
+    gdt::write_tss_rsp0(trap_cx_ptr + basic::task::TrapFrame::USER_CONTEXT_SIZE);
     unsafe {
-        arch::write_msr(arch::MSR_KERNEL_GS_BASE, trap_cx_ptr as u64);
+        Msr::new(MSR_KERNEL_GS_BASE).write(trap_cx_ptr as u64);
     }
 
-    unsafe {
-        asm!(
-            "mov cr3, {cr3}",
-            "mov rsp, {frame}",
-            "pop r15",
-            "pop r14",
-            "pop r13",
-            "pop r12",
-            "pop rbp",
-            "pop rbx",
-            "pop r11",
-            "pop r10",
-            "pop r9",
-            "pop r8",
-            "pop rsi",
-            "pop rdi",
-            "pop rdx",
-            "pop rcx",
-            "pop rax",
-            "add rsp, 16",
-            "iretq",
-            cr3 = in(reg) user_cr3,
-            frame = in(reg) trap_cx_ptr,
-            options(noreturn)
-        )
-    }
+    unsafe { x86_trampoline_return(user_cr3, trap_cx_ptr) }
 }

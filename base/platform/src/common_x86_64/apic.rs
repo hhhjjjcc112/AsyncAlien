@@ -80,8 +80,6 @@ pub fn init_secondary_apic() {
 }
 
 /// 获取 Local APIC 可变引用。
-///
-/// # Safety
 /// 必须在 APIC 初始化后调用。
 pub unsafe fn get_local_apic() -> &'static mut LocalApic {
     #[allow(static_mut_refs)]
@@ -95,9 +93,7 @@ pub fn is_x2apic() -> bool {
 
 /// 获取当前 CPU ID。
 pub fn current_cpu_id() -> usize {
-    raw_cpuid::CpuId::new()
-        .get_feature_info()
-        .map_or(0, |finfo| finfo.initial_local_apic_id() as usize)
+    arch::cpu_id()
 }
 
 /// 发送 APIC EOI。
@@ -106,10 +102,6 @@ pub fn eoi() {
         get_local_apic().end_of_interrupt();
     }
 }
-
-// ============================================================================
-// I/O APIC IRQ 管理
-// ============================================================================
 
 /// 开关 I/O APIC 的 IRQ 路由。
 pub fn set_irq_enable(vector: usize, enabled: bool) {

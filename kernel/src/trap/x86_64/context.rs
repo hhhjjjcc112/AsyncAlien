@@ -1,50 +1,21 @@
-use core::arch::asm;
+use basic::task::TrapFrame;
+use x86_64::registers::control::Cr2;
 
-/// x86-64 trap frame pushed by CPU and trap handler
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct X86TrapFrame {
-    pub r15: usize,
-    pub r14: usize,
-    pub r13: usize,
-    pub r12: usize,
-    pub rbp: usize,
-    pub rbx: usize,
-    pub r11: usize,
-    pub r10: usize,
-    pub r9: usize,
-    pub r8: usize,
-    pub rsi: usize,
-    pub rdi: usize,
-    pub rdx: usize,
-    pub rcx: usize,
-    pub rax: usize,
-    pub vector: usize,
-    pub error_code: usize,
-    pub rip: usize,
-    pub cs: usize,
-    pub rflags: usize,
-    pub rsp: usize,
-    pub ss: usize,
+pub type X86TrapFrame = TrapFrame;
+
+pub trait X86TrapFrameExt {
+    fn is_user(&self) -> bool;
 }
 
-impl X86TrapFrame {
+impl X86TrapFrameExt for X86TrapFrame {
     #[inline]
-    pub fn is_user(&self) -> bool {
+    fn is_user(&self) -> bool {
         (self.cs & 0x3) == 3
     }
 
-    #[inline]
-    pub fn is_kernel(&self) -> bool {
-        (self.cs & 0x3) == 0
-    }
+}
 
-    #[inline]
-    pub fn fault_address() -> usize {
-        let addr: usize;
-        unsafe {
-            asm!("mov {}, cr2", out(reg) addr, options(nomem, nostack, preserves_flags));
-        }
-        addr
-    }
+#[inline]
+pub fn fault_address() -> usize {
+    Cr2::read().as_u64() as usize
 }

@@ -49,6 +49,8 @@ use core::{
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 };
 
+use crate::domain_proxy::PerCpuCounter;
+
 /// 已完成从核初始化的数量。
 static SECONDARY_INIT_COUNT: AtomicUsize = AtomicUsize::new(0);
 /// BSP 放行后，从核才进入调度。
@@ -57,6 +59,9 @@ static SECONDARY_RUN_RELEASED: AtomicBool = AtomicBool::new(false);
 #[unsafe(no_mangle)]
 fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
+    platform::platform_init_percpu_primary(boot_cpu_id);
+    
+
     trap::init_trap_subsystem();
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
@@ -90,6 +95,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 /// 从核入口：由平台汇编从核入口直接调用。
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
+    platform::platform_init_percpu_secondary(cpu_id);
     trap::init_trap_subsystem();
     platform::platform_init_secondary(cpu_id);
     mem::init_memory_system(false);

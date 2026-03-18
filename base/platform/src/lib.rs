@@ -117,6 +117,30 @@ pub fn clear_bss() {
     }
 }
 
+/// BSP在 clear_bss() 后初始化percpu。
+pub fn platform_init_percpu_primary(cpu_id: usize) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        arch::init_percpu_primary(cpu_id);
+    }
+    #[cfg(target_arch = "riscv64")]
+    {
+        let _ = cpu_id;
+    }
+}
+
+/// 从核初始化percpu。
+pub fn platform_init_percpu_secondary(cpu_id: usize) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        arch::init_percpu_secondary(cpu_id);
+    }
+    #[cfg(target_arch = "riscv64")]
+    {
+        let _ = cpu_id;
+    }
+}
+
 /// BSP平台初始化。
 pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
     // 不需要初始化控制台
@@ -124,6 +148,8 @@ pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         use common_x86_64::{apic, time};
+        // 初始化 FPU/SSE，允许用户态浮点运算。
+        arch::init_fpu();
         // 初始化 APIC。
         apic::init_primary_apic();
         // 初始化时间子系统（TSC、RTC）。
@@ -141,6 +167,8 @@ pub fn platform_init_secondary(_cpu_id: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         use common_x86_64::{apic, time};
+        // 初始化从核 FPU/SSE。
+        arch::init_fpu();
         // 初始化 APIC。
         apic::init_secondary_apic();
         // 初始化 APIC 定时器（依赖 TSC 校准）。
@@ -172,7 +200,8 @@ pub fn start_other_cpu(cpu_id: usize) {
 }
 
 unsafe extern "Rust" {
-    fn main(hart_id: usize, info_ptr: usize);
+    fn main(cpu_id: usize, info_ptr: usize);
+    fn secondary_main(cpu_id: usize);
     #[cfg(target_arch = "riscv64")]
     fn _start_secondary();
 }

@@ -155,29 +155,15 @@ pub fn kernel_page_table_root_paddr() -> usize {
     KERNEL_SPACE.read().root_paddr()
 }
 
-/// 返回根页表 PPN（用于激活分页）。
-pub fn kernel_page_table_root_ppn() -> usize {
-    kernel_page_table_root_paddr() >> 12
-}
-
-#[allow(dead_code)]
-pub fn kernel_pgd() -> usize {
-    kernel_page_table_root_paddr()
-}
-
 pub fn kernel_page_table_token() -> usize {
     #[cfg(target_arch = "x86_64")]
     {
         kernel_page_table_root_paddr()
     }
-    #[cfg(not(target_arch = "x86_64"))]
+    #[cfg(target_arch = "riscv64")]
     {
-    8usize << 60 | (kernel_page_table_root_paddr() >> FRAME_BITS)
+        8usize << 60 | (kernel_page_table_root_paddr() >> FRAME_BITS)
     }
-}
-
-pub fn kernel_satp() -> usize {
-    kernel_page_table_token()
 }
 
 pub fn query_kernel_space(addr: usize) -> Option<usize> {

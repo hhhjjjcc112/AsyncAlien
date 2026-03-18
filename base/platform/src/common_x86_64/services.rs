@@ -70,7 +70,7 @@ pub fn console_getchar() -> Option<u8> {
 
 /// 通过 APIC IPI 启动从核。
 pub fn start_secondary_cpu(cpu_id: usize, start_addr: usize, opaque: usize) {
-    let _ = ap::start_secondary_cpu(cpu_id, start_addr, opaque);
+    ap::start_secondary_cpu(cpu_id, start_addr, opaque);
 }
 
 /// x86 指令缓存一致，保持空操作。

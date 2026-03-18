@@ -3,6 +3,10 @@
 .global syscall_entry
 
 # TrapFrame 偏移（x86_64, repr(C), 每项 8 字节）
+# GPR: r15@0..rax@112（15×8=120）
+# CPU: vector@120..ss@168（7×8=56）
+# 内核字段: k_cr3@176, k_sp@184, trap_handler@192, cpu_id@200
+# FPU: fx_state@208（208=13×16，16 字节对齐）
 .equ TF_R15, 0
 .equ TF_R14, 8
 .equ TF_R13, 16
@@ -21,12 +25,19 @@
 .equ TF_VECTOR, 120
 .equ TF_ERROR_CODE, 128
 .equ TF_RIP, 136
+.equ TF_CS, 144
 .equ TF_RFLAGS, 152
 .equ TF_RSP, 160
+.equ TF_SS, 168
+.equ TF_K_CR3, 176
 .equ TF_K_SP, 184
 
 .equ MSR_KERNEL_GS_BASE, 0xC0000102
 .equ SYSCALL_VECTOR, 0x80
+.equ USER_CS, 0x23
+.equ USER_SS, 0x1b
+# TrapFrame 浮点状态区偏移（见 domain-lib/basic/src/task/mod.rs）
+.equ TF_FX_STATE, 208
 
 syscall_entry:
     # 保存会被 rdmsr 覆盖的寄存器，以及一个临时寄存器。
@@ -64,32 +75,19 @@ syscall_entry:
     mov [r12 + TF_R8], r8
     mov [r12 + TF_RSI], rsi
     mov [r12 + TF_RDI], rdi
-
+    # 保存用户态 FPU/SSE 状态（syscall entry，r12 = TrapFrame 虚拟地址）
+    fxsave64 [r12 + TF_FX_STATE]
     lea rax, [rsp + 40]
     mov [r12 + TF_RSP], rax
+    mov qword ptr [r12 + TF_CS], USER_CS
+    mov qword ptr [r12 + TF_SS], USER_SS
     mov [r12 + TF_RFLAGS], r11
     mov qword ptr [r12 + TF_VECTOR], SYSCALL_VECTOR
     mov qword ptr [r12 + TF_ERROR_CODE], 0
 
+    mov rax, [r12 + TF_K_CR3]
+    mov cr3, rax
     mov rsp, [r12 + TF_K_SP]
     call x86_syscall_handler
 
-    # 从 TrapFrame 恢复用户上下文，用 sysretq 返回用户态。
-    mov r15, [r12 + TF_R15]
-    mov r14, [r12 + TF_R14]
-    mov r13, [r12 + TF_R13]
-    mov rbp, [r12 + TF_RBP]
-    mov rbx, [r12 + TF_RBX]
-    mov r10, [r12 + TF_R10]
-    mov r9, [r12 + TF_R9]
-    mov r8, [r12 + TF_R8]
-    mov rsi, [r12 + TF_RSI]
-    mov rdi, [r12 + TF_RDI]
-    mov rdx, [r12 + TF_RDX]
-    mov rax, [r12 + TF_RAX]
-
-    mov rcx, [r12 + TF_RIP]
-    mov r11, [r12 + TF_RFLAGS]
-    mov rsp, [r12 + TF_RSP]
-    mov r12, [r12 + TF_R12]
-    sysretq
+    ud2

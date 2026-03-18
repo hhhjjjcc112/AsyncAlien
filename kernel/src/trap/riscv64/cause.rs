@@ -1,3 +1,4 @@
+use basic::sync::OnceGet;
 use riscv::register::{
     scause::{Exception, Interrupt, Trap},
     sepc, stval,

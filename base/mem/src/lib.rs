@@ -25,7 +25,7 @@ use pconst::LinuxErrno;
 pub use ptable::*;
 use spin::Lazy;
 pub use vmm::{
-    kernel_page_table_root_paddr, kernel_page_table_root_ppn, kernel_page_table_token, kernel_satp, map_domain_region,
+    kernel_page_table_root_paddr, kernel_page_table_token, map_domain_region,
     map_kstack_for_task, query_kernel_space, set_memory_x, unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
 };
 
@@ -46,12 +46,12 @@ pub fn init_memory_system(is_first_cpu: bool) {
         #[cfg(feature = "memory_self_test")]
         vmm::verify_kernel_page_table_mappings();
         println!("Build kernel address space success");
-        activate_paging_mode(vmm::kernel_page_table_root_ppn());
+        activate_paging_mode(vmm::kernel_page_table_token());
         #[cfg(feature = "memory_self_test")]
         vmm::verify_kernel_page_table_activated();
         println!("Activate paging mode success");
     } else {
-        activate_paging_mode(vmm::kernel_page_table_root_ppn());
+        activate_paging_mode(vmm::kernel_page_table_token());
         #[cfg(feature = "memory_self_test")]
         vmm::verify_kernel_page_table_activated();
     }

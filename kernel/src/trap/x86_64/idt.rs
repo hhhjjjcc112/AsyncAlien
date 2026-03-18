@@ -1,120 +1,84 @@
 use basic::sync::Once;
-use core::arch::asm;
+use config::TRAMPOLINE;
+use spin::Lazy;
+use x86_64::PrivilegeLevel;
+use x86_64::structures::idt::{
+    Entry, HandlerFunc, InterruptDescriptorTable,
+};
 
 use super::vector;
 
-#[repr(u8)]
-#[derive(Debug, Clone, Copy)]
-pub enum GateType {
-    Interrupt = 0xE,
-    Trap = 0xF,
+const NUM_INT: usize = 256;
+
+pub struct IdtStruct {
+    table: InterruptDescriptorTable,
 }
 
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct IdtEntry {
-    offset_low: u16,
-    selector: u16,
-    ist: u8,
-    type_attr: u8,
-    offset_mid: u16,
-    offset_high: u32,
-    reserved: u32,
-}
-
-impl IdtEntry {
-    pub const fn empty() -> Self {
-        Self {
-            offset_low: 0,
-            selector: 0,
-            ist: 0,
-            type_attr: 0,
-            offset_mid: 0,
-            offset_high: 0,
-            reserved: 0,
-        }
-    }
-
-    pub fn new(handler: usize, selector: u16, gate_type: GateType, dpl: u8, ist: u8) -> Self {
-        Self {
-            offset_low: handler as u16,
-            selector,
-            ist,
-            type_attr: (1 << 7) | ((dpl & 0x3) << 5) | (gate_type as u8),
-            offset_mid: (handler >> 16) as u16,
-            offset_high: (handler >> 32) as u32,
-            reserved: 0,
-        }
-    }
-}
-
-#[repr(C, align(16))]
-pub struct Idt {
-    entries: [IdtEntry; 256],
-}
-
-impl Idt {
-    pub const fn new() -> Self {
-        Self {
-            entries: [IdtEntry::empty(); 256],
-        }
-    }
-
-    pub fn set_handler(&mut self, vector: u8, handler: usize, gate_type: GateType, dpl: u8) {
-        self.entries[vector as usize] = IdtEntry::new(handler, 0x08, gate_type, dpl, 0);
-    }
-
-    pub fn load(&self) {
-        #[repr(C, packed)]
-        struct IdtPointer {
-            limit: u16,
-            base: u64,
-        }
-
-        let ptr = IdtPointer {
-            limit: (core::mem::size_of::<Idt>() - 1) as u16,
-            base: self as *const _ as u64,
+impl IdtStruct {
+    fn new(entries: &'static [unsafe extern "C" fn(); NUM_INT], map_to_trampoline: bool) -> Self {
+        let mut idt = Self {
+            table: InterruptDescriptorTable::new(),
         };
 
-        unsafe {
-            asm!("lidt [{}]", in(reg) &ptr, options(readonly, nostack, preserves_flags));
+        let table_entries = unsafe {
+            core::slice::from_raw_parts_mut(
+                &mut idt.table as *mut _ as *mut Entry<HandlerFunc>,
+                NUM_INT,
+            )
+        };
+
+        for vec in 0..NUM_INT {
+            let handler = if map_to_trampoline {
+                let entry = entries[vec] as usize;
+                let offset = entry - strampoline as *const () as usize;
+                unsafe { core::mem::transmute(TRAMPOLINE + offset) }
+            } else {
+                entries[vec]
+            };
+            #[allow(clippy::missing_transmute_annotations)]
+            let opt = table_entries[vec].set_handler_fn(unsafe { core::mem::transmute(handler) });
+            if vec as u8 == vector::BREAKPOINT || vec as u8 == vector::SYSCALL {
+                opt.set_privilege_level(PrivilegeLevel::Ring3);
+            }
         }
+
+        idt
+    }
+
+    #[inline]
+    fn load(&'static self) {
+        self.table.load();
     }
 }
 
-static mut IDT: Idt = Idt::new();
 static IDT_INIT: Once<()> = Once::new();
 
 unsafe extern "C" {
+    fn strampoline();
     #[link_name = "trap_handler_table"]
-    static TRAP_HANDLER_TABLE: [unsafe extern "C" fn(); 256];
+    static TRAP_HANDLER_TABLE: [unsafe extern "C" fn(); NUM_INT];
+    #[link_name = "user_trap_handler_table"]
+    static USER_TRAP_HANDLER_TABLE: [unsafe extern "C" fn(); NUM_INT];
 }
 
+static KERNEL_IDT: Lazy<IdtStruct> = Lazy::new(|| unsafe { IdtStruct::new(&TRAP_HANDLER_TABLE, false) });
+static USER_IDT: Lazy<IdtStruct> = Lazy::new(|| unsafe { IdtStruct::new(&USER_TRAP_HANDLER_TABLE, true) });
+
 pub fn init_idt() {
-    IDT_INIT.call_once(|| unsafe {
-        // 关键步骤：将汇编生成的 256 个入口写入 IDT。
-        let idt = &raw mut IDT;
-        let handlers = &raw const TRAP_HANDLER_TABLE;
-        for vec in 0u8..=u8::MAX {
-            let idx = vec as usize;
-            let handler = (*handlers)[idx] as usize;
-            let gate_type = if vec == vector::BREAKPOINT {
-                GateType::Trap
-            } else {
-                GateType::Interrupt
-            };
-            let dpl = if vec == vector::BREAKPOINT || vec == vector::SYSCALL {
-                3
-            } else {
-                0
-            };
-            (*idt).set_handler(vec, handler, gate_type, dpl);
-        }
+    IDT_INIT.call_once(|| {
+        let _ = &*KERNEL_IDT;
+        let _ = &*USER_IDT;
     });
 
-    // 关键步骤：每个 CPU 都要执行一次 lidt。
-    unsafe {
-        let idt = &raw const IDT;
-        (*idt).load();
-    }
+    set_kernel_trap_entry();
+}
+
+#[inline]
+pub fn set_kernel_trap_entry() {
+    KERNEL_IDT.load();
+}
+
+#[inline]
+pub fn set_user_trap_entry() {
+    USER_IDT.load();
 }

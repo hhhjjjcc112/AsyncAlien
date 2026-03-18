@@ -38,6 +38,8 @@ global_asm!(include_str!("./riscv64/trampoline.asm"));
 
 #[cfg(target_arch = "x86_64")]
 global_asm!(include_str!("./x86_64/vectors.asm"));
+#[cfg(target_arch = "x86_64")]
+global_asm!(include_str!("./x86_64/trampoline.asm"));
 
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
 pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();

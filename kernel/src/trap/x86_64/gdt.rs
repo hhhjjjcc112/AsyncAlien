@@ -1,124 +1,95 @@
-use core::arch::asm;
+use core::{arch::asm, mem::MaybeUninit};
 
-const GDT_KERNEL_CODE: u16 = 0x08;
-const GDT_KERNEL_DATA: u16 = 0x10;
-const GDT_TSS: u16 = 0x28;
+use arch::cpu_id;
+use config::CPU_NUM;
+use x86_64::PrivilegeLevel;
+use x86_64::instructions::segmentation::CS;
+use x86_64::instructions::tables::load_tss;
+use x86_64::registers::segmentation::{DS, ES, FS, GS, SS, Segment, SegmentSelector};
+use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable};
+use x86_64::structures::tss::TaskStateSegment;
+use x86_64::VirtAddr;
 
-#[repr(C, packed)]
-struct GdtDescriptor {
-    limit: u16,
-    base: u64,
+struct Selectors {
+    kcode: SegmentSelector,
+    kdata: SegmentSelector,
+    tss: SegmentSelector,
 }
 
-#[repr(C, packed)]
-struct Tss64 {
-    _reserved0: u32,
-    rsp0: u64,
-    rsp1: u64,
-    rsp2: u64,
-    _reserved1: u64,
-    ist: [u64; 7],
-    _reserved2: u64,
-    _reserved3: u16,
-    io_map_base: u16,
-}
-
-impl Tss64 {
-    const fn new() -> Self {
-        Self {
-            _reserved0: 0,
-            rsp0: 0,
-            rsp1: 0,
-            rsp2: 0,
-            _reserved1: 0,
-            ist: [0; 7],
-            _reserved2: 0,
-            _reserved3: 0,
-            io_map_base: core::mem::size_of::<Tss64>() as u16,
-        }
-    }
-}
-
-// 选择子布局需与 TrapFrame 默认的 CS/SS 保持一致：
-// user CS=0x23(index=4), user SS=0x1b(index=3)。
-static mut GDT: [u64; 8] = [
-    0x0000_0000_0000_0000, // null
-    0x00AF_9B00_0000_FFFF, // 0x08 kernel code 64
-    0x00CF_9300_0000_FFFF, // 0x10 kernel data
-    0x00CF_F300_0000_FFFF, // 0x18 user data
-    0x00AF_FB00_0000_FFFF, // 0x20 user code 64
-    0x0000_0000_0000_0000, // 0x28 tss low
-    0x0000_0000_0000_0000, // 0x30 tss high
-    0x0000_0000_0000_0000,
-];
-
-static mut TSS: Tss64 = Tss64::new();
+static mut GDT_PER_CPU: [MaybeUninit<GlobalDescriptorTable>; CPU_NUM] =
+    [const { MaybeUninit::uninit() }; CPU_NUM];
+static mut TSS_PER_CPU: [MaybeUninit<TaskStateSegment>; CPU_NUM] =
+    [const { MaybeUninit::uninit() }; CPU_NUM];
+static mut SELECTORS_PER_CPU: [MaybeUninit<Selectors>; CPU_NUM] =
+    [const { MaybeUninit::uninit() }; CPU_NUM];
+static mut INIT_DONE: [bool; CPU_NUM] = [false; CPU_NUM];
 
 #[inline]
-fn tss_descriptor(tss: *const Tss64) -> (u64, u64) {
-    let base = tss as u64;
-    let limit = (core::mem::size_of::<Tss64>() - 1) as u64;
-
-    let low = (limit & 0xFFFF)
-        | ((base & 0xFF_FFFF) << 16)
-        | (0x9_u64 << 40)
-        | (1_u64 << 47)
-        | (((limit >> 16) & 0xF) << 48)
-        | (((base >> 24) & 0xFF) << 56);
-    let high = (base >> 32) & 0xFFFF_FFFF;
-    (low, high)
-}
-
-#[inline]
-unsafe fn reload_segment_registers() {
+fn current_rsp() -> usize {
+    let rsp: usize;
     unsafe {
-        asm!(
-            "push {kcode}",
-            "lea rax, [rip + 2f]",
-            "push rax",
-            "retfq",
-            "2:",
-            "mov ax, {kdata}",
-            "mov ds, ax",
-            "mov es, ax",
-            "mov ss, ax",
-            "xor eax, eax",
-            "mov fs, ax",
-            "mov gs, ax",
-            kcode = const GDT_KERNEL_CODE as u64,
-            kdata = const GDT_KERNEL_DATA,
-            out("rax") _,
-            options(preserves_flags)
-        );
+        asm!("mov {}, rsp", out(reg) rsp, options(nomem, preserves_flags));
+    }
+    rsp
+}
+
+#[inline]
+fn init_current_cpu_gdt_tss(cpu: usize) {
+    unsafe {
+        let mut tss = TaskStateSegment::new();
+        tss.privilege_stack_table[0] = VirtAddr::new_truncate(current_rsp() as u64);
+        TSS_PER_CPU[cpu].write(tss);
+
+        let mut gdt = GlobalDescriptorTable::new();
+        // 顺序保持与现有 TrapFrame 段选择子一致：
+        // user CS=0x23(index=4), user SS=0x1b(index=3), tss=0x28(index=5)。
+        let kcode = gdt.add_entry(Descriptor::kernel_code_segment());
+        let kdata = gdt.add_entry(Descriptor::kernel_data_segment());
+        let _udata = gdt.add_entry(Descriptor::user_data_segment());
+        let _ucode = gdt.add_entry(Descriptor::user_code_segment());
+        let tss_sel = gdt.add_entry(Descriptor::tss_segment(
+            TSS_PER_CPU[cpu].assume_init_ref(),
+        ));
+
+        GDT_PER_CPU[cpu].write(gdt);
+        SELECTORS_PER_CPU[cpu].write(Selectors {
+            kcode,
+            kdata,
+            tss: tss_sel,
+        });
+        INIT_DONE[cpu] = true;
     }
 }
 
 /// 初始化本核 GDT/TSS，并装载 TR。
 pub fn init_gdt() {
     unsafe {
-        let mut rsp: u64;
-        asm!("mov {}, rsp", out(reg) rsp, options(nomem, preserves_flags));
-        TSS.rsp0 = rsp;
+        let cpu = cpu_id();
+        if !INIT_DONE[cpu] {
+            init_current_cpu_gdt_tss(cpu);
+        }
 
-        let (tss_low, tss_high) = tss_descriptor(&raw const TSS);
-        GDT[5] = tss_low;
-        GDT[6] = tss_high;
+        let gdt = &*(&raw const GDT_PER_CPU[cpu]).cast::<GlobalDescriptorTable>();
+        let selectors = &*(&raw const SELECTORS_PER_CPU[cpu]).cast::<Selectors>();
 
-        let gdtr = GdtDescriptor {
-            limit: (core::mem::size_of::<[u64; 8]>() - 1) as u16,
-            base: (&raw const GDT as *const _ as u64),
-        };
-
-        // 关键步骤：lgdt 后必须刷新段寄存器，并显式加载 TSS。
-        asm!("lgdt [{}]", in(reg) &gdtr, options(readonly, nostack, preserves_flags));
-        reload_segment_registers();
-        asm!("ltr ax", in("ax") GDT_TSS, options(nomem, nostack, preserves_flags));
+        gdt.load();
+        CS::set_reg(selectors.kcode);
+        SS::set_reg(selectors.kdata);
+        DS::set_reg(selectors.kdata);
+        ES::set_reg(selectors.kdata);
+        let null_sel = SegmentSelector::new(0, PrivilegeLevel::Ring0);
+        FS::set_reg(null_sel);
+        GS::set_reg(null_sel);
+        load_tss(selectors.tss);
     }
 }
 
 #[inline]
 pub fn write_tss_rsp0(rsp0: usize) {
     unsafe {
-        TSS.rsp0 = rsp0 as u64;
+        let cpu = cpu_id();
+        assert!(INIT_DONE[cpu], "write_tss_rsp0 before init_gdt on cpu {}", cpu);
+        let tss = &mut *(&raw mut TSS_PER_CPU[cpu]).cast::<TaskStateSegment>();
+        tss.privilege_stack_table[0] = VirtAddr::new_truncate(rsp0 as u64);
     }
 }

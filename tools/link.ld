@@ -1,6 +1,6 @@
 OUTPUT_ARCH({{arch}})
 ENTRY(_start)
-BASE_ADDRESS = 0x80200000;
+BASE_ADDRESS = {{base_address}};
 
 SECTIONS
 {
@@ -30,6 +30,17 @@ SECTIONS
         . = ALIGN(4K);
         erodata = .;
     }
+
+    . = ALIGN(4K);
+    _percpu_start = .;
+    _percpu_end = _percpu_start + SIZEOF(.percpu);
+    .percpu 0x0 : AT(_percpu_start) {
+        _percpu_load_start = .;
+        *(.percpu .percpu.*)
+        _percpu_load_end = .;
+        . = _percpu_load_start + ALIGN(64) * {{max_cpu_num}};
+    }
+    . = _percpu_end;
 
     .data : ALIGN(4096){
         sdata = .;

@@ -4,7 +4,7 @@ BSP: BIOS/GRUB(multiboot1) -> _start -> rust_entry -> axplat::call_main -> rust_
 _start:
 - GRUB按multiboot1协议加载内核后进入_start，eax传入magic，ebx传入multiboot info地址
 - 先进入32位入口bsp_entry32，加载临时GDT并设置段寄存器
-- 打开CR4里的PAE/PGE，加载临时页表，设置EFER(LME/NXE)，再打开CR0分页，完成进入长模式前置条件
+- 设置CR4，加载临时页表，设置EFER，再打开CR0分页，完成进入长模式前置条件
 - 通过长跳转进入bsp_entry64
 - 在64位入口清理段寄存器，设置启动栈，调用rust_entry(magic, mbi)
 
