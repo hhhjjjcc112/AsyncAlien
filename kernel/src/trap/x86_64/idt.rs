@@ -15,7 +15,7 @@ pub struct IdtStruct {
 }
 
 impl IdtStruct {
-    fn new(entries: &'static [unsafe extern "C" fn(); NUM_INT], map_to_trampoline: bool) -> Self {
+    fn new(entries: &'static [unsafe extern "C" fn(); NUM_INT]) -> Self {
         let mut idt = Self {
             table: InterruptDescriptorTable::new(),
         };
@@ -28,13 +28,10 @@ impl IdtStruct {
         };
 
         for vec in 0..NUM_INT {
-            let handler = if map_to_trampoline {
-                let entry = entries[vec] as usize;
-                let offset = entry - strampoline as *const () as usize;
-                unsafe { core::mem::transmute(TRAMPOLINE + offset) }
-            } else {
-                entries[vec]
-            };
+            let entry = entries[vec] as usize;
+            let offset = entry - strampoline as *const () as usize;
+            let handler: unsafe extern "C" fn() =
+                unsafe { core::mem::transmute(TRAMPOLINE + offset) };
             #[allow(clippy::missing_transmute_annotations)]
             let opt = table_entries[vec].set_handler_fn(unsafe { core::mem::transmute(handler) });
             if vec as u8 == vector::BREAKPOINT || vec as u8 == vector::SYSCALL {
@@ -57,28 +54,19 @@ unsafe extern "C" {
     fn strampoline();
     #[link_name = "trap_handler_table"]
     static TRAP_HANDLER_TABLE: [unsafe extern "C" fn(); NUM_INT];
-    #[link_name = "user_trap_handler_table"]
-    static USER_TRAP_HANDLER_TABLE: [unsafe extern "C" fn(); NUM_INT];
 }
 
-static KERNEL_IDT: Lazy<IdtStruct> = Lazy::new(|| unsafe { IdtStruct::new(&TRAP_HANDLER_TABLE, false) });
-static USER_IDT: Lazy<IdtStruct> = Lazy::new(|| unsafe { IdtStruct::new(&USER_TRAP_HANDLER_TABLE, true) });
+static IDT: Lazy<IdtStruct> = Lazy::new(|| unsafe { IdtStruct::new(&TRAP_HANDLER_TABLE) });
 
 pub fn init_idt() {
     IDT_INIT.call_once(|| {
-        let _ = &*KERNEL_IDT;
-        let _ = &*USER_IDT;
+        let _ = &*IDT;
     });
 
-    set_kernel_trap_entry();
+    set_trap_entry();
 }
 
 #[inline]
-pub fn set_kernel_trap_entry() {
-    KERNEL_IDT.load();
-}
-
-#[inline]
-pub fn set_user_trap_entry() {
-    USER_IDT.load();
+pub fn set_trap_entry() {
+    IDT.load();
 }

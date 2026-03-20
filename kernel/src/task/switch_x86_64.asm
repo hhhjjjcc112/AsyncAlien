@@ -16,6 +16,7 @@
 #   0x28: r13
 #   0x30: r14
 #   0x38: r15
+#   0x40: fp_simd (fxsave64/fxrstor64, 512 bytes)
 
 .section .text
 .globl __switch
@@ -33,6 +34,7 @@ __switch:
     mov [rdi + 0x28], r13
     mov [rdi + 0x30], r14
     mov [rdi + 0x38], r15
+    fxsave64 [rdi + 0x40]
     
     # Restore next task context
     # Restore callee-saved registers
@@ -42,6 +44,7 @@ __switch:
     mov r13, [rsi + 0x28]
     mov r14, [rsi + 0x30]
     mov r15, [rsi + 0x38]
+    fxrstor64 [rsi + 0x40]
     mov rsp, [rsi + 0x08]
     
     # Jump to saved return address

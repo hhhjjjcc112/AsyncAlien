@@ -1,93 +1,100 @@
-.section .text
+.section .text.trampoline
 .code64
+
 .global syscall_entry
+.global strampoline
 
-# TrapFrame 偏移（x86_64, repr(C), 每项 8 字节）
-# GPR: r15@0..rax@112（15×8=120）
-# CPU: vector@120..ss@168（7×8=56）
-# 内核字段: k_cr3@176, k_sp@184, trap_handler@192, cpu_id@200
-# FPU: fx_state@208（208=13×16，16 字节对齐）
-.equ TF_R15, 0
-.equ TF_R14, 8
-.equ TF_R13, 16
-.equ TF_R12, 24
-.equ TF_RBP, 32
-.equ TF_RBX, 40
-.equ TF_R11, 48
-.equ TF_R10, 56
-.equ TF_R9, 64
-.equ TF_R8, 72
-.equ TF_RSI, 80
-.equ TF_RDI, 88
-.equ TF_RDX, 96
-.equ TF_RCX, 104
-.equ TF_RAX, 112
-.equ TF_VECTOR, 120
-.equ TF_ERROR_CODE, 128
-.equ TF_RIP, 136
-.equ TF_CS, 144
-.equ TF_RFLAGS, 152
-.equ TF_RSP, 160
-.equ TF_SS, 168
-.equ TF_K_CR3, 176
-.equ TF_K_SP, 184
+# syscall 入口仅依赖这两个 percpu 符号：用户 rsp 暂存 + TSS.rsp0 读取。
+.extern __PERCPU_USER_RSP
+.extern __PERCPU_TSS
 
-.equ MSR_KERNEL_GS_BASE, 0xC0000102
-.equ SYSCALL_VECTOR, 0x80
-.equ USER_CS, 0x23
-.equ USER_SS, 0x1b
-# TrapFrame 浮点状态区偏移（见 domain-lib/basic/src/task/mod.rs）
-.equ TF_FX_STATE, 208
+# TrapFrame 槽位偏移（单位：字节）
+.equ TF_VECTOR, 136
+.equ TF_RSP, 176
 
+strampoline:
+    # 标记 trampoline 起始地址（用于 LSTAR 偏移计算）
+
+.align 8
 syscall_entry:
-    # 保存会被 rdmsr 覆盖的寄存器，以及一个临时寄存器。
+    # 用户态 syscall 指令入门
+    # 硬件状态：RCX <- RIP、R11 <- RFLAGS，权限不变（仍为 DPL3）
+
+    swapgs
+
+    # 入口早期：仅在 percpu 保存用户栈指针。
+    mov qword ptr gs:[offset __PERCPU_USER_RSP], rsp
+
+    # 从 per-cpu TSS 读取 rsp0（TrapContext 末尾）。
+    mov rsp, qword ptr gs:[offset __PERCPU_TSS + {tss_rsp0_offset}]
+
+    # 使用 push 直接构造 TrapContext。
+    # 跳过不需要的槽位：ss/cs/error_code/vector。
+    sub rsp, 8  # 跳过 ss
+    push qword ptr gs:[offset __PERCPU_USER_RSP] # rsp
+    push r11    # rflags
+    sub rsp, 8  # 跳过 cs
+    push rcx   # rip
+    sub rsp, 2 * 8  # 跳过 error_code/vector
+
     push rax
-    push rdx
     push rcx
+    push rdx
+    push rdi
+    push rsi
+    push r8
+    push r9
+    push r10
+    push r11
     push rbx
+    push rbp
     push r12
+    push r13
+    push r14
+    push r15
 
-    mov ecx, MSR_KERNEL_GS_BASE
-    rdmsr
-    shl rdx, 32
-    or rax, rdx
-    mov r12, rax                  # r12 = 当前任务 TrapFrame 虚拟地址
+    # 旧 TrapContext 基址在当前 rsp 的 -16 位置。
+    mov r13, qword ptr [rsp - 16]
+    mov r14, qword ptr [rsp - 8]
 
-    mov rax, [rsp]
-    mov [r12 + TF_R12], rax
-    mov rax, [rsp + 8]
-    mov [r12 + TF_RBX], rax
-    mov rax, [rsp + 16]
-    mov [r12 + TF_RIP], rax
-    mov [r12 + TF_RCX], rax
-    mov rax, [rsp + 24]
-    mov [r12 + TF_RDX], rax
-    mov rax, [rsp + 32]
-    mov [r12 + TF_RAX], rax
+    # 切到内核 CR3/栈
+    mov cr3, r13
+    # 此处进入内核地址空间
+    mov rsp, r14
 
-    mov [r12 + TF_R15], r15
-    mov [r12 + TF_R14], r14
-    mov [r12 + TF_R13], r13
-    mov [r12 + TF_RBP], rbp
-    mov [r12 + TF_R11], r11
-    mov [r12 + TF_R10], r10
-    mov [r12 + TF_R9], r9
-    mov [r12 + TF_R8], r8
-    mov [r12 + TF_RSI], rsi
-    mov [r12 + TF_RDI], rdi
-    # 保存用户态 FPU/SSE 状态（syscall entry，r12 = TrapFrame 虚拟地址）
-    fxsave64 [r12 + TF_FX_STATE]
-    lea rax, [rsp + 40]
-    mov [r12 + TF_RSP], rax
-    mov qword ptr [r12 + TF_CS], USER_CS
-    mov qword ptr [r12 + TF_SS], USER_SS
-    mov [r12 + TF_RFLAGS], r11
-    mov qword ptr [r12 + TF_VECTOR], SYSCALL_VECTOR
-    mov qword ptr [r12 + TF_ERROR_CODE], 0
+    # 调用 syscall handler
+    lea r15, [rip + x86_syscall_handler]
+    call r15
 
-    mov rax, [r12 + TF_K_CR3]
+    # handler 返回约定：rax=user_cr3, rdx=trap_cx_ptr
+    
     mov cr3, rax
-    mov rsp, [r12 + TF_K_SP]
-    call x86_syscall_handler
+    # 切 rsp 回用户 TrapFrame
+    mov rsp, rdx
+    # 跳过前置内核字段区，按寄存器布局恢复。
+    add rsp, 16
 
-    ud2
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbp
+    pop rbx
+    pop r11                    # RFLAGS（for sysret）
+    pop r10
+    pop r9
+    pop r8
+    pop rsi
+    pop rdi
+    pop rdx
+    pop rcx                    # RIP（for sysret）
+    pop rax                    # syscall 返回值（handler 已写回）
+
+    # 此时 rsp 指向 TrapContext 的 vector 槽
+    add rsp, 7 * 8
+    mov rcx, [rsp - 5 * 8]  // rip
+    mov r11, [rsp - 3 * 8]  // rflags
+    mov rsp, [rsp - 2 * 8]  // user rsp
+
+    swapgs
+    sysretq

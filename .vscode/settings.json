@@ -2,10 +2,6 @@
     "rust-analyzer.files.exclude": [
         "user/**"
     ],
-    // ============================================================================
-    // 架构选择: 修改下面的配置切换 rust-analyzer 检查的目标架构
-    // 选项: "riscv64" 或 "x86_64"
-    // ============================================================================
     
     // ---- RISC-V 64 配置 (取消注释以启用) ----
     // "rust-analyzer.cargo.target": "riscv64gc-unknown-none-elf",
@@ -15,7 +11,7 @@
     // },
     
     // ---- x86-64 配置 (当前启用) ----
-    "rust-analyzer.cargo.target": "./tools/x86_64.json",
+    "rust-analyzer.cargo.target": "x86_64-unknown-none",
     "rust-analyzer.cargo.extraEnv": {
         "RUSTFLAGS": "--cfg getrandom_backend=\"custom\" --cfg plat_qemu_x86_64",
         "PLATFORM": "plat_qemu_x86_64"

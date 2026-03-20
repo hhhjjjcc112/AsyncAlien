@@ -6,7 +6,7 @@ use alloc::sync::Arc;
 use core::arch::global_asm;
 
 use arch::cpu_id;
-use basic::{sync::Once, sync::OnceGet, task::TaskContext};
+use basic::{sync::Once, task::TaskContext};
 use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;
@@ -43,7 +43,7 @@ pub static TASK_DOMAIN: Once<Arc<dyn TaskDomain>> = Once::new();
 #[macro_export]
 macro_rules! task_domain {
     () => {
-        $crate::task::TASK_DOMAIN.get_must()
+        basic::sync::OnceGet::get_must(&$crate::task::TASK_DOMAIN)
     };
 }
 

@@ -1,6 +1,5 @@
 use core::arch::asm;
 
-use basic::sync::OnceGet;
 use config::TRAMPOLINE;
 use riscv::register::{
     scause::Trap,

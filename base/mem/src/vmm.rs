@@ -2,9 +2,10 @@ use alloc::{boxed::Box, sync::Arc, vec, vec::Vec};
 use core::sync::atomic::AtomicUsize;
 
 use arch::sfence_vma_all;
-#[cfg(not(target_arch = "x86_64"))]
 use config::FRAME_BITS;
 use config::{FRAME_SIZE, KERNEL_HEAP_SIZE, TRAMPOLINE};
+#[cfg(target_arch = "x86_64")]
+use config::PERCPU_MIRROR_BASE;
 use ksync::RwLock;
 use log::info;
 use page_table::MappingFlags;
@@ -27,10 +28,39 @@ unsafe extern "C" {
     fn sinit();
     fn einit();
 
+    #[cfg(target_arch = "x86_64")]
+    fn _percpu_start();
+    #[cfg(target_arch = "x86_64")]
+    fn _percpu_end();
+
     // fn kernel_eh_frame();
     // fn kernel_eh_frame_end();
     // fn kernel_eh_frame_hdr();
     // fn kernel_eh_frame_hdr_end();
+}
+
+#[cfg(target_arch = "x86_64")]
+fn map_percpu_mirror(kernel_space: &mut VmSpace<VmmPageAllocator>) {
+    let percpu_start = _percpu_start as *const () as usize;
+    let percpu_end = _percpu_end as *const () as usize;
+    if percpu_end <= percpu_start {
+        return;
+    }
+    let size = (percpu_end - percpu_start + FRAME_SIZE - 1) & !(FRAME_SIZE - 1);
+    let pages = size / FRAME_SIZE;
+
+    let mut frames: Vec<Box<dyn PhysPage>> = Vec::with_capacity(pages);
+    for i in 0..pages {
+        let paddr = percpu_start + i * FRAME_SIZE;
+        frames.push(Box::new(FrameTracker::new(paddr >> FRAME_BITS, 1, false)));
+    }
+
+    let percpu_area = VmArea::new(
+        PERCPU_MIRROR_BASE..PERCPU_MIRROR_BASE + size,
+        MappingFlags::READ | MappingFlags::WRITE,
+        frames,
+    );
+    kernel_space.map(VmAreaType::VmArea(percpu_area)).unwrap();
 }
 
 pub fn kernel_info() -> usize {
@@ -120,6 +150,9 @@ pub fn build_kernel_address_space() {
     kernel_space
         .map(VmAreaType::VmArea(trampoline_area))
         .unwrap();
+
+    #[cfg(target_arch = "x86_64")]
+    map_percpu_mirror(&mut kernel_space);
 
     let mut map_max = heap_end;
     for &(start, size) in Platform::alloc_ranges() {

@@ -37,8 +37,6 @@ global_asm!(include_str!("./riscv64/kernel_v.asm"));
 global_asm!(include_str!("./riscv64/trampoline.asm"));
 
 #[cfg(target_arch = "x86_64")]
-global_asm!(include_str!("./x86_64/vectors.asm"));
-#[cfg(target_arch = "x86_64")]
 global_asm!(include_str!("./x86_64/trampoline.asm"));
 
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
@@ -47,14 +45,14 @@ pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();
 #[macro_export]
 macro_rules! syscall_domain {
     () => {
-        $crate::trap::SYSCALL_DOMAIN.get_must()
+        basic::sync::OnceGet::get_must(&$crate::trap::SYSCALL_DOMAIN)
     };
 }
 
 #[macro_export]
 macro_rules! plic_domain {
     () => {
-        $crate::trap::PLIC_DOMAIN.get_must()
+        basic::sync::OnceGet::get_must(&$crate::trap::PLIC_DOMAIN)
     };
 }
 
