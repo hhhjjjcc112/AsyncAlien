@@ -1,54 +1,41 @@
 # x86-64 task switch implementation
 #
-# Switches between two task contexts by saving and restoring
-# callee-saved registers (rbx, rbp, r12-r15) and stack pointer.
+# 使用与 axcpu 一致的切换方式：
+# - 当前任务把 callee-saved 寄存器压栈后保存 rsp
+# - 下一个任务恢复 rsp 后弹栈并 ret 到其保存的 rip
 #
 # Arguments:
 #   rdi = pointer to current TaskContext (to save)
 #   rsi = pointer to next TaskContext (to restore)
 #
 # TaskContext layout on x86-64:
-#   0x00: rip (return address)
-#   0x08: rsp (stack pointer)
-#   0x10: rbx
-#   0x18: rbp
-#   0x20: r12
-#   0x28: r13
-#   0x30: r14
-#   0x38: r15
-#   0x40: fp_simd (fxsave64/fxrstor64, 512 bytes)
+#   0x00: kstack_top
+#   0x08: rsp
+#   0x10: fs_base
+#   0x18: gs_base
 
 .section .text
 .globl __switch
 __switch:
-    # Save current task context
-    # Save return address (after this function returns)
-    lea rax, [rip + .Lswitch_return]
-    mov [rdi + 0x00], rax
-    
-    # Save callee-saved registers
+    # 当前任务：压栈并记录切换后的 rsp
+    push rbp
+    push rbx
+    push r12
+    push r13
+    push r14
+    push r15
     mov [rdi + 0x08], rsp
-    mov [rdi + 0x10], rbx
-    mov [rdi + 0x18], rbp
-    mov [rdi + 0x20], r12
-    mov [rdi + 0x28], r13
-    mov [rdi + 0x30], r14
-    mov [rdi + 0x38], r15
-    fxsave64 [rdi + 0x40]
-    
-    # Restore next task context
-    # Restore callee-saved registers
-    mov rbx, [rsi + 0x10]
-    mov rbp, [rsi + 0x18]
-    mov r12, [rsi + 0x20]
-    mov r13, [rsi + 0x28]
-    mov r14, [rsi + 0x30]
-    mov r15, [rsi + 0x38]
-    fxrstor64 [rsi + 0x40]
-    mov rsp, [rsi + 0x08]
-    
-    # Jump to saved return address
-    jmp [rsi + 0x00]
 
-.Lswitch_return:
+    # 切换到下一个任务的栈
+    mov rsp, [rsi + 0x08]
+
+    # 恢复下一个任务的 callee-saved 寄存器
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbx
+    pop rbp
+
+    # 返回到下一个任务保存的 rip
     ret

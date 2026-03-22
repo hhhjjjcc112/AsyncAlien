@@ -4,9 +4,6 @@ mod entry;
 pub use entry::{
     set_kernel_trap_entry, trap_return, user_trap_vector,
 };
-use entry::{
-    kernel_trap_vector, set_user_trap_entry,
-};
 
 pub fn init_trap() {
     // RISC-V: 初始化并设置 stvec（含内核态和用户态入口）

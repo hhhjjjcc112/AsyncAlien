@@ -1,16 +1,17 @@
-use core::{arch::asm, task};
+use core::arch::asm;
 
-use basic::task::TrapFrame;
-use mem::PhysAddr;
+use config::TRAMPOLINE;
 use platform;
 
 use crate::{plic_domain, task_domain, timer};
 
 use super::{
-    context::{fault_address, X86TrapFrame, X86TrapFrameExt}, gdt, syscall, vector,
+    context::{fault_address, X86TrapFrame, X86TrapFrameExt}, syscall,
+    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult}, vectors,
 };
 
 unsafe extern "C" {
+    fn strampoline();
     fn x86_trampoline_return(user_cr3: usize, trap_cx_ptr: usize) -> !;
 }
 
@@ -31,54 +32,35 @@ pub extern "C" fn kernel_trap_handler(frame: &mut X86TrapFrame) {
     // 函数返回，汇编自动 ret
 }
 
-#[repr(C)]
-pub struct UserTrapResult {
-    pub user_cr3: usize,
-    pub trap_cx_ptr: usize,
-}
-
 /// 用户态 trap 处理函数
 /// 由 trampoline.asm 中的 .Lfrom_user 直接调用
 /// 参数 rdi: 指向 TrapFrame 的指针
 /// 返回后汇编自动 ret，继续执行在 trampoline 中的恢复代码
 #[unsafe(no_mangle)]
 pub extern "C" fn user_trap_vector() -> UserTrapResult {
-    let task_domain = task_domain!();
-    let trap_frame_phy_addr = task_domain.trap_frame_phy_addr().expect("user_trap_vector: no trap frame for current task");
-    let frame = X86TrapFrame::from_raw_phy_ptr(PhysAddr::from(trap_frame_phy_addr));
+    let frame = current_trap_frame();
 
     handle_user_trap(frame);
 
-    // 在返回前设置 TSS.rsp0，使下次 trap 时 CPU 能正确栈帧
-    let task_domain = task_domain!();
-    let (user_cr3, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
-
-    // 更新 TSS.rsp0
-    gdt::write_tss_rsp0(trap_cx_ptr + basic::task::TrapFrame::USER_CONTEXT_SIZE);
-
-    // 通过指定寄存器返回 user_cr3 和 trap_cx_ptr，供 trampoline 恢复用户态使用
-    // 使用了rax和rdx寄存器
-    UserTrapResult {
-        user_cr3,
-        trap_cx_ptr,
-    }
+    // SysV ABI 下以 rax/rdx 返回 user_cr3 与 trap_cx_ptr。
+    prepare_user_return()
 }
 
 fn handle_user_trap(frame: &mut X86TrapFrame) {
     let vec = frame.vector as u8;
 
     match vec {
-        vector::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
-        vector::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
-        vector::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
-        vector::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
-        vector::GENERAL_PROTECTION => {
+        vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
+        vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
+        vectors::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
+        vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
+        vectors::GENERAL_PROTECTION => {
             panic!(
                 "General protection fault at RIP={:#x}, error_code={:#x}",
                 frame.rip, frame.error_code
             );
         }
-        vector::PAGE_FAULT => {
+        vectors::PAGE_FAULT => {
             let fault_addr = fault_address();
             task_domain!()
                 .do_load_page_fault(fault_addr)
@@ -89,32 +71,32 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
                 frame.rip
             );
         }
-        vector::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
+        vectors::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
 
-        vector::APIC_TIMER => {
+        vectors::APIC_TIMER => {
             trace!("APIC timer interrupt");
             timer::set_next_trigger();
             crate::task::yield_now();
             send_apic_eoi();
         }
 
-        vector::SYSCALL => {
+        vectors::SYSCALL => {
             // 兼容入口：int 0x80 从用户态触发
             syscall::handle_legacy_syscall(frame);
         }
 
-        v if (vector::IRQ_BASE..vector::APIC_TIMER).contains(&v) => {
-            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vector::IRQ_BASE);
+        v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
+            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
             plic_domain!().handle_irq().expect("handle_irq failed");
             send_apic_eoi();
         }
 
-        vector::APIC_ERROR => {
+        vectors::APIC_ERROR => {
             log::warn!("APIC error interrupt");
             send_apic_eoi();
         }
 
-        vector::APIC_SPURIOUS => {
+        vectors::APIC_SPURIOUS => {
             log::warn!("Spurious APIC interrupt");
         }
 
@@ -131,45 +113,45 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
     let vec = frame.vector as u8;
 
     match vec {
-        vector::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
-        vector::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
-        vector::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
-        vector::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
-        vector::GENERAL_PROTECTION => {
+        vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
+        vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
+        vectors::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
+        vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
+        vectors::GENERAL_PROTECTION => {
             panic!(
                 "General protection fault at RIP={:#x}, error_code={:#x}",
                 frame.rip, frame.error_code
             );
         }
-        vector::PAGE_FAULT => {
+        vectors::PAGE_FAULT => {
             let fault_addr = fault_address();
             panic!(
                 "Kernel page fault at RIP={:#x}, fault_addr={:#x}, error={:#x}",
                 frame.rip, fault_addr, frame.error_code
             );
         }
-        vector::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
+        vectors::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
 
-        vector::APIC_TIMER => {
+        vectors::APIC_TIMER => {
             trace!("APIC timer interrupt");
             timer::set_next_trigger();
             send_apic_eoi();
         }
 
-        vector::SYSCALL => panic!("syscall from kernel mode"),
+        vectors::SYSCALL => panic!("syscall from kernel mode"),
 
-        v if (vector::IRQ_BASE..vector::APIC_TIMER).contains(&v) => {
-            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vector::IRQ_BASE);
+        v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
+            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
             plic_domain!().handle_irq().expect("handle_irq failed");
             send_apic_eoi();
         }
 
-        vector::APIC_ERROR => {
+        vectors::APIC_ERROR => {
             log::warn!("APIC error interrupt");
             send_apic_eoi();
         }
 
-        vector::APIC_SPURIOUS => {
+        vectors::APIC_SPURIOUS => {
             log::warn!("Spurious APIC interrupt");
         }
 
@@ -191,11 +173,16 @@ fn send_apic_eoi() {
 pub extern "C" fn trap_return() -> ! {
     // 该入口用于任务上下文首次/再次返回用户态，不走常规函数返回。
     let task_domain = task_domain!();
-    let (user_cr3, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
+    let (user_cr3, trap_cx_ptr) = task_domain
+        .page_table_token_with_trap_frame_virt_addr()
+        .unwrap();
+    // 返回代码必须位于 trampoline 共享映射中，避免切到用户 CR3 后取指失败。
+    let ret_va = x86_trampoline_return as *const () as usize - strampoline as *const () as usize
+        + TRAMPOLINE;
     unsafe {
         asm!(
             "jmp {ret}",
-            ret = sym x86_trampoline_return,
+            ret = in(reg) ret_va,
             in("rdi") user_cr3,
             in("rsi") trap_cx_ptr,
             options(noreturn)

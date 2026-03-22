@@ -7,8 +7,6 @@
 //! Each architecture uses its native naming conventions while
 //! exposing a unified public interface.
 
-mod exception;
-
 // Architecture-specific implementations
 #[cfg(target_arch = "riscv64")]
 mod riscv64;

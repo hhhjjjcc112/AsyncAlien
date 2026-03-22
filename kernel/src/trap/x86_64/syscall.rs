@@ -1,6 +1,5 @@
 use core::arch::global_asm;
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
-use mem::PhysAddr;
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::{
     VirtAddr,
@@ -11,11 +10,8 @@ use x86_64::{
     },
 };
 
-use crate::task_domain;
-use crate::trap::x86_64::handler::UserTrapResult;
-
 use super::context::X86TrapFrame;
-use super::gdt;
+use super::user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult};
 
 #[unsafe(no_mangle)]
 #[percpu::def_percpu]
@@ -33,11 +29,7 @@ unsafe extern "C" {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
-    let task_domain = task_domain!();
-    let frame = task_domain
-        .trap_frame_phy_addr()
-        .expect("x86_syscall_handler: no trap frame for current task");
-    let frame = X86TrapFrame::from_raw_phy_ptr(PhysAddr::from(frame));
+    let frame = current_trap_frame();
 
     let parameters = frame.parameters();
     let result = crate::syscall_domain!().call(
@@ -56,16 +48,8 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
         err as isize
     });
     frame.update_result(res as usize);
-    let (user_cr3, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
-
-    // syscall 返回前同样刷新 rsp0，供下一次用户态陷入使用。
-    gdt::write_tss_rsp0(trap_cx_ptr + basic::task::TrapFrame::USER_CONTEXT_SIZE);
-
-    // 返回 user_cr3 和 trap_cx_ptr，供 trampoline 恢复用户态使用
-    UserTrapResult {
-        user_cr3,
-        trap_cx_ptr,
-    }
+    // SysV ABI 下以 rax/rdx 返回 user_cr3 与 trap_cx_ptr。
+    prepare_user_return()
 }
 
 /// 处理当前 x86_64 的系统调用入口。

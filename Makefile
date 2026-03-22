@@ -315,8 +315,8 @@ gdb-client:
 endif
 
 clean:
-	rm build/disk/g*
-	rm build/init/g*
+	rm -f build/disk/g*
+	rm -f build/init/g*
 	cargo clean
 
 ifeq ($(ARCH_KIND),x86_64)

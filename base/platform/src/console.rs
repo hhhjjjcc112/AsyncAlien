@@ -6,8 +6,8 @@ use crate::console_putchar;
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-        let hard_id = arch::hart_id();
-        $crate::console::__print(format_args!("[{}] {}", hard_id, format_args!($($arg)*)))
+        let cpu_id = arch::cpu_id();
+        $crate::console::__print(format_args!("[{}] {}", cpu_id, format_args!($($arg)*)))
     };
 }
 

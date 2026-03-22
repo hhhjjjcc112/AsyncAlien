@@ -1,7 +1,7 @@
 mod init;
 
 extern crate alloc;
-use alloc::{boxed::Box, string::{String, ToString}, sync::Arc};
+use alloc::{boxed::Box, string::ToString, sync::Arc};
 
 use basic::bus::mmio::VirtioMmioDeviceType;
 use corelib::AlienResult;
@@ -40,9 +40,9 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     let plic_address = plic_device.address_range();
     let plic_info = PlicInfo {
         device_info: plic_address.start.as_usize()..plic_address.end.as_usize(),
-        #[cfg(any(plat_qemu_riscv, plat_qemu_x86_64))]
+        #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
         ty: PlicType::Qemu,
-        #[cfg(plat_vf2)]
+        #[cfg(all(target_arch = "riscv64", plat_vf2))]
         ty: PlicType::SiFive,
     };
     plic.init_by_box(Box::new(plic_info))?;
@@ -53,8 +53,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
         true
     );
 
-    let mut nic_irq: Option<u32> = None;
-    let mut nic_name: Option<String> = None;
+    let mut nic_irq = 0;
 
     for device in platform_bus.common_devices().iter() {
         let address = device.address().as_usize();
@@ -134,12 +133,11 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     false
                 );
                 let irq = device.irq();
-                nic_irq = irq;
-                nic_name = Some("nic-1".to_string());
+                nic_irq = irq.unwrap();
             }
             "sdcard" => {
                 let (sdcard, domain_file_info) =
-                    create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "plat_vf2_sd")?;
+                    create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "vf2_sd")?;
                 sdcard.init_by_box(Box::new(address..address + size))?;
                 register_domain!(
                     "block",
@@ -172,8 +170,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     false
                 );
                 let irq = device.irq();
-                nic_irq = irq;
-                nic_name = Some("nic-1".to_string());
+                nic_irq = irq.unwrap();
             }
             VirtioMmioDeviceType::Block => {
                 let (blk_driver, domain_file_info) = create_domain!(
@@ -244,7 +241,74 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
             }
         }
     }
+    {
+        let (net_stack, domain_file_info) =
+            create_domain!(NetDomainProxy, DomainTypeRaw::NetDomain, "net_stack")?;
+        net_stack.init_by_box(Box::new("nic-1".to_string()))?;
+        register_domain!(
+            "net_stack",
+            domain_file_info,
+            DomainType::NetDomain(net_stack),
+            true
+        );
+        // register irq
+        plic.register_irq(nic_irq as _, &DVec::from_slice("net_stack".as_bytes()))?
+    }
+    // create shadow block and cache block device
+    {
+        let (shadow_blk, domain_file_info) = create_domain!(
+            ShadowBlockDomainProxy,
+            DomainTypeRaw::ShadowBlockDomain,
+            "shadow_blk"
+        )?;
+        shadow_blk.init_by_box(Box::new("block-1".to_string()))?;
+        register_domain!(
+            "shadow_blk",
+            domain_file_info,
+            DomainType::ShadowBlockDomain(shadow_blk),
+            false
+        );
+        let (cache_blk, domain_file_info) = create_domain!(
+            CacheBlkDomainProxy,
+            DomainTypeRaw::CacheBlkDeviceDomain,
+            "cache_blk"
+        )?;
+        cache_blk.init_by_box(Box::new("shadow_blk-1".to_string()))?;
+        register_domain!(
+            "cache_blk",
+            domain_file_info,
+            DomainType::CacheBlkDeviceDomain(cache_blk),
+            false
+        );
+    }
 
+    // create random and null device
+    {
+        let (null_device, domain_file_info) = create_domain!(
+            EmptyDeviceDomainProxy,
+            DomainTypeRaw::EmptyDeviceDomain,
+            "null"
+        )?;
+        null_device.init_by_box(Box::new(()))?;
+        register_domain!(
+            "null",
+            domain_file_info,
+            DomainType::EmptyDeviceDomain(null_device),
+            true
+        );
+        let (random_device, domain_file_info) = create_domain!(
+            EmptyDeviceDomainProxy,
+            DomainTypeRaw::EmptyDeviceDomain,
+            "random"
+        )?;
+        random_device.init_by_box(Box::new(()))?;
+        register_domain!(
+            "random",
+            domain_file_info,
+            DomainType::EmptyDeviceDomain(random_device),
+            true
+        );
+    }
     Ok(plic)
 }
 

@@ -62,7 +62,7 @@ impl CoreFunction for DomainSyscall {
         strampoline as *const () as usize
     }
 
-    fn sys_kernel_satp(&self) -> usize {
+    fn sys_kernel_page_table_token(&self) -> usize {
         mem::kernel_page_table_token()
     }
 
@@ -340,6 +340,8 @@ unsafe extern "C" {
     fn strampoline();
 }
 static BLK_CRASH: AtomicBool = AtomicBool::new(true);
+
+
 fn unwind() {
     BLK_CRASH.store(false, core::sync::atomic::Ordering::Relaxed);
 }

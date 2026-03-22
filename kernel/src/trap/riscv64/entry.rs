@@ -2,8 +2,7 @@ use core::arch::asm;
 
 use config::TRAMPOLINE;
 use riscv::register::{
-    scause::Trap,
-    sepc, sscratch, sstatus,
+    scause::Trap, sscratch, sstatus,
     sstatus::SPP,
     stvec,
     stvec::TrapMode,
@@ -68,7 +67,9 @@ pub fn user_trap_vector() {
 pub fn trap_return() -> ! {
     set_user_trap_entry();
     let task_domain = task_domain!();
-    let (user_satp, trap_cx_ptr) = task_domain.satp_with_trap_frame_virt_addr().unwrap();
+    let (user_page_table_token, trap_cx_ptr) = task_domain
+        .page_table_token_with_trap_frame_virt_addr()
+        .unwrap();
     let restore_va = user_r as *const () as usize - user_v as *const () as usize + TRAMPOLINE;
     unsafe {
         asm!(
@@ -76,7 +77,7 @@ pub fn trap_return() -> ! {
             "jr {restore_va}",
             restore_va = in(reg) restore_va,
             in("a0") trap_cx_ptr,
-            in("a1") user_satp,
+            in("a1") user_page_table_token,
             options(noreturn)
         )
     }

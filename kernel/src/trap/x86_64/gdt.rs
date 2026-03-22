@@ -1,5 +1,3 @@
-use core::arch::asm;
-
 use x86_64::instructions::segmentation::CS;
 use x86_64::instructions::tables::{lgdt, load_tss};
 use x86_64::registers::segmentation::{SS, Segment, SegmentSelector};

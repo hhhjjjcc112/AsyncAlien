@@ -6,7 +6,7 @@ use x86_64::structures::idt::{
     Entry, HandlerFunc, InterruptDescriptorTable,
 };
 
-use super::vector;
+use super::vectors;
 
 const NUM_INT: usize = 256;
 
@@ -34,7 +34,7 @@ impl IdtStruct {
                 unsafe { core::mem::transmute(TRAMPOLINE + offset) };
             #[allow(clippy::missing_transmute_annotations)]
             let opt = table_entries[vec].set_handler_fn(unsafe { core::mem::transmute(handler) });
-            if vec as u8 == vector::BREAKPOINT || vec as u8 == vector::SYSCALL {
+            if vec as u8 == vectors::BREAKPOINT || vec as u8 == vectors::SYSCALL {
                 opt.set_privilege_level(PrivilegeLevel::Ring3);
             }
         }

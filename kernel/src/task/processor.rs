@@ -1,5 +1,8 @@
 use alloc::sync::Arc;
-use core::{arch::asm, hint::spin_loop};
+use core::hint::spin_loop;
+
+#[cfg(target_arch = "riscv64")]
+use core::arch::asm;
 
 use basic::{
     arch::{cpu_id, CpuLocal},
@@ -43,6 +46,10 @@ impl Cpu {
 const CPU_ONE: CpuLocal<Cpu> = CpuLocal::new(Cpu::empty());
 static CPUS: [CpuLocal<Cpu>; CPU_NUM] = [CPU_ONE; CPU_NUM];
 
+#[cfg(target_arch = "x86_64")]
+#[percpu::def_percpu]
+static CURRENT_TID: usize = 0;
+
 pub fn current_cpu() -> &'static mut Cpu {
     CPUS[cpu_id()].as_mut()
 }
@@ -74,9 +81,12 @@ fn current_tid_impl() -> Option<usize> {
 
 #[cfg(target_arch = "x86_64")]
 fn current_tid_impl() -> Option<usize> {
-    // On x86-64, we use GS base or a dedicated per-CPU variable
-    // For now, read from per-CPU structure
-    current_task().map(|task| task.lock().tid())
+    let tid = CURRENT_TID.read_current();
+    if tid == 0 {
+        None
+    } else {
+        Some(tid)
+    }
 }
 
 pub fn take_current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
@@ -86,7 +96,7 @@ pub fn take_current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
 /// Set thread pointer register
 /// 
 /// - RISC-V: Sets the `tp` register
-/// - x86-64: Sets GS base (or uses per-CPU variable)
+/// - x86-64: Writes current tid into percpu
 #[inline(always)]
 #[cfg(target_arch = "riscv64")]
 fn set_tp(tp: usize) {
@@ -97,21 +107,27 @@ fn set_tp(tp: usize) {
 
 #[inline(always)]
 #[cfg(target_arch = "x86_64")]
-fn set_tp(_tp: usize) {
-    // On x86-64, thread-local state is tracked via per-CPU data
-    // The CPU ID can be read via CPUID/APIC, TID via task structure
+fn set_tp(tp: usize) {
+    CURRENT_TID.write_current(tp);
 }
 
 /// Create thread pointer value from task ID
 /// 
-/// Creates a combined value storing both TID and CPU ID.
-/// - RISC-V: Upper 32 bits = TID, lower 32 bits = hart_id
-/// - x86-64: Same format using APIC ID
+/// Creates architecture-specific tp value.
+/// - RISC-V: Upper 32 bits = TID, lower 32 bits = cpu_id
+/// - x86-64: Equals TID
 #[inline(always)]
+#[cfg(target_arch = "riscv64")]
 fn tp_from_tid(tid: usize) -> usize {
     let current_cpu = cpu_id(); // Get current CPU ID
     // tid:cpu_id format (32:32 bits)
     (tid << 32) | current_cpu
+}
+
+#[inline(always)]
+#[cfg(target_arch = "x86_64")]
+fn tp_from_tid(tid: usize) -> usize {
+    tid
 }
 
 pub fn schedule() {

@@ -3,7 +3,38 @@ use riscv::register::{
     sepc, stval,
 };
 
-use crate::{plic_domain, task_domain, timer};
+use basic::task::TrapFrame;
+use mem::PhysAddr;
+
+use crate::{plic_domain, syscall_domain, task_domain, timer};
+
+#[inline]
+fn handle_user_syscall() {
+    let task_domain = task_domain!();
+    let trap_frame_phy_addr = task_domain.trap_frame_phy_addr().unwrap();
+    let cx = TrapFrame::from_raw_phy_ptr(PhysAddr::from(trap_frame_phy_addr));
+
+    // ecall 返回前前移 sepc，避免重复陷入。
+    cx.update_sepc(cx.sepc() + 4);
+
+    let parameters = cx.parameters();
+    let result = syscall_domain!().call(
+        parameters[0],
+        [
+            parameters[1],
+            parameters[2],
+            parameters[3],
+            parameters[4],
+            parameters[5],
+            parameters[6],
+        ],
+    );
+    let res = result.unwrap_or_else(|err| {
+        error!("syscall error: {:?}", err);
+        err as isize
+    });
+    cx.update_result(res as usize);
+}
 
 pub trait TrapHandler {
     fn do_user_handle(&self);
@@ -18,7 +49,7 @@ impl TrapHandler for Trap {
 
         match self {
             Trap::Exception(Exception::UserEnvCall) => {
-                super::super::exception::syscall_exception_handler();
+                handle_user_syscall();
             }
             Trap::Exception(Exception::StoreFault)
             | Trap::Exception(Exception::LoadFault)

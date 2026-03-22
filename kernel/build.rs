@@ -89,6 +89,11 @@ fn write_link_script(out_dir: &str, content: &str) -> PathBuf {
 }
 
 fn main() {
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=../tools/link.ld");
+    println!("cargo:rerun-if-env-changed=PLATFORM");
+    println!("cargo:rerun-if-env-changed=VF2_SD");
+
     println!("cargo::rustc-check-cfg=cfg(plat_qemu_riscv)");
     println!("cargo::rustc-check-cfg=cfg(plat_qemu_x86_64)");
     println!("cargo::rustc-check-cfg=cfg(plat_vf2)");

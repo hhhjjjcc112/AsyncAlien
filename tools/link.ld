@@ -31,17 +31,6 @@ SECTIONS
         erodata = .;
     }
 
-    . = ALIGN(4K);
-    _percpu_start = .;
-    _percpu_end = _percpu_start + SIZEOF(.percpu);
-    .percpu 0x0 : AT(_percpu_start) {
-        _percpu_load_start = .;
-        *(.percpu .percpu.*)
-        _percpu_load_end = .;
-        . = _percpu_load_start + ALIGN(64) * {{max_cpu_num}};
-    }
-    . = _percpu_end;
-
     .data : ALIGN(4096){
         sdata = .;
         sinit = .;
@@ -82,6 +71,18 @@ SECTIONS
         kernel_eh_frame_end = .;
     }
     . = ALIGN(4K);
+
+    . = ALIGN(4K);
+    _percpu_start = .;
+    _percpu_end = _percpu_start + SIZEOF(.percpu);
+    .percpu 0x0 : AT(_percpu_start) {
+        _percpu_load_start = .;
+        *(.percpu .percpu.*)
+        _percpu_load_end = .;
+        . = _percpu_load_start + ALIGN(64) * {{max_cpu_num}};
+    }
+    . = _percpu_end;
+
     sheap = .;
     PROVIDE(end = .);
 }

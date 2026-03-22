@@ -60,10 +60,11 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
     platform::platform_init_percpu_primary(boot_cpu_id);
 
+    trap::init_trap_subsystem();
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
     mem::init_memory_system(true);
-    trap::init_trap_subsystem();
+    
 
     println!("Boot CPU {}", boot_cpu_id);
     let machine_info = platform::platform_machine_info();
@@ -94,11 +95,11 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
     platform::platform_init_percpu_secondary(cpu_id);
-    
-    platform::platform_init_secondary(cpu_id);
-    
-    mem::init_memory_system(false);
+
     trap::init_trap_subsystem();
+    platform::platform_init_secondary(cpu_id);
+
+    mem::init_memory_system(false);
     #[cfg(target_arch = "riscv64")]
     arch::allow_access_user_memory();
     println!("CPU {} start...", cpu_id);
