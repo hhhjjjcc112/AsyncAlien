@@ -26,11 +26,29 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("vfs", DomainTypeRaw::VfsDomain),
     #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
     ("uart16550", DomainTypeRaw::UartDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("uart16550", DomainTypeRaw::UartDomain),
     #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
+    ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
     ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain),
     ("net_stack", DomainTypeRaw::NetDomain),
     ("logger", DomainTypeRaw::LogDomain),
     ("domainfs", DomainTypeRaw::FsDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("local_apic", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("io_apic", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("hpet", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("apic", DomainTypeRaw::APICDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("virtio_mmio_net", DomainTypeRaw::NetDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("virtio_mmio_input", DomainTypeRaw::InputDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("virtio_mmio_gpu", DomainTypeRaw::GpuDomain),
     #[cfg(all(target_arch = "riscv64", plat_vf2, not(plat_vf2_sd)))]
     ("mem_block", DomainTypeRaw::BlkDeviceDomain),
     #[cfg(feature = "bench")]

@@ -70,6 +70,7 @@ impl PerCpuCounter {
 gen_for_BufInputDomain!();
 gen_for_BufUartDomain!();
 gen_for_CacheBlkDeviceDomain!();
+gen_for_APICDomain!();
 gen_for_EmptyDeviceDomain!();
 gen_for_FsDomain!();
 gen_for_GpuDomain!();

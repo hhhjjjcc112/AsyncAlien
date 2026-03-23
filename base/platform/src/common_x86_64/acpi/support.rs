@@ -1,11 +1,4 @@
-use core::sync::atomic::AtomicU32;
-
 use acpi::PciAddress;
-use spin::Mutex;
-
-pub(super) static NEXT_MUTEX_ID: AtomicU32 = AtomicU32::new(1);
-pub(super) static AML_MUTEX_STATE: Mutex<[bool; super::AML_MUTEX_MAX]> =
-    Mutex::new([false; super::AML_MUTEX_MAX]);
 
 #[inline]
 pub(super) fn phys_to_virt(paddr: usize) -> usize {

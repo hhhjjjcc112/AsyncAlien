@@ -24,7 +24,7 @@ use alloc::sync::Arc;
 use core::arch::global_asm;
 
 use basic::sync::Once;
-use interface::{PLICDomain, SysCallDomain};
+use interface::{APICDomain, PLICDomain, SysCallDomain};
 use platform::println;
 
 
@@ -39,6 +39,7 @@ global_asm!(include_str!("./x86_64/trampoline.asm"));
 
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
 pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();
+pub static APIC_DOMAIN: Once<Arc<dyn APICDomain>> = Once::new();
 
 #[macro_export]
 macro_rules! syscall_domain {
@@ -54,12 +55,23 @@ macro_rules! plic_domain {
     };
 }
 
+#[macro_export]
+macro_rules! apic_domain {
+    () => {
+        basic::sync::OnceGet::get_must(&$crate::trap::APIC_DOMAIN)
+    };
+}
+
 pub fn register_syscall_domain(syscall_domain: Arc<dyn SysCallDomain>) {
     SYSCALL_DOMAIN.call_once(|| syscall_domain);
 }
 
 pub fn register_plic_domain(plic_domain: Arc<dyn PLICDomain>) {
     PLIC_DOMAIN.call_once(|| plic_domain);
+}
+
+pub fn register_apic_domain(apic_domain: Arc<dyn APICDomain>) {
+    APIC_DOMAIN.call_once(|| apic_domain);
 }
 
 

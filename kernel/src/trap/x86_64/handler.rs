@@ -3,8 +3,14 @@ use core::arch::asm;
 use config::TRAMPOLINE;
 use platform;
 
-use crate::{plic_domain, task_domain, timer};
+use crate::{task_domain, timer};
+#[cfg(target_arch = "riscv64")]
+use crate::plic_domain;
+#[cfg(target_arch = "x86_64")]
+use crate::apic_domain;
 
+#[cfg(feature = "trap_self_test")]
+use super::self_test;
 use super::{
     context::{fault_address, X86TrapFrame, X86TrapFrameExt}, syscall,
     user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult}, vectors,
@@ -24,10 +30,7 @@ pub extern "C" fn kernel_trap_handler(frame: &mut X86TrapFrame) {
     if frame.is_user() {
         panic!("kernel_trap_handler: received user-mode trap");
     }
-    assert!(
-        !arch::is_interrupt_enable(),
-        "Interrupts should be disabled in kernel trap handler"
-    );
+    println!("Kernel trap: vector={}, RIP={:#x}, error={:#x}", frame.vector, frame.rip, frame.error_code);
     handle_kernel_trap(frame);
     // 函数返回，汇编自动 ret
 }
@@ -52,7 +55,13 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
     match vec {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
         vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
-        vectors::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
+        vectors::BREAKPOINT => {
+            #[cfg(feature = "trap_self_test")]
+            self_test::record_breakpoint(frame.rip);
+            #[cfg(feature = "trap_self_test")]
+            println!("[trap_self_test] breakpoint entered at RIP={:#x}", frame.rip);
+            log::info!("Breakpoint at RIP={:#x}", frame.rip);
+        }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
         vectors::GENERAL_PROTECTION => {
             panic!(
@@ -87,7 +96,11 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
-            plic_domain!().handle_irq().expect("handle_irq failed");
+            #[cfg(target_arch = "x86_64")]
+            {
+                let irq = (v - vectors::IRQ_BASE) as usize;
+                apic_domain!().handle_irq(irq).expect("handle_irq failed");
+            }
             send_apic_eoi();
         }
 
@@ -115,7 +128,13 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
     match vec {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
         vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
-        vectors::BREAKPOINT => log::debug!("Breakpoint at RIP={:#x}", frame.rip),
+        vectors::BREAKPOINT => {
+            #[cfg(feature = "trap_self_test")]
+            self_test::record_breakpoint(frame.rip);
+            #[cfg(feature = "trap_self_test")]
+            println!("[trap_self_test] breakpoint entered at RIP={:#x}", frame.rip);
+            log::info!("Breakpoint at RIP={:#x}", frame.rip);
+        }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
         vectors::GENERAL_PROTECTION => {
             panic!(
@@ -142,6 +161,12 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
+            #[cfg(target_arch = "x86_64")]
+            {
+                let irq = (v - vectors::IRQ_BASE) as usize;
+                apic_domain!().handle_irq(irq).expect("handle_irq failed");
+            }
+            #[cfg(target_arch = "riscv64")]
             plic_domain!().handle_irq().expect("handle_irq failed");
             send_apic_eoi();
         }

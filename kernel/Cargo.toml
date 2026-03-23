@@ -51,6 +51,8 @@ riscv = "0.11"
 [target.'cfg(target_arch = "x86_64")'.dependencies]
 x86 = "0.52.0"
 x86_64 = "0.14.0"
+acpi = "6.1.0"
+aml = "0.16.4"
 
 
 [features]
@@ -60,6 +62,7 @@ bench = []
 test = []
 time-tick = []
 memory_self_test = ["mem/memory_self_test"]
+trap_self_test = []
 
 
 [lints.rust]

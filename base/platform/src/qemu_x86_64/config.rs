@@ -53,7 +53,7 @@ pub const RESERVED_MEMORY: &[(usize, usize)] = &[
     (0, 0x100000), // 低 1MiB 预留给传统设备
 ];
 
-/// 为兼容 RISC-V 接口保留的设备空间描述。
+/// 平台内部的静态 ACPI 兼容设备描述。
 pub const DEVICE_SPACE: &[(&str, usize, usize)] = &[
     ("local_apic", 0xfee0_0000, 0x1000),
     ("io_apic", 0xfec0_0000, 0x1000),
@@ -61,27 +61,3 @@ pub const DEVICE_SPACE: &[(&str, usize, usize)] = &[
     ("pci_ecam", 0xb000_0000, 0x1000_0000),
 ];
 
-/// ACPI 动态发现的设备区间。
-/// 若 ACPI 尚未初始化，则回退到静态设备表。
-pub fn device_space_dynamic() -> heapless::Vec<(&'static str, usize, usize), 16> {
-    let mut out = heapless::Vec::new();
-    if STATIC_ACPI {
-        for (name, base, size) in DEVICE_SPACE {
-            let _ = out.push((*name, *base, *size));
-        }
-        return out;
-    }
-
-    let list = crate::common_x86_64::acpi::device_list();
-    if list.entries.is_empty() {
-        for (name, base, size) in DEVICE_SPACE {
-            let _ = out.push((*name, *base, *size));
-        }
-        return out;
-    }
-
-    for entry in list.entries.iter() {
-        let _ = out.push((entry.name, entry.base, entry.size));
-    }
-    out
-}

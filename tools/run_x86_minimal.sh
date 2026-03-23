@@ -13,6 +13,7 @@ LOG_LEVEL="${LOG:-}"
 ENABLE_NET="${NET:-n}"
 X86_CPU="${X86_CPU:-max,+x2apic}"
 MEMORY_SELF_TEST="${MEMORY_SELF_TEST:-y}"
+TRAP_SELF_TEST="${TRAP_SELF_TEST:-y}"
 
 KERNEL_FEATURES="${FEATURES:-default}"
 KERNEL_FEATURES="${KERNEL_FEATURES// /,}"
@@ -20,6 +21,13 @@ if [[ "$MEMORY_SELF_TEST" == "y" ]]; then
   # 默认启用内存自检，便于最小化启动时尽早发现问题。
   if [[ ",$KERNEL_FEATURES," != *",memory_self_test,"* ]]; then
     KERNEL_FEATURES="$KERNEL_FEATURES,memory_self_test"
+  fi
+fi
+
+if [[ "$TRAP_SELF_TEST" == "y" ]]; then
+  # 按需启用 trap 自检，避免默认启动行为变化。
+  if [[ ",$KERNEL_FEATURES," != *",trap_self_test,"* ]]; then
+    KERNEL_FEATURES="$KERNEL_FEATURES,trap_self_test"
   fi
 fi
 

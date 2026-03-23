@@ -1,11 +1,17 @@
-use core::{ptr::NonNull, sync::atomic::Ordering};
+use core::{ptr::NonNull, sync::atomic::{AtomicU32, Ordering}};
 
 use acpi::{Handle, Handler as AcpiHandler, PhysicalMapping, PciAddress};
+use spin::Mutex;
 
-use super::{AML_MUTEX_MAX, support::{AML_MUTEX_STATE, NEXT_MUTEX_ID, pci_cfg_read32, pci_cfg_write32, phys_to_virt}};
+use super::support::{pci_cfg_read32, pci_cfg_write32, phys_to_virt};
+
+const AML_MUTEX_MAX: usize = 64;
+
+static NEXT_MUTEX_ID: AtomicU32 = AtomicU32::new(1);
+static AML_MUTEX_STATE: Mutex<[bool; AML_MUTEX_MAX]> = Mutex::new([false; AML_MUTEX_MAX]);
 
 #[derive(Clone, Copy)]
-pub(super) struct AcpiHost;
+pub struct AcpiHost;
 
 impl AcpiHost {
     #[inline]
@@ -121,21 +127,6 @@ impl AcpiHandler for AcpiHost {
         pci_cfg_write32(address, offset, value)
     }
 
-    fn nanos_since_boot(&self) -> u64 {
-        self.nanos_since_boot()
-    }
-
-    fn stall(&self, microseconds: u64) {
-        let deadline = self.nanos_since_boot().saturating_add(microseconds.saturating_mul(1_000));
-        while self.nanos_since_boot() < deadline {
-            core::hint::spin_loop();
-        }
-    }
-
-    fn sleep(&self, milliseconds: u64) {
-        self.stall(milliseconds.saturating_mul(1_000));
-    }
-
     fn create_mutex(&self) -> Handle {
         Handle(NEXT_MUTEX_ID.fetch_add(1, Ordering::Relaxed))
     }
@@ -178,5 +169,20 @@ impl AcpiHandler for AcpiHost {
         let idx = (mutex.0 as usize) % AML_MUTEX_MAX;
         let mut states = AML_MUTEX_STATE.lock();
         states[idx] = false;
+    }
+
+    fn nanos_since_boot(&self) -> u64 {
+        self.nanos_since_boot()
+    }
+
+    fn stall(&self, microseconds: u64) {
+        let deadline = self.nanos_since_boot().saturating_add(microseconds.saturating_mul(1_000));
+        while self.nanos_since_boot() < deadline {
+            core::hint::spin_loop();
+        }
+    }
+
+    fn sleep(&self, milliseconds: u64) {
+        self.stall(milliseconds.saturating_mul(1_000));
     }
 }

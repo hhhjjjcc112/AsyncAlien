@@ -66,7 +66,7 @@ pub fn init_primary_apic() {
     }
 
     // 初始化 I/O APIC。
-    let io_apic_base = crate::common_x86_64::acpi::device_info().ioapic_base;
+    let io_apic_base = crate::qemu_x86_64::config::DEVICE_SPACE[1].1;
     log::info!("Initializing I/O APIC at {:#x}...", io_apic_base);
     let io_apic = unsafe { IoApic::new((io_apic_base as u64) + (PHYS_VIRT_OFFSET as u64)) };
     IO_APIC.call_once(|| Mutex::new(io_apic));

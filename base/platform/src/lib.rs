@@ -77,6 +77,14 @@ pub mod apic {
     pub use crate::common_x86_64::apic::*;
 }
 
+/// x86_64 ACPI 接口导出。
+#[cfg(target_arch = "x86_64")]
+pub mod acpi {
+    pub use crate::common_x86_64::acpi::{
+        device_info, device_list, init, tables, AcpiDeviceEntry, AcpiDeviceInfo, AcpiDeviceList, AcpiHost,
+    };
+}
+
 
 /// 设置单次定时器。
 pub fn set_timer(time: usize) {

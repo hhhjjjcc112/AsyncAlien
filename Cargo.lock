@@ -2684,6 +2684,8 @@ dependencies = [
 name = "kernel"
 version = "0.1.0"
 dependencies = [
+ "acpi",
+ "aml",
  "arch",
  "basic",
  "config",
@@ -3922,7 +3924,6 @@ name = "platform"
 version = "0.1.0"
 dependencies = [
  "acpi",
- "aml",
  "arch",
  "bitflags 2.11.0",
  "config",

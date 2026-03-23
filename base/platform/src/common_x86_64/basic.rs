@@ -56,7 +56,7 @@ impl Debug for MachineInfo {
 pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
     // 先根据 Multiboot 初始化内存区间。
     super::mem::init_from_multiboot(multiboot_ptr);
-    let acpi_info = super::acpi::device_info();
+    let device_space = crate::qemu_x86_64::config::DEVICE_SPACE;
     
     // 从 CPUID 获取 CPU 数。
     let smp = get_cpu_count();
@@ -72,10 +72,10 @@ pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
         model,
         smp,
         memory: super::mem::memory_range(),
-        // ACPI MADT 提供的 Local APIC 地址。
-        plic: acpi_info.lapic_base..(acpi_info.lapic_base + 0x1000),
-        // ACPI MADT 提供的 IO APIC 地址（放入 clint 槽位做兼容）。
-        clint: acpi_info.ioapic_base..(acpi_info.ioapic_base + 0x1000),
+        // 使用静态配置里的 Local APIC 地址。
+        plic: device_space[0].1..(device_space[0].1 + device_space[0].2),
+        // 使用静态配置里的 IO APIC 地址，兼容 clint 槽位。
+        clint: device_space[1].1..(device_space[1].1 + device_space[1].2),
         initrd,
         bootargs,
         bootargs_len,

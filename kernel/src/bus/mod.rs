@@ -5,9 +5,11 @@ use core::ops::Range;
 use ::fdt::Fdt;
 use mem::PhysAddr;
 
-use crate::{bus::fdt::Probe, error::AlienResult};
+use crate::error::AlienResult;
 
+#[cfg(target_arch = "riscv64")]
 mod fdt;
+mod acpi;
 pub mod mmio;
 pub mod pci;
 pub mod platform;
@@ -20,29 +22,58 @@ pub struct CommonDeviceInfo {
 }
 #[derive(Debug, Clone)]
 pub enum CommonDeviceType {
+    #[cfg(target_arch = "riscv64")]
     Plic(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
+    LocalApic(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
+    IoApic(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
+    Hpet(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
     Uart(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
     Rtc(CommonDeviceInfo),
+    #[cfg(target_arch = "riscv64")]
     VirtIo(CommonDeviceInfo),
+    #[cfg(target_arch = "x86_64")]
     Pci(CommonDeviceInfo),
+    #[cfg(any(feature = "bench", all(target_arch = "riscv64", plat_vf2, not(plat_vf2_sd))))]
     Ramdisk(CommonDeviceInfo),
+    #[cfg(all(target_arch = "riscv64", plat_vf2))]
     LoopBack(CommonDeviceInfo),
+    #[cfg(all(target_arch = "riscv64", plat_vf2, plat_vf2_sd))]
     SdCard(CommonDeviceInfo),
 }
 
+#[cfg(target_arch = "riscv64")]
 fn register_detected_devices(devices: alloc::vec::Vec<CommonDeviceType>) {
     devices.into_iter().for_each(|ty| match ty {
+        #[cfg(target_arch = "riscv64")]
         CommonDeviceType::Plic(info) => platform::register_platform_device(info, "plic"),
-        CommonDeviceType::Uart(info) => platform::register_platform_device(info, "uart"),
-        CommonDeviceType::Rtc(info) => platform::register_platform_device(info, "rtc"),
         CommonDeviceType::VirtIo(info) => mmio::register_mmio_device(info),
-        CommonDeviceType::Pci(info) => pci::pci_init(info),
+        #[cfg(any(feature = "bench", all(target_arch = "riscv64", plat_vf2, not(plat_vf2_sd))))]
         CommonDeviceType::Ramdisk(info) => platform::register_platform_device(info, "ramdisk"),
+        #[cfg(all(target_arch = "riscv64", plat_vf2))]
         CommonDeviceType::LoopBack(info) => platform::register_platform_device(info, "loopback"),
+        #[cfg(all(target_arch = "riscv64", plat_vf2, plat_vf2_sd))]
         CommonDeviceType::SdCard(info) => platform::register_platform_device(info, "sdcard"),
     });
 }
 
+#[cfg(target_arch = "x86_64")]
+fn register_detected_devices(devices: alloc::vec::Vec<CommonDeviceType>) {
+    devices.into_iter().for_each(|ty| match ty {
+        CommonDeviceType::LocalApic(info) => platform::register_platform_device(info, "local_apic"),
+        CommonDeviceType::IoApic(info) => platform::register_platform_device(info, "io_apic"),
+        CommonDeviceType::Hpet(info) => platform::register_platform_device(info, "hpet"),
+        CommonDeviceType::Uart(info) => platform::register_platform_device(info, "uart"),
+        CommonDeviceType::Rtc(info) => platform::register_platform_device(info, "rtc"),
+        CommonDeviceType::Pci(info) => pci::pci_init(info),
+    });
+}
+
+#[cfg(target_arch = "riscv64")]
 pub fn init_with_dtb() -> AlienResult<()> {
     let ptr = ::platform::platform_boot_info_ptr();
     let dtb = unsafe { Fdt::from_ptr(ptr as *const u8) }.unwrap();
@@ -110,32 +141,17 @@ pub fn init_with_dtb() -> AlienResult<()> {
 }
 
 #[cfg(target_arch = "x86_64")]
-pub fn init_with_acpi() -> AlienResult<()> {
-    let mut devices = vec![];
+fn init_with_acpi() -> AlienResult<()> {
+    let mut devices = acpi::enumerate_devices();
 
-    // Register ACPI-discovered x86 devices into the common bus model.
-    for (name, base, size) in ::platform::config::device_space_dynamic().iter() {
-        let info = CommonDeviceInfo {
-            address_range: PhysAddr::from(*base)..PhysAddr::from(*base + *size),
-            irq: None,
-            compatible: Some((*name).into()),
-        };
-
-        match *name {
-            // Keep using the "plic" abstraction; x86 backend interprets it as APIC/IOAPIC.
-            "io_apic" | "local_apic" => devices.push(CommonDeviceType::Plic(info)),
-            "pci_ecam" => devices.push(CommonDeviceType::Pci(info)),
-            _ => {}
-        }
+    if devices.is_empty() {
+        // 如果 ACPI 没给出任何可用信息，至少保留一个串口，保证早期调试链路不中断。
+        devices.push(CommonDeviceType::Uart(CommonDeviceInfo {
+            address_range: PhysAddr::from(0x3f8usize)..PhysAddr::from(0x400usize),
+            irq: Some(4),
+            compatible: Some("ns16550a".into()),
+        }));
     }
-
-    // Legacy COM1 for early serial/uart domain compatibility on x86.
-    let uart_info = CommonDeviceInfo {
-        address_range: PhysAddr::from(0x3f8usize)..PhysAddr::from(0x400usize),
-        irq: Some(4),
-        compatible: Some("ns16550a".into()),
-    };
-    devices.push(CommonDeviceType::Uart(uart_info));
 
     register_detected_devices(devices);
     Ok(())

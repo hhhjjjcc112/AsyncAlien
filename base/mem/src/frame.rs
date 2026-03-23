@@ -150,6 +150,7 @@ pub struct FrameTracker {
 
 unsafe extern "C" {
     fn strampoline();
+    fn etrampoline();
 }
 
 impl FrameTracker {
@@ -162,6 +163,8 @@ impl FrameTracker {
     }
     pub fn create_trampoline() -> Self {
         let trampoline_phy_addr = strampoline as *const () as usize;
+        let etrampoline_phy_addr = etrampoline as *const () as usize;
+        assert!(etrampoline_phy_addr - trampoline_phy_addr <= FRAME_SIZE, "trampoline code exceeds one frame");
         assert_eq!(trampoline_phy_addr % FRAME_SIZE, 0);
         Self {
             start_page: trampoline_phy_addr >> FRAME_BITS,

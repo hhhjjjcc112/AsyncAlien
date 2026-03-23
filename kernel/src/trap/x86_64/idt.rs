@@ -30,8 +30,7 @@ impl IdtStruct {
         for vec in 0..NUM_INT {
             let entry = entries[vec] as usize;
             let offset = entry - strampoline as *const () as usize;
-            let handler: unsafe extern "C" fn() =
-                unsafe { core::mem::transmute(TRAMPOLINE + offset) };
+            let handler: unsafe extern "C" fn() = unsafe { core::mem::transmute(TRAMPOLINE + offset) };
             #[allow(clippy::missing_transmute_annotations)]
             let opt = table_entries[vec].set_handler_fn(unsafe { core::mem::transmute(handler) });
             if vec as u8 == vectors::BREAKPOINT || vec as u8 == vectors::SYSCALL {
