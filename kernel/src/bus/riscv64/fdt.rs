@@ -4,7 +4,9 @@ use core::ops::Range;
 use fdt::{standard_nodes::Compatible, Fdt};
 use mem::PhysAddr;
 
-use crate::bus::{pci::ecam_device, CommonDeviceInfo, CommonDeviceType};
+use crate::bus::CommonDeviceInfo;
+
+use super::CommonDeviceType;
 
 pub trait Probe {
     /// Get the base address and irq number of the uart device from the device tree.
@@ -89,9 +91,7 @@ impl Probe for Fdt<'_> {
     }
 
     fn probe_pci(&self) -> Option<CommonDeviceType> {
-        // riscv64 侧只负责找到 PCI 设备树节点，再把它转换成统一的 ECAM 设备描述。
-        // 真正“怎么扫描配置空间”仍然由 `kernel::bus::pci` 统一处理。
-        self.probe_common("pci", false).map(ecam_device)
+        self.probe_common("pci", false).map(CommonDeviceType::Pci)
     }
 
     #[cfg(all(plat_vf2, plat_vf2_sd))]

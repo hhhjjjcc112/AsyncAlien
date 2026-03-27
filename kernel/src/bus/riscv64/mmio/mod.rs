@@ -3,10 +3,9 @@ mod device;
 use basic::io::SafeIORegion;
 use ksync::Mutex;
 
-use crate::bus::{
-    mmio::device::{MmioBus, MmioCommonDevice},
-    CommonDeviceInfo,
-};
+use crate::bus::CommonDeviceInfo;
+
+use self::device::{MmioBus, MmioCommonDevice};
 
 pub static MMIO_BUS: Mutex<MmioBus> = Mutex::new(MmioBus::new());
 

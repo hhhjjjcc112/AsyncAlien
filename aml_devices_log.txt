@@ -1,0 +1,167 @@
+[INFO] Invoking _INI at level: \_SB_.PCI0.PRES
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.CPUS
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.CPUS _HID=ACPI0010
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.CPUS _CID=PNP0A05
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.CPUS ids=["ACPI0010", "PNP0A05"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.HPET
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.HPET _HID=PNP0103
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.HPET ids=["PNP0103"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.LNKA
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKA _HID=PNP0C0F
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKA ids=["PNP0C0F"]
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] invoke \_SB_.LNKA._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.LNKB
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKB _HID=PNP0C0F
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKB ids=["PNP0C0F"]
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] invoke \_SB_.LNKB._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.LNKC
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKC _HID=PNP0C0F
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKC ids=["PNP0C0F"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.LNKD
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKD _HID=PNP0C0F
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKD ids=["PNP0C0F"]
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] invoke \_SB_.LNKD._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.LNKS
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKS _HID=PNP0C0F
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.LNKS ids=["PNP0C0F"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0 _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0 ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.FWCF
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.FWCF _HID=QEMU0002
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.FWCF ids=["QEMU0002"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.GPE0
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.GPE0 _HID=PNP0A06
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.GPE0 ids=["PNP0A06"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.COM1
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.COM1 _HID=PNP0501
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.COM1 ids=["PNP0501"]
+[DEBUG] [bus][x86_64][acpi][aml] UART _CRS parsed: address=0x3f8, size=8, irq=Some(4)
+[TRACE] [bus][x86_64][acpi][aml] UART detected: path=\_SB_.PCI0.ISA_.COM1, io=0x3f8..0x400, irq=Some(4)
+[TRACE] [bus][x86_64][acpi][aml] matched device: \_SB_.PCI0.ISA_.COM1
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.FDC0
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.FDC0 _HID=PNP0700
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.FDC0 ids=["PNP0700"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.FDC0.FLPA
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.FDC0.FLPA _HID=PNP0700
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.FDC0.FLPA ids=["PNP0700"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.KBD_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.KBD_ _HID=PNP0303
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.KBD_ ids=["PNP0303"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.LPT1
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.LPT1 _HID=PNP0400
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.LPT1 ids=["PNP0400"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.MOU_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.MOU_ _HID=PNP0F13
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.MOU_ ids=["PNP0F13"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.ISA_.RTC_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.RTC_ _HID=PNP0B00
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.RTC_ ids=["PNP0B00"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.PHPR
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.PHPR _HID=PNP0A06
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.PHPR ids=["PNP0A06"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.PRES
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.PRES _HID=PNP0A06
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.PRES ids=["PNP0A06"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S00_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S00_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S00_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S10_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S10_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S10_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S18_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S18_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S18_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S20_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S20_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S20_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S28_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S28_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S28_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S30_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S30_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S30_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S38_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S38_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S38_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S40_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S40_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S40_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S48_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S48_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S48_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S50_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S50_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S50_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S58_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S58_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S58_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S60_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S60_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S60_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S68_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S68_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S68_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S70_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S70_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S70_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S78_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S78_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S78_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S80_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S80_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S80_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S88_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S88_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S88_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S90_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S90_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S90_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.S98_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S98_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.S98_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SA0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SA0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SA0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SA8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SA8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SA8_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SB0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SB0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SB0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SB8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SB8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SB8_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SC0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SC0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SC0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SC8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SC8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SC8_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SD0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SD0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SD0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SD8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SD8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SD8_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SE0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SE0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SE0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SE8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SE8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SE8_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SF0_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SF0_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SF0_ ids=["PNP0A03"]
+[TRACE] [bus][x86_64][acpi][aml] visit device: \_SB_.PCI0.SF8_
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SF8_ _HID=PNP0A03
+[TRACE] [bus][x86_64][acpi][aml] \_SB_.PCI0.SF8_ ids=["PNP0A03"]

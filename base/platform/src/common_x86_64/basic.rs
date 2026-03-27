@@ -19,9 +19,9 @@ pub struct MachineInfo {
     pub smp: usize,
     /// 物理内存区间。
     pub memory: Range<usize>,
-    /// 中断控制器区间（x86 对应 Local APIC）。
+    /// 兼容字段：x86_64 下不承载真实设备发现语义。
     pub plic: Range<usize>,
-    /// 定时器控制区间（x86 由 APIC 定时器集成实现）。
+    /// 兼容字段：x86_64 下不承载真实设备发现语义。
     pub clint: Range<usize>,
     /// initrd 区间（若由引导器加载）。
     pub initrd: Option<Range<usize>>,
@@ -38,7 +38,14 @@ impl Debug for MachineInfo {
         writeln!(f, "Machine: {}", model)?;
         writeln!(f, "SMP:     {} CPUs", self.smp)?;
         writeln!(f, "Memory:  {:#x}..{:#x}", self.memory.start, self.memory.end)?;
-        writeln!(f, "APIC:    {:#x}..{:#x}", self.plic.start, self.plic.end)?;
+        writeln!(
+            f,
+            "Compat:  plic={:#x}..{:#x}, clint={:#x}..{:#x}",
+            self.plic.start,
+            self.plic.end,
+            self.clint.start,
+            self.clint.end
+        )?;
         if let Some(ref initrd) = self.initrd {
             writeln!(f, "Initrd:  {:#x}..{:#x}", initrd.start, initrd.end)?;
         }
@@ -56,7 +63,6 @@ impl Debug for MachineInfo {
 pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
     // 先根据 Multiboot 初始化内存区间。
     super::mem::init_from_multiboot(multiboot_ptr);
-    let device_space = crate::qemu_x86_64::config::DEVICE_SPACE;
     
     // 从 CPUID 获取 CPU 数。
     let smp = get_cpu_count();
@@ -72,10 +78,9 @@ pub fn machine_info_from_boot_info(multiboot_ptr: usize) -> MachineInfo {
         model,
         smp,
         memory: super::mem::memory_range(),
-        // 使用静态配置里的 Local APIC 地址。
-        plic: device_space[0].1..(device_space[0].1 + device_space[0].2),
-        // 使用静态配置里的 IO APIC 地址，兼容 clint 槽位。
-        clint: device_space[1].1..(device_space[1].1 + device_space[1].2),
+        // x86_64 下这两个字段仅为兼容占位，不作为设备发现结果。
+        plic: 0..0,
+        clint: 0..0,
         initrd,
         bootargs,
         bootargs_len,

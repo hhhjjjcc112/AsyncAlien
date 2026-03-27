@@ -1,0 +1,4 @@
+- 通过rsdp获取到acpi表的地址
+- acpi表包含
+  - madt: 包含local_apic, io_apic信息
+    - 

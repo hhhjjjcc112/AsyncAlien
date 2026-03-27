@@ -31,6 +31,12 @@
 .section .text.trampoline
 .code64
 
+# 存储kernel_trap_handler和user_trap_vector的绝对地址
+kernel_trap_handler_ptr:
+    .quad kernel_trap_handler
+user_trap_vector_ptr:
+    .quad user_trap_vector
+
 .set i, 0
 .rept NUM_INT
     DEF_HANDLER %i
@@ -64,7 +70,9 @@
     je .Lfrom_user
 
     mov rdi, rsp
-    lea r13, [rip + kernel_trap_handler]
+
+    # 指向kernel_trap_handler绝对地址
+    mov r13, [kernel_trap_handler_ptr]
     call r13
 
     # 跳过k_sp和k_cr3
@@ -104,7 +112,7 @@
     mov rsp, r14
 
     # 调用 user_trap_vector，返回后继续执行恢复逻辑
-    lea r13, [rip + user_trap_vector]
+    mov r13, [user_trap_vector_ptr]
     call r13
 
     # handler 返回约定：rax=user_cr3, rdx=trap_cx_ptr
@@ -168,6 +176,8 @@ x86_trampoline_return:
     # 跳过 error_code/vector
     add rsp, 2 * 8
     iretq
+
+
 .section .rodata
 .global trap_handler_table
 trap_handler_table:

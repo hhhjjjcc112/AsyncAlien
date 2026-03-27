@@ -5,7 +5,7 @@ use arch::sfence_vma_all;
 use config::FRAME_BITS;
 use config::{FRAME_SIZE, KERNEL_HEAP_SIZE, TRAMPOLINE};
 #[cfg(target_arch = "x86_64")]
-use config::PERCPU_MIRROR_BASE;
+use config::{LOW_PHYS_MAP_BASE, LOW_PHYS_MAP_SIZE, PERCPU_MIRROR_BASE};
 use ksync::RwLock;
 use log::info;
 use page_table::MappingFlags;
@@ -61,6 +61,62 @@ fn map_percpu_mirror(kernel_space: &mut VmSpace<VmmPageAllocator>) {
         frames,
     );
     kernel_space.map(VmAreaType::VmArea(percpu_area)).unwrap();
+}
+
+#[cfg(target_arch = "x86_64")]
+fn map_low_phys_window(kernel_space: &mut VmSpace<VmmPageAllocator>) {
+    let pages = LOW_PHYS_MAP_SIZE / FRAME_SIZE;
+    let mut frames: Vec<Box<dyn PhysPage>> = Vec::with_capacity(pages);
+    for page in 0..pages {
+        frames.push(Box::new(FrameTracker::new(page, 1, false)));
+    }
+
+    // 供 ACPI/AML 访问低端物理内存（如 EBDA/BDA），避免和空指针地址重叠。
+    let low_phys_area = VmArea::new(
+        LOW_PHYS_MAP_BASE..LOW_PHYS_MAP_BASE + LOW_PHYS_MAP_SIZE,
+        MappingFlags::READ | MappingFlags::WRITE,
+        frames,
+    );
+    kernel_space.map(VmAreaType::VmArea(low_phys_area)).unwrap();
+}
+
+#[cfg(target_arch = "x86_64")]
+fn map_acpi_reserved_tail(kernel_space: &mut VmSpace<VmmPageAllocator>) {
+    const ACPI_TAIL_MAP_SIZE: usize = 0x20_0000;
+    const PCI_ECAM_BASE: usize = 0xb000_0000;
+
+    let max_ram_end = Platform::phys_ram_ranges()
+        .iter()
+        .map(|(start, size)| start.saturating_add(*size))
+        .max()
+        .unwrap_or(0);
+    if max_ram_end == 0 {
+        return;
+    }
+
+    let start = (max_ram_end + FRAME_SIZE - 1) & !(FRAME_SIZE - 1);
+    if start >= PCI_ECAM_BASE {
+        return;
+    }
+    let mut end = start.saturating_add(ACPI_TAIL_MAP_SIZE);
+    if end > PCI_ECAM_BASE {
+        end = PCI_ECAM_BASE;
+    }
+    end &= !(FRAME_SIZE - 1);
+    if end <= start {
+        return;
+    }
+
+    let pages = (end - start) / FRAME_SIZE;
+    let mut frames: Vec<Box<dyn PhysPage>> = Vec::with_capacity(pages);
+    for page in 0..pages {
+        let paddr = start + page * FRAME_SIZE;
+        frames.push(Box::new(FrameTracker::new(paddr >> FRAME_BITS, 1, false)));
+    }
+
+    // QEMU 常把 ACPI reclaim/NVS 放在可用内存尾部上方，这里补一段只读写映射供 ACPI 解析。
+    let tail_area = VmArea::new(start..end, MappingFlags::READ | MappingFlags::WRITE, frames);
+    kernel_space.map(VmAreaType::VmArea(tail_area)).unwrap();
 }
 
 pub fn kernel_info() -> usize {
@@ -152,7 +208,11 @@ pub fn build_kernel_address_space() {
         .unwrap();
 
     #[cfg(target_arch = "x86_64")]
-    map_percpu_mirror(&mut kernel_space);
+    {
+        map_percpu_mirror(&mut kernel_space);
+        map_low_phys_window(&mut kernel_space);
+        map_acpi_reserved_tail(&mut kernel_space);
+    }
 
     let mut map_max = heap_end;
     for &(start, size) in Platform::alloc_ranges() {

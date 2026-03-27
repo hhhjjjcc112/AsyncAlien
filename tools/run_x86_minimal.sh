@@ -9,7 +9,7 @@ cd "$ROOT_DIR"
 
 SMP="${SMP:-2}"
 MEMORY_SIZE="${MEMORY_SIZE:-2048M}"
-LOG_LEVEL="${LOG:-}"
+LOG_LEVEL="${LOG:-DEBUG}"
 ENABLE_NET="${NET:-n}"
 X86_CPU="${X86_CPU:-max,+x2apic}"
 MEMORY_SELF_TEST="${MEMORY_SELF_TEST:-y}"
@@ -33,6 +33,7 @@ fi
 
 echo "[minimal-x86] build kernel only"
 echo "[minimal-x86] features: $KERNEL_FEATURES"
+echo "[minimal-x86] log level: $LOG_LEVEL"
 make build ARCH=x86_64 LOG="$LOG_LEVEL" FEATURES="$KERNEL_FEATURES"
 
 QEMU_ARGS=(

@@ -1,5 +1,7 @@
 use crate::{arch, syscall, syscall_id};
+use pconst::*;
 
+// pconst 暂未覆盖的 Linux 号或兼容名，先在 userlib 保持。
 syscall_id!(SYSCALL_SETXATTR, 5);
 syscall_id!(SYSCALL_LSETXATTR, 6);
 syscall_id!(SYSCALL_FSETXATTR, 7);
@@ -12,67 +14,30 @@ syscall_id!(SYSCALL_FLISTXATTR, 13);
 syscall_id!(SYSCALL_REMOVEXATTR, 14);
 syscall_id!(SYSCALL_LREMOVEXATTR, 15);
 syscall_id!(SYSCALL_FREMOVEXATTR, 16);
-
-syscall_id!(SYSCALL_GETCWD, 17);
-
-syscall_id!(SYSCALL_DUP, 23);
-syscall_id!(SYSCALL_DUP3, 24);
-syscall_id!(SYSCALL_LINKAT, 37);
-syscall_id!(SYSCALL_UNLINKAT, 35);
 syscall_id!(SYSCALL_SYMLINKAT, 36);
-syscall_id!(SYSCALL_READLINKAT, 78);
-syscall_id!(SYSCALL_CHDIR, 49);
-syscall_id!(SYSCALL_READ, 63);
 syscall_id!(SYSCALL_FSTATFS, 44);
-syscall_id!(SYSCALL_STATFS, 43);
 syscall_id!(SYSCALL_TRUNCATE, 45);
-syscall_id!(SYSCALL_FTRUNCATE, 46);
-syscall_id!(SYSCALL_PIPE, 59);
-
-syscall_id!(SYSCALL_GETDENTS, 61);
-syscall_id!(SYSCALL_WRITE, 64);
-syscall_id!(SYSCALL_FSTAT, 80);
-syscall_id!(SYSCALL_FSTATAT, 79);
-syscall_id!(SYSCALL_EXIT, 93);
 syscall_id!(SYSCALL_WAITID, 95);
-syscall_id!(SYSCALL_YIELD, 124);
-syscall_id!(SYSCALL_GET_TIME, 169);
-syscall_id!(SYSCALL_GETPID, 172);
-syscall_id!(SYSCALL_GETTID, 178);
-syscall_id!(SYSCALL_FORK, 220);
-syscall_id!(SYSCALL_EXEC, 221);
-syscall_id!(SYSCALL_WAITPID, 260);
-
-syscall_id!(SYSCALL_SOCKET, 198);
 syscall_id!(SYSCALL_SOCKET_PAIR, 199);
-syscall_id!(SYSCALL_BIND, 200);
-syscall_id!(SYSCALL_LISTEN, 201);
-syscall_id!(SYSCALL_ACCEPT, 202);
-syscall_id!(SYSCALL_CONNECT, 203);
-syscall_id!(SYSCALL_GET_SOCKNAME, 204);
-syscall_id!(SYSCALL_GET_PEERNAME, 205);
-syscall_id!(SYSCALL_SENDTO, 206);
-syscall_id!(SYSCALL_RECVFROM, 207);
-syscall_id!(SYSCALL_SET_SOCKOPT, 208);
-syscall_id!(SYSCALL_GET_SOCKOPT, 209);
-syscall_id!(SYSCALL_SHUTDOWN, 210);
-
-syscall_id!(SYSCALL_OPENAT, 56);
-syscall_id!(SYSCALL_MOUNT, 40);
-syscall_id!(SYSCALL_CLOSE, 57);
-syscall_id!(SYSCALL_LSEEK, 62);
 syscall_id!(SYSCALL_MKDIR, 83);
 syscall_id!(SYSCALL_RMDIR, 84);
 syscall_id!(SYSCALL_UNLINK, 87);
 syscall_id!(SYSCALL_RENAMEAT, 38);
-syscall_id!(SYSCALL_MKDIRAT, 34);
 
-syscall_id!(SYSCALL_BRK, 214);
-syscall_id!(SYSCALL_MUNMAP, 215);
-syscall_id!(SYSCALL_MMAP, 222);
+// 与历史命名保持兼容，避免改动上层接口。
+const SYSCALL_PIPE: usize = SYSCALL_PIPE2;
+const SYSCALL_GETDENTS: usize = SYSCALL_GETDENTS64;
+const SYSCALL_GET_TIME: usize = SYSCALL_GET_TIME_OF_DAY;
+const SYSCALL_FORK: usize = SYSCALL_CLONE;
+const SYSCALL_EXEC: usize = SYSCALL_EXECVE;
+const SYSCALL_WAITPID: usize = SYSCALL_WAIT4;
+const SYSCALL_GET_SOCKNAME: usize = SYSCALL_GETSOCKNAME;
+const SYSCALL_GET_PEERNAME: usize = SYSCALL_GETPEERNAME;
+const SYSCALL_SET_SOCKOPT: usize = SYSCALL_SETSOCKOPT;
+const SYSCALL_GET_SOCKOPT: usize = SYSCALL_GETSOCKOPT;
+const SYSCALL_NANO_SLEEP: usize = SYSCALL_NANOSLEEP;
 
-syscall_id!(SYSCALL_NANO_SLEEP, 101);
-
+// Alien 私有扩展号段。
 syscall_id!(SYSCALL_LIST, 1000);
 syscall_id!(SYSCALL_CREATE_GLOBAL_BUCKET, 1001);
 syscall_id!(SYSCALL_EXECUTE_USER_FUNC, 1002);
@@ -352,3 +317,16 @@ syscall!(
 );
 
 syscall!(sys_out_mask, 2003);
+
+// 编译期断言：兼容别名必须与 pconst 一致。
+const _: [(); SYSCALL_PIPE] = [(); pconst::SYSCALL_PIPE2];
+const _: [(); SYSCALL_GETDENTS] = [(); pconst::SYSCALL_GETDENTS64];
+const _: [(); SYSCALL_GET_TIME] = [(); pconst::SYSCALL_GET_TIME_OF_DAY];
+const _: [(); SYSCALL_FORK] = [(); pconst::SYSCALL_CLONE];
+const _: [(); SYSCALL_EXEC] = [(); pconst::SYSCALL_EXECVE];
+const _: [(); SYSCALL_WAITPID] = [(); pconst::SYSCALL_WAIT4];
+const _: [(); SYSCALL_GET_SOCKNAME] = [(); pconst::SYSCALL_GETSOCKNAME];
+const _: [(); SYSCALL_GET_PEERNAME] = [(); pconst::SYSCALL_GETPEERNAME];
+const _: [(); SYSCALL_SET_SOCKOPT] = [(); pconst::SYSCALL_SETSOCKOPT];
+const _: [(); SYSCALL_GET_SOCKOPT] = [(); pconst::SYSCALL_GETSOCKOPT];
+const _: [(); SYSCALL_NANO_SLEEP] = [(); pconst::SYSCALL_NANOSLEEP];

@@ -1,66 +1,87 @@
 VERSION = 1.33.1
 BB = busybox
 ARCH ?= riscv64
+
 COMPILER_riscv64 = riscv64-linux-musl-
 COMPILER_x86_64 = x86_64-linux-musl-
 COMPILER = $(COMPILER_$(ARCH))
-initrd = initramfs
 
+INITRD_DIR = initramfs-$(ARCH)
+INITRD_CPIO = initramfs-$(ARCH).cpio.gz
+BB_WORK = $(abspath $(BB)-build-$(ARCH))
+BB_INSTALL = $(BB_WORK)/_install
+BB_WORK_MARK = $(BB_WORK)/.alien_busybox_worktree
 
-all:
-	@make download
-	@if [ -f initramfs.cpio.gz ]; then \
-		echo "initramfs.cpio.gz exists"; \
-	else \
-	  	make config; \
-		make build; \
-		make initramfs; \
-	fi
+EXPECTED_ARCH_riscv64 = RISC-V
+EXPECTED_ARCH_x86_64 = x86-64
+EXPECTED_ARCH = $(EXPECTED_ARCH_$(ARCH))
 
+ifeq ($(strip $(COMPILER)),)
+$(error Unsupported ARCH=$(ARCH), expected riscv64 or x86_64)
+endif
+
+all: download build initramfs
 
 download:
 	@if [ -d $(BB) ]; then \
-    		echo "Busybox exists"; \
-    	else \
-    		echo "Busybox does not exist"; \
-    		wget http://busybox.net/downloads/busybox-$(VERSION).tar.bz2; \
-    		tar -xvf busybox-$(VERSION).tar.bz2 && mv busybox-$(VERSION) $(BB); \
+		echo "Busybox exists"; \
+	else \
+		echo "Busybox does not exist"; \
+		wget http://busybox.net/downloads/busybox-$(VERSION).tar.bz2; \
+		tar -xvf busybox-$(VERSION).tar.bz2 && mv busybox-$(VERSION) $(BB); \
 	fi
 
 config:
-	sudo apt install libncurses5-dev libncursesw5-dev
-	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make defconfig -C $(BB)
-	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make menuconfig -C $(BB)
+	@if [ -d $(BB_WORK) ] && [ ! -f $(BB_WORK)/.alien_busybox_worktree ]; then \
+		echo "Recreating legacy busybox build dir: $(BB_WORK)"; \
+		rm -rf $(BB_WORK); \
+	fi
+	@if [ ! -d $(BB_WORK) ]; then \
+		cp -a $(BB) $(BB_WORK); \
+		touch $(BB_WORK)/.alien_busybox_worktree; \
+	fi
+	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make defconfig -C $(BB_WORK)
+	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make menuconfig -C $(BB_WORK)
 
-build:
-	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make -j $(nproc) -C $(BB)
-	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make install -C $(BB)
+# 若目标架构尚未配置，则先生成默认配置。
+prepare-config:
+	@if [ -d $(BB_WORK) ] && [ ! -f $(BB_WORK)/.alien_busybox_worktree ]; then \
+		echo "Recreating legacy busybox build dir: $(BB_WORK)"; \
+		rm -rf $(BB_WORK); \
+	fi
+	@if [ ! -d $(BB_WORK) ]; then \
+		echo "Creating isolated busybox tree for $(ARCH)"; \
+		cp -a $(BB) $(BB_WORK); \
+		touch $(BB_WORK)/.alien_busybox_worktree; \
+	fi
+	@if [ ! -f $(BB_WORK)/.config ]; then \
+		echo "Generating default busybox config for $(ARCH)"; \
+		CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make defconfig -C $(BB_WORK); \
+	fi
+
+build: prepare-config
+	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make -j $(shell nproc) -C $(BB_WORK)
+	CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make install -C $(BB_WORK)
+	@file $(BB_WORK)/busybox | grep -q "$(EXPECTED_ARCH)" || \
+		( echo "busybox arch mismatch: expect $(EXPECTED_ARCH)"; exit 1 )
 
 initramfs:
-	@if [ -d $(initrd) ]; then \
-		echo "initramfs exists"; \
-		rm -rf $(initrd)/*; \
-	else \
-		echo "initramfs does not exist"; \
-		mkdir $(initrd); \
+	@rm -rf $(INITRD_DIR)
+	@mkdir -p $(INITRD_DIR)
+	cp -r $(BB_INSTALL)/* $(INITRD_DIR)
+	@if [ ! -f $(INITRD_DIR)/init ]; then \
+		echo "#!/bin/sh\nmount -t proc none /proc\nmount -t sysfs none /sys\nmount -t devtmpfs none /dev\nexec /bin/sh" > $(INITRD_DIR)/init; \
+		chmod +x $(INITRD_DIR)/init; \
 	fi
-	cp -r $(BB)/_install/* $(initrd)
-	-#mkdir -p $(initrd)/dev
-	-#mkdir -p $(initrd)/proc
-	-#mkdir -p $(initrd)/sys
-	-#mkdir -p $(initrd)/tmp
-	@if [ -f init ]; then \
-		echo "init exists"; \
-	else \
-		echo "init does not exist"; \
-		echo "#!/bin/sh\nmount -t proc none /proc\nmount -t sysfs none /sys\nmount -t devtmpfs none /dev\nexec /bin/sh" > $(initrd)/init; \
-		chmod +x $(initrd)/init; \
-	fi
-	cd $(initrd) && find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
-
+	cd $(INITRD_DIR) && find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../$(INITRD_CPIO)
+	@ln -snf $(INITRD_CPIO) initramfs.cpio.gz
+	@ln -snf $(INITRD_DIR) initramfs
 
 clean:
-	make clean -C $(BB)
-	rm initramfs.cpio.gz
+	@if [ -d $(BB_WORK) ]; then \
+		CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make clean -C $(BB_WORK); \
+	fi
+	rm -rf $(INITRD_DIR)
+	rm -f $(INITRD_CPIO)
 
-.PHONY: clean initramfs
+.PHONY: all clean initramfs build config download prepare-config

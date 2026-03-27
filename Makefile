@@ -240,8 +240,8 @@ endif
 
 user:
 	@echo "Building user apps"
-	@make all -C ./user/apps
-	@make all -C ./user/musl
+	@make all -C ./user/apps ARCH=$(ARCH_KIND)
+	@make all -C ./user/musl ARCH=$(ARCH_KIND)
 	@echo "Building user apps done"
 
 
@@ -277,10 +277,15 @@ domain:
 	@make initrd
 
 initrd:
-	@make -C user/initrd
+	@make -C user/initrd ARCH=$(ARCH_KIND)
 	@mkdir -p ./initrd
 	@cp ./build/init/g* ./initrd
-	@cp ./user/initrd/initramfs/* ./initrd -r
+	@if [ -d ./user/initrd/initramfs-$(ARCH_KIND) ]; then \
+		cp ./user/initrd/initramfs-$(ARCH_KIND)/* ./initrd -r; \
+	else \
+		echo "[WARN] ./user/initrd/initramfs-$(ARCH_KIND) 不存在，回退到旧目录"; \
+		cp ./user/initrd/initramfs/* ./initrd -r; \
+	fi
 	@#-cp ./user/bin/* ./initrd/bin -r
 	@#cd ./initrd && find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../build/initramfs.cpio.gz && cd ..
 	@cd ./initrd && find . | cpio -o -H newc | gzip -9 > ../build/initramfs.cpio.gz && cd ..

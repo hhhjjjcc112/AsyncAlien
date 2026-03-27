@@ -18,7 +18,7 @@ use crate::{
     domain_helper::{DOMAIN_DATA_ALLOCATOR, SHARED_HEAP_ALLOCATOR},
     domain_loader::creator::*,
     domain_proxy::*,
-    mmio_bus, platform_bus, register_domain,
+    mmio_bus, pci_bus, platform_bus, register_domain,
 };
 
 /// set the kernel to the specific domain
@@ -308,40 +308,6 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     true
                 );
             }
-            "hpet" => {
-                let (hpet, domain_file_info) = create_domain!(
-                    EmptyDeviceDomainProxy,
-                    DomainTypeRaw::EmptyDeviceDomain,
-                    "hpet"
-                )?;
-                hpet.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "hpet",
-                    domain_file_info,
-                    DomainType::EmptyDeviceDomain(hpet),
-                    true
-                );
-            }
-            "rtc" => {
-                if let Some(compatible) = device.compatible() {
-                    if compatible != "rtc" {
-                        warn!("unknown rtc device: {}", compatible);
-                        continue;
-                    }
-                }
-
-                let (rtc, domain_file_info) =
-                    create_domain!(RtcDomainProxy, DomainTypeRaw::RtcDomain, "goldfish")?;
-                rtc.init_by_box(Box::new(address..address + size))?;
-                register_domain!("rtc", domain_file_info, DomainType::RtcDomain(rtc), true);
-
-                if let Some(irq) = irq {
-                    let vector = 32u8.saturating_add(irq as u8);
-                    platform::apic::configure_irq(irq as u8, vector, 0);
-                    platform::apic::set_irq_enable(irq as usize, true);
-                    apic.register_irq(irq as _, &DVec::from_slice("rtc".as_bytes()))?;
-                }
-            }
             "uart" => {
                 let compatible = device
                     .compatible()
@@ -376,6 +342,10 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     apic.register_irq(irq as _, &DVec::from_slice(buf_uart_name.as_bytes()))?;
                 }
             }
+            "rtc" => {
+                // 当前 x86_64 RTC 仅完成总线枚举，域驱动后续再接入。
+                warn!("rtc device detected, rtc domain is not wired yet");
+            }
             "ramdisk" => {
                 let (ramdisk, domain_file_info) =
                     create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "mem_block")?;
@@ -396,70 +366,81 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                 );
             }
             "pci_ecam" => {
-                let (blk_driver, domain_file_info) = create_domain!(
-                    BlkDomainProxy,
-                    DomainTypeRaw::BlkDeviceDomain,
-                    "virtio_mmio_block"
-                )?;
-                blk_driver.init_by_box(Box::new(address..address + size))?;
-                println!("virtio-pci block ECAM @ {:#x}..{:#x}", address, address + size);
-                register_domain!(
-                    "block",
-                    domain_file_info,
-                    DomainType::BlkDeviceDomain(blk_driver),
-                    false
-                );
+                // 先用 PCI 端点枚举结果判定有哪些 virtio 设备，再按类型初始化对应域。
+                let (has_blk, has_net, has_input) = {
+                    let bus = pci_bus!().lock();
+                    let has_blk = bus
+                        .endpoint_devices()
+                        .iter()
+                        .any(|ep| ep.virtio_kind() == Some("virtio-blk"));
+                    let has_net = bus
+                        .endpoint_devices()
+                        .iter()
+                        .any(|ep| ep.virtio_kind() == Some("virtio-net"));
+                    let has_input = bus
+                        .endpoint_devices()
+                        .iter()
+                        .any(|ep| ep.virtio_kind() == Some("virtio-input"));
+                    (has_blk, has_net, has_input)
+                };
 
-                let (net_driver, domain_file_info) = create_domain!(
-                    NetDeviceDomainProxy,
-                    DomainTypeRaw::NetDeviceDomain,
-                    "virtio_mmio_net"
-                )?;
-                net_driver.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "nic",
-                    domain_file_info,
-                    DomainType::NetDeviceDomain(net_driver),
-                    false
-                );
+                if has_blk {
+                    let (blk_driver, domain_file_info) = create_domain!(
+                        BlkDomainProxy,
+                        DomainTypeRaw::BlkDeviceDomain,
+                        "virtio_mmio_block"
+                    )?;
+                    blk_driver.init_by_box(Box::new(address..address + size))?;
+                    println!("virtio-pci block ECAM @ {:#x}..{:#x}", address, address + size);
+                    register_domain!(
+                        "block",
+                        domain_file_info,
+                        DomainType::BlkDeviceDomain(blk_driver),
+                        false
+                    );
+                }
 
-                let (input_driver, domain_file_info) = create_domain!(
-                    InputDomainProxy,
-                    DomainTypeRaw::InputDomain,
-                    "virtio_mmio_input"
-                )?;
-                input_driver.init_by_box(Box::new(address..address + size))?;
-                let input_name = register_domain!(
-                    "virtio_mmio_input",
-                    domain_file_info,
-                    DomainType::InputDomain(input_driver),
-                    false
-                );
-                let (buf_input, domain_file_info) = create_domain!(
-                    BufInputDomainProxy,
-                    DomainTypeRaw::BufInputDomain,
-                    "buf_input"
-                )?;
-                buf_input.init_by_box(Box::new(input_name))?;
-                register_domain!(
-                    "buf_input",
-                    domain_file_info,
-                    DomainType::BufInputDomain(buf_input),
-                    false
-                );
+                if has_net {
+                    let (net_driver, domain_file_info) = create_domain!(
+                        NetDeviceDomainProxy,
+                        DomainTypeRaw::NetDeviceDomain,
+                        "virtio_mmio_net"
+                    )?;
+                    net_driver.init_by_box(Box::new(address..address + size))?;
+                    register_domain!(
+                        "nic",
+                        domain_file_info,
+                        DomainType::NetDeviceDomain(net_driver),
+                        false
+                    );
+                }
 
-                let (gpu_driver, domain_file_info) = create_domain!(
-                    GpuDomainProxy,
-                    DomainTypeRaw::GpuDomain,
-                    "virtio_mmio_gpu"
-                )?;
-                gpu_driver.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "virtio_mmio_gpu",
-                    domain_file_info,
-                    DomainType::GpuDomain(gpu_driver),
-                    true
-                );
+                if has_input {
+                    let (input_driver, domain_file_info) = create_domain!(
+                        InputDomainProxy,
+                        DomainTypeRaw::InputDomain,
+                        "virtio_mmio_input"
+                    )?;
+                    input_driver.init_by_box(Box::new(address..address + size))?;
+                    let input_name = register_domain!(
+                        "virtio_mmio_input",
+                        domain_file_info,
+                        DomainType::InputDomain(input_driver),
+                        false
+                    );
+                    let (buf_input, domain_file_info) = create_domain!(
+                        BufInputDomainProxy,
+                        DomainTypeRaw::BufInputDomain,
+                        "buf_input"
+                    )?;
+                    buf_input.init_by_box(Box::new(input_name))?;
+                    register_domain!(
+                        "buf_input",
+                        domain_file_info,
+                        DomainType::BufInputDomain(buf_input),
+                        false
+                    );
+                }
             }
             _ => {
                 warn!("unknown device: {}", device.name());
@@ -526,17 +507,6 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     false
                 );
                 assert!(buf_input_name.starts_with("buf_input-"));
-            }
-            VirtioMmioDeviceType::GPU => {
-                let (gpu_driver, domain_file_info) =
-                    create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_mmio_gpu")?;
-                gpu_driver.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "virtio_mmio_gpu",
-                    domain_file_info,
-                    DomainType::GpuDomain(gpu_driver),
-                    true
-                );
             }
             _ => {
                 warn!("unknown device: {:?}", device.device_type());

@@ -2,7 +2,6 @@
 
 pub mod ap;
 pub mod apic;
-pub mod acpi;
 pub mod basic;
 pub mod boot;
 pub mod mem;

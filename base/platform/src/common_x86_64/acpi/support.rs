@@ -2,6 +2,9 @@ use acpi::PciAddress;
 
 #[inline]
 pub(super) fn phys_to_virt(paddr: usize) -> usize {
+    if paddr < config::LOW_PHYS_MAP_SIZE {
+        return config::LOW_PHYS_MAP_BASE + paddr;
+    }
     paddr + crate::common_x86_64::boot::PHYS_VIRT_OFFSET as usize
 }
 

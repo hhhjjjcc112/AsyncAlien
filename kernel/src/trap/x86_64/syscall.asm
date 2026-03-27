@@ -2,23 +2,24 @@
 .code64
 
 .global syscall_entry
-.global strampoline
 
 # syscall 入口仅依赖这两个 percpu 符号：用户 rsp 暂存 + TSS.rsp0 读取。
 .extern __PERCPU_USER_RSP
 .extern __PERCPU_TSS
+.extern x86_syscall_handler
 
 # TrapFrame 槽位偏移（单位：字节）
 .equ TF_VECTOR, 136
 .equ TF_RSP, 176
 
-strampoline:
-    # 标记 trampoline 起始地址（用于 LSTAR 偏移计算）
+# syscall handler 的地址也存储在 trampoline 中
+syscall_handler_ptr:
+    .quad x86_syscall_handler
+
 
 .align 8
 syscall_entry:
-    # 用户态 syscall 指令入门
-    # 硬件状态：RCX <- RIP、R11 <- RFLAGS，权限不变（仍为 DPL3）
+    # 硬件状态：RCX <- RIP、R11 <- RFLAGS
 
     swapgs
 
@@ -63,7 +64,7 @@ syscall_entry:
     mov rsp, r14
 
     # 调用 syscall handler
-    lea r15, [rip + x86_syscall_handler]
+    mov r15, [syscall_handler_ptr]
     call r15
 
     # handler 返回约定：rax=user_cr3, rdx=trap_cx_ptr

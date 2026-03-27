@@ -12,6 +12,7 @@ pub fn first_irq(ctx: &AmlContext, value: &AmlValue) -> Option<u32> {
     None
 }
 
+/// 函数说明：执行对应的总线处理步骤。
 pub fn first_io_port_base(ctx: &AmlContext, value: &AmlValue) -> Option<usize> {
     for descriptor in read_resource_bytes(ctx, value)? {
         if descriptor.kind == ResourceKind::IoPort {
@@ -22,6 +23,7 @@ pub fn first_io_port_base(ctx: &AmlContext, value: &AmlValue) -> Option<usize> {
     None
 }
 
+/// 函数说明：执行对应的总线处理步骤。
 pub fn first_io_port_length(ctx: &AmlContext, value: &AmlValue) -> Option<usize> {
     for descriptor in read_resource_bytes(ctx, value)? {
         if descriptor.kind == ResourceKind::IoPort {
@@ -46,6 +48,7 @@ struct ParsedResource {
     length: Option<usize>,
 }
 
+/// 函数说明：执行对应的总线处理步骤。
 fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec::Vec<ParsedResource>> {
     // _CRS 常见为 buffer 或 resource template；这里统一按字节流扫描。
     let buffer = value.as_buffer(ctx).ok()?;
@@ -154,6 +157,7 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
     Some(parsed)
 }
 
+/// 函数说明：执行对应的总线处理步骤。
 fn first_set_bit(mask: u16) -> Option<u16> {
     if mask == 0 {
         return None;
