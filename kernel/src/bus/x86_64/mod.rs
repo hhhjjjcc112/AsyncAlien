@@ -1,7 +1,10 @@
 use alloc::string::String;
 
 use crate::{
-    bus::CommonDeviceInfo,
+    bus::{
+        CommonDeviceInfo, DeviceClass, DeviceLocator, DeviceTransport, DiscoveredDevice,
+        FirmwareSource,
+    },
     error::AlienResult,
 };
 
@@ -21,18 +24,152 @@ pub enum CommonDeviceType {
     Virtio(String),
 }
 
-/// 函数说明：执行对应的总线处理步骤。
-fn register_detected_devices(devices: alloc::vec::Vec<CommonDeviceType>) {
-    // 步骤1：把统一设备枚举结果分发到 platform/pci 子总线。
-    devices.into_iter().for_each(|ty| match ty {
-        CommonDeviceType::LocalApic(info) => platform::register_platform_device(info, "local_apic"),
-        CommonDeviceType::IoApic(info) => platform::register_platform_device(info, "io_apic"),
-        CommonDeviceType::Uart(info) => platform::register_platform_device(info, "uart"),
-        CommonDeviceType::Rtc(info) => platform::register_platform_device(info, "rtc"),
-        CommonDeviceType::Pci(info) => pci::pci_init(info),
+fn parse_bdf(bdf: &str) -> Option<(u16, u8, u8, u8)> {
+    let (seg, rest) = bdf.split_once(':')?;
+    let (bus, rest) = rest.split_once(':')?;
+    let (dev, func) = rest.split_once('.')?;
+    let segment = u16::from_str_radix(seg, 16).ok()?;
+    let bus = u8::from_str_radix(bus, 16).ok()?;
+    let device = u8::from_str_radix(dev, 16).ok()?;
+    let function = func.parse::<u8>().ok()?;
+    Some((segment, bus, device, function))
+}
+
+fn info_locator(info: &CommonDeviceInfo) -> DeviceLocator {
+    let start = info.address_range.start.as_usize();
+    let end = info.address_range.end.as_usize();
+    if end <= 0x1_0000 && start < end {
+        DeviceLocator::Pio((start as u16)..(end as u16))
+    } else {
+        DeviceLocator::Mmio(info.address_range.clone())
+    }
+}
+
+fn from_common_device(ty: CommonDeviceType) -> DiscoveredDevice {
+    match ty {
+        CommonDeviceType::LocalApic(info) => DiscoveredDevice {
+            class: DeviceClass::LocalApic,
+            locator: info_locator(&info),
+            transport: DeviceTransport::Platform,
+            irq: info.irq,
+            compatible: info.compatible,
+            fw_source: FirmwareSource::Acpi,
+        },
+        CommonDeviceType::IoApic(info) => DiscoveredDevice {
+            class: DeviceClass::IoApic,
+            locator: info_locator(&info),
+            transport: DeviceTransport::Platform,
+            irq: info.irq,
+            compatible: info.compatible,
+            fw_source: FirmwareSource::Acpi,
+        },
+        CommonDeviceType::Uart(info) => DiscoveredDevice {
+            class: DeviceClass::Uart,
+            locator: info_locator(&info),
+            transport: DeviceTransport::Platform,
+            irq: info.irq,
+            compatible: info.compatible,
+            fw_source: FirmwareSource::Acpi,
+        },
+        CommonDeviceType::Rtc(info) => DiscoveredDevice {
+            class: DeviceClass::Rtc,
+            locator: info_locator(&info),
+            transport: DeviceTransport::Platform,
+            irq: info.irq,
+            compatible: info.compatible,
+            fw_source: FirmwareSource::Acpi,
+        },
+        CommonDeviceType::Pci(info) => DiscoveredDevice {
+            class: DeviceClass::PciHost,
+            locator: DeviceLocator::Mmio(info.address_range),
+            transport: DeviceTransport::Pci,
+            irq: info.irq,
+            compatible: info.compatible,
+            fw_source: FirmwareSource::Acpi,
+        },
         CommonDeviceType::Virtio(bdf) => {
-            debug!("[bus][x86_64][virtio] detected virtio @ {}", bdf);
+            let locator = parse_bdf(&bdf)
+                .map(|(segment, bus, device, function)| DeviceLocator::PciBdf {
+                    segment,
+                    bus,
+                    device,
+                    function,
+                })
+                .unwrap_or(DeviceLocator::None);
+            DiscoveredDevice {
+                class: DeviceClass::VirtioPci,
+                locator,
+                transport: DeviceTransport::Pci,
+                irq: None,
+                compatible: Some("virtio-pci".into()),
+                fw_source: FirmwareSource::PciScan,
+            }
         }
+    }
+}
+
+fn locator_to_info(locator: &DeviceLocator, irq: Option<u32>, compatible: Option<String>) -> Option<CommonDeviceInfo> {
+    match locator {
+        DeviceLocator::Mmio(range) => Some(CommonDeviceInfo {
+            address_range: range.clone(),
+            irq,
+            compatible,
+        }),
+        DeviceLocator::Pio(range) => Some(CommonDeviceInfo {
+            address_range: mem::PhysAddr::from(range.start as usize)
+                ..mem::PhysAddr::from(range.end as usize),
+            irq,
+            compatible,
+        }),
+        _ => None,
+    }
+}
+
+/// 函数说明：执行对应的总线处理步骤。
+fn register_discovered_devices(devices: alloc::vec::Vec<DiscoveredDevice>) {
+    devices.into_iter().for_each(|dev| match dev.class {
+        DeviceClass::LocalApic => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "local_apic");
+            }
+        }
+        DeviceClass::IoApic => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "io_apic");
+            }
+        }
+        DeviceClass::Uart => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "uart");
+            }
+        }
+        DeviceClass::Rtc => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "rtc");
+            }
+        }
+        DeviceClass::PciHost => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                pci::pci_init(info);
+            }
+        }
+        DeviceClass::VirtioPci => {
+            if let DeviceLocator::PciBdf {
+                segment,
+                bus,
+                device,
+                function,
+            } = dev.locator
+            {
+                debug!(
+                    "[bus][x86_64][virtio] detected virtio @ {:04x}:{:02x}:{:02x}.{}",
+                    segment, bus, device, function
+                );
+            } else {
+                debug!("[bus][x86_64][virtio] detected virtio with unknown bdf");
+            }
+        }
+        _ => {}
     });
 }
 
@@ -47,7 +184,7 @@ fn fallback_with_aml(base_devices: &mut alloc::vec::Vec<CommonDeviceType>) {
     }
 
     // 步骤2：静态表缺 UART 时，回退 AML 解析路径。
-    debug!("[bus][x86_64][fallback] UART missing in static tables, try AML fallback");
+    warn!("[bus][x86_64][fallback] UART missing in static tables, try AML fallback");
     if let Some(uart) = acpi::enumerate_uart_from_aml() {
         base_devices.push(uart);
         return;
@@ -152,12 +289,22 @@ pub fn init_with_acpi() -> AlienResult<()> {
 
     // 步骤4：注册基础设备（APIC/RTC/UART/PCI ECAM）。
     debug!("[bus][x86_64][init_with_acpi] step4: register base devices");
-    register_detected_devices(base_devices.clone());
+    let discovered_base = base_devices
+        .clone()
+        .into_iter()
+        .map(from_common_device)
+        .collect();
+    register_discovered_devices(discovered_base);
 
     // 步骤5：基于 PCI 端点收集 virtio 设备。
     debug!("[bus][x86_64][init_with_acpi] step5: collect virtio devices from PCI endpoints");
     let virtio_devices = pci::collect_virtio_devices();
-    register_detected_devices(virtio_devices.clone());
+    let discovered_virtio = virtio_devices
+        .clone()
+        .into_iter()
+        .map(from_common_device)
+        .collect();
+    register_discovered_devices(discovered_virtio);
 
     // 步骤6：输出汇总日志，便于链路验收。
     debug!("[bus][x86_64][init_with_acpi] step6: print consolidated probe summary");

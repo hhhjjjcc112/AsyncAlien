@@ -40,6 +40,8 @@ impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
         }
         let size = SIZE as u16;
         let mut queue_page = H::dma_alloc(pages(Self::total_size()));
+        // virtqueue 元数据必须从干净状态开始，避免 flags/idx 脏值导致设备不被正确通知。
+        queue_page.as_mut_slice().fill(0);
         let descriptors_paddr = queue_page.paddr();
         let driver_area_paddr = descriptors_paddr + Self::AVAIL_RING_OFFSET;
         let device_area_paddr = descriptors_paddr + Self::USED_RING_OFFSET;
@@ -281,8 +283,9 @@ impl Default for Descriptor {
 }
 impl Descriptor {
     pub(crate) fn new<const SIZE: usize, H: Hal<SIZE>>(vaddr: usize, len: u32, flags: u16) -> Self {
+        let paddr = H::to_paddr(vaddr);
         Self {
-            addr: H::to_paddr(vaddr) as _,
+            addr: paddr as _,
             len,
             flags,
             next: 0,

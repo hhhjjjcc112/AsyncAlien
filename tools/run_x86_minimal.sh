@@ -7,10 +7,18 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-SMP="${SMP:-2}"
+SMP="${SMP:-1}"
 MEMORY_SIZE="${MEMORY_SIZE:-2048M}"
 LOG_LEVEL="${LOG:-DEBUG}"
 ENABLE_NET="${NET:-n}"
+WITH_INITRD="${WITH_INITRD:-y}"
+WITH_DRIVE="${WITH_DRIVE:-y}"
+WITH_NET="${WITH_NET:-$ENABLE_NET}"
+WITH_INPUT="${WITH_INPUT:-n}"
+WITH_GPU="${WITH_GPU:-n}"
+VIRTIO_FORCE_LEGACY="${VIRTIO_FORCE_LEGACY:-y}"
+NET_HOSTFWD="${NET_HOSTFWD:-y}"
+NET_FWD_PORT="${NET_FWD_PORT:-55555}"
 X86_CPU="${X86_CPU:-max,+x2apic}"
 MEMORY_SELF_TEST="${MEMORY_SELF_TEST:-y}"
 TRAP_SELF_TEST="${TRAP_SELF_TEST:-y}"
@@ -34,7 +42,13 @@ fi
 echo "[minimal-x86] build kernel only"
 echo "[minimal-x86] features: $KERNEL_FEATURES"
 echo "[minimal-x86] log level: $LOG_LEVEL"
+echo "[minimal-x86] switches: initrd=$WITH_INITRD drive=$WITH_DRIVE net=$WITH_NET input=$WITH_INPUT gpu=$WITH_GPU"
 make build ARCH=x86_64 LOG="$LOG_LEVEL" FEATURES="$KERNEL_FEATURES"
+
+VIRTIO_PCI_OPTS=""
+if [[ "$VIRTIO_FORCE_LEGACY" == "y" ]]; then
+  VIRTIO_PCI_OPTS=",disable-modern=on,disable-legacy=off,x-disable-pcie=on"
+fi
 
 QEMU_ARGS=(
   -m "$MEMORY_SIZE"
@@ -45,16 +59,31 @@ QEMU_ARGS=(
   -serial mon:stdio
 )
 
-if [[ -f build/initramfs.cpio.gz ]]; then
+if [[ "$WITH_INITRD" == "y" && -f build/initramfs.cpio.gz ]]; then
   QEMU_ARGS+=( -initrd build/initramfs.cpio.gz -append "rdinit=/init" )
 fi
 
-QEMU_ARGS+=( -drive file=build/sdcard.img,if=none,format=raw,id=x0 )
-QEMU_ARGS+=( -device virtio-blk-pci,drive=x0 )
+if [[ "$WITH_DRIVE" == "y" ]]; then
+  QEMU_ARGS+=( -drive file=build/sdcard.img,if=none,format=raw,id=x0 )
+  QEMU_ARGS+=( -device "virtio-blk-pci,drive=x0${VIRTIO_PCI_OPTS}" )
+fi
 
-if [[ "$ENABLE_NET" == "y" ]]; then
-  QEMU_ARGS+=( -device virtio-net-pci,netdev=net0 )
-  QEMU_ARGS+=( -netdev user,id=net0,hostfwd=tcp::55555-:55555 )
+if [[ "$WITH_NET" == "y" ]]; then
+  QEMU_ARGS+=( -device "virtio-net-pci,netdev=net0${VIRTIO_PCI_OPTS}" )
+  if [[ "$NET_HOSTFWD" == "y" ]]; then
+    QEMU_ARGS+=( -netdev "user,id=net0,hostfwd=tcp::${NET_FWD_PORT}-:${NET_FWD_PORT}" )
+  else
+    QEMU_ARGS+=( -netdev user,id=net0 )
+  fi
+fi
+
+if [[ "$WITH_INPUT" == "y" ]]; then
+  QEMU_ARGS+=( -device "virtio-keyboard-pci${VIRTIO_PCI_OPTS}" )
+  QEMU_ARGS+=( -device "virtio-mouse-pci${VIRTIO_PCI_OPTS}" )
+fi
+
+if [[ "$WITH_GPU" == "y" ]]; then
+  QEMU_ARGS+=( -device "virtio-gpu-pci${VIRTIO_PCI_OPTS}" )
 fi
 
 echo "[minimal-x86] run qemu"

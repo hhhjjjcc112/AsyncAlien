@@ -44,6 +44,7 @@ impl TargetArch {
             Self::Riscv64 => 0x8020_0000,
         }
     }
+
 }
 
 fn resolve_platform(target_arch: TargetArch) -> String {

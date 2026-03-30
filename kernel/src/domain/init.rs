@@ -2,6 +2,7 @@ use alloc::{collections::BTreeMap, string::ToString, vec};
 
 use core2::io::Read;
 use interface::DomainTypeRaw;
+use log::warn;
 
 use crate::domain_loader::creator::register_domain_elf;
 
@@ -11,9 +12,11 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("cache_blk", DomainTypeRaw::CacheBlkDeviceDomain),
     ("devfs", DomainTypeRaw::DevFsDomain),
     ("fatfs", DomainTypeRaw::FsDomain),
+    #[cfg(target_arch = "riscv64")]
     ("goldfish", DomainTypeRaw::RtcDomain),
     ("null", DomainTypeRaw::EmptyDeviceDomain),
     ("pipefs", DomainTypeRaw::FsDomain),
+    #[cfg(target_arch = "riscv64")]
     ("plic", DomainTypeRaw::PLICDomain),
     ("procfs", DomainTypeRaw::FsDomain),
     ("ramfs", DomainTypeRaw::FsDomain),
@@ -29,9 +32,9 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     #[cfg(target_arch = "x86_64")]
     ("uart16550", DomainTypeRaw::UartDomain),
     #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
-    ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain),
+    ("virtio_blk", DomainTypeRaw::BlkDeviceDomain),
     #[cfg(target_arch = "x86_64")]
-    ("virtio_mmio_block", DomainTypeRaw::BlkDeviceDomain),
+    ("virtio_blk", DomainTypeRaw::BlkDeviceDomain),
     ("net_stack", DomainTypeRaw::NetDomain),
     ("logger", DomainTypeRaw::LogDomain),
     ("domainfs", DomainTypeRaw::FsDomain),
@@ -42,9 +45,11 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     #[cfg(target_arch = "x86_64")]
     ("apic", DomainTypeRaw::APICDomain),
     #[cfg(target_arch = "x86_64")]
-    ("virtio_mmio_net", DomainTypeRaw::NetDeviceDomain),
+    ("virtio_net", DomainTypeRaw::NetDeviceDomain),
     #[cfg(target_arch = "x86_64")]
-    ("virtio_mmio_input", DomainTypeRaw::InputDomain),
+    ("virtio_input", DomainTypeRaw::InputDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("virtio_gpu", DomainTypeRaw::GpuDomain),
     #[cfg(all(target_arch = "riscv64", plat_vf2, not(plat_vf2_sd)))]
     ("mem_block", DomainTypeRaw::BlkDeviceDomain),
     #[cfg(feature = "bench")]
@@ -77,11 +82,14 @@ pub fn init_domains() {
     }
 
     let mut register = |domain_file_name: &str, domain: DomainTypeRaw| {
-        register_domain_elf(
-            domain_file_name,
-            map.remove(domain_file_name).unwrap(),
-            domain,
-        );
+        if let Some(elf) = map.remove(domain_file_name) {
+            register_domain_elf(domain_file_name, elf, domain);
+        } else {
+            warn!(
+                "initrd missing domain elf: {}, skip pre-register",
+                domain_file_name
+            );
+        }
     };
 
     for (domain_file_name, domain) in INIT_DOMAIN_LIST {

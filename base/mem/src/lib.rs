@@ -25,7 +25,7 @@ use pconst::LinuxErrno;
 pub use ptable::*;
 use spin::Lazy;
 pub use vmm::{
-    kernel_page_table_root_paddr, kernel_page_table_token, map_domain_region,
+    kernel_page_table_root_paddr, kernel_page_table_token, map_device_phys_range, map_domain_region,
     map_kstack_for_task, query_kernel_space, set_memory_x, unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
 };
 

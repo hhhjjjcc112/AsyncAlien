@@ -66,22 +66,25 @@ pub fn log_virtio_summary() {
     let mut blk = 0usize;
     let mut net = 0usize;
     let mut input = 0usize;
+    let mut gpu = 0usize;
 
     // 步骤2：逐个输出设备明细，便于启动日志排查。
     for endpoint in bus.endpoint_devices().iter() {
         match endpoint.virtio_kind() {
             Some("virtio-blk") => blk += 1,
             Some("virtio-net") => net += 1,
+            Some("virtio-gpu") => gpu += 1,
             Some("virtio-input") => input += 1,
             _ => {}
         }
     }
 
     println!(
-        "[bus][x86_64][pci] virtio summary: blk={}, net={}, input={}",
+        "[bus][x86_64][pci] virtio summary: blk={}, net={}, input={}, gpu={}",
         blk,
         net,
-        input
+        input,
+        gpu
     );
 
     for endpoint in bus.endpoint_devices().iter() {

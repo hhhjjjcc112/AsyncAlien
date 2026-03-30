@@ -38,6 +38,11 @@ impl VirtIoDeviceIo for SafeIoRegion {
         Ok(unsafe { ptr.read_volatile() })
     }
     #[inline]
+    fn read_volatile_u16_at(&self, off: usize) -> VirtIoResult<u16> {
+        let ptr = (self.base + off) as *const u16;
+        Ok(unsafe { ptr.read_volatile() })
+    }
+    #[inline]
     fn read_volatile_u8_at(&self, off: usize) -> VirtIoResult<u8> {
         let ptr = (self.base + off) as *const u8;
         Ok(unsafe { ptr.read_volatile() })
@@ -45,6 +50,14 @@ impl VirtIoDeviceIo for SafeIoRegion {
     #[inline]
     fn write_volatile_u32_at(&self, off: usize, data: u32) -> VirtIoResult<()> {
         let ptr = (self.base + off) as *mut u32;
+        unsafe {
+            ptr.write_volatile(data);
+        }
+        Ok(())
+    }
+    #[inline]
+    fn write_volatile_u16_at(&self, off: usize, data: u16) -> VirtIoResult<()> {
+        let ptr = (self.base + off) as *mut u16;
         unsafe {
             ptr.write_volatile(data);
         }

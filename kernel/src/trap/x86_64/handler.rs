@@ -1,4 +1,5 @@
 use core::arch::asm;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 use config::TRAMPOLINE;
 use platform;
@@ -21,6 +22,9 @@ unsafe extern "C" {
     fn x86_trampoline_return(user_cr3: usize, trap_cx_ptr: usize) -> !;
 }
 
+static USER_TRAP_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+static USER_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+
 /// 内核态 trap 处理函数
 /// 由 trampoline.asm 中的 .Ltrap_common 直接调用
 /// 参数 rdi: 指向 TrapFrame 的指针
@@ -30,7 +34,6 @@ pub extern "C" fn kernel_trap_handler(frame: &mut X86TrapFrame) {
     if frame.is_user() {
         panic!("kernel_trap_handler: received user-mode trap");
     }
-    println!("Kernel trap: vector={}, RIP={:#x}, error={:#x}", frame.vector, frame.rip, frame.error_code);
     handle_kernel_trap(frame);
     // 函数返回，汇编自动 ret
 }
@@ -51,6 +54,15 @@ pub extern "C" fn user_trap_vector() -> UserTrapResult {
 
 fn handle_user_trap(frame: &mut X86TrapFrame) {
     let vec = frame.vector as u8;
+    let trace_idx = USER_TRAP_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if trace_idx < 16 {
+        log::warn!(
+            "[x86 user trap] vec={}, rip={:#x}, err={:#x}",
+            vec,
+            frame.rip,
+            frame.error_code
+        );
+    }
 
     match vec {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
@@ -96,11 +108,8 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
-            #[cfg(target_arch = "x86_64")]
-            {
-                let irq = (v - vectors::IRQ_BASE) as usize;
-                apic_domain!().handle_irq(irq).expect("handle_irq failed");
-            }
+            let irq = (v - vectors::IRQ_BASE) as usize;
+            apic_domain!().handle_irq(irq).expect("handle_irq failed");
             send_apic_eoi();
         }
 
@@ -201,6 +210,14 @@ pub extern "C" fn trap_return() -> ! {
     let (user_cr3, trap_cx_ptr) = task_domain
         .page_table_token_with_trap_frame_virt_addr()
         .unwrap();
+    let trace_idx = USER_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if trace_idx < 8 {
+        log::warn!(
+            "[x86 trap_return] user_cr3={:#x}, trap_cx={:#x}",
+            user_cr3,
+            trap_cx_ptr
+        );
+    }
     // 返回代码必须位于 trampoline 共享映射中，避免切到用户 CR3 后取指失败。
     let ret_va = x86_trampoline_return as *const () as usize - strampoline as *const () as usize
         + TRAMPOLINE;

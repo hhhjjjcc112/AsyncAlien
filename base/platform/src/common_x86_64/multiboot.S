@@ -8,7 +8,7 @@ multiboot_header:
     .int    multiboot_header - {phys_virt_offset}         # header_addr
     .int    skernel - {phys_virt_offset}        # load_addr
     .int    edata - {phys_virt_offset}            # load_end
-    .int    ebss - {phys_virt_offset}            # bss_end_addr
+    .int    end - {phys_virt_offset}             # bss_end_addr
     .int    _start - {phys_virt_offset}         # entry_addr
 
 .code32

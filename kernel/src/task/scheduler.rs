@@ -24,8 +24,15 @@ pub fn set_scheduler(scheduler: Arc<dyn SchedulerDomain>) {
 }
 
 pub fn add_task(task_meta: Arc<Mutex<TaskMetaExt>>) {
-    log::warn!("<add_task>: {:?}", task_meta.lock().tid());
-    let scheduling_info = task_meta.lock().take_scheduling_info();
+    let mut guard = task_meta.lock();
+    let tid = guard.tid();
+    if tid <= 1 {
+        log::warn!("<add_task>: tid={}, cx={:?}", tid, guard.basic_info.context);
+    } else {
+        log::warn!("<add_task>: {:?}", tid);
+    }
+    let scheduling_info = guard.take_scheduling_info();
+    drop(guard);
     TASK_MAP.lock().insert(scheduling_info.tid, task_meta);
     global_scheduler!().add_task(scheduling_info).unwrap();
 }

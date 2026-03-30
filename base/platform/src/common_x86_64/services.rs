@@ -10,9 +10,9 @@ use super::time::apic_timer;
 const QEMU_EXIT_PORT: u16 = 0xf4;
 const COM1_PORT: u16 = 0x3f8;
 
-/// 设置定时器触发时间（开机后纳秒）。
-pub fn set_timer(time_ns: usize) {
-    apic_timer::set_apic_timer(time_ns as u64);
+/// 设置定时器触发时间（绝对 TSC deadline）。
+pub fn set_timer(deadline_tsc: usize) {
+    apic_timer::set_timer_at_tsc(deadline_tsc as u64);
 }
 
 pub fn system_shutdown() -> ! {

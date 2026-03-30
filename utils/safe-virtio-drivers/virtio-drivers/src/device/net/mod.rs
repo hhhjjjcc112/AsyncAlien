@@ -10,6 +10,7 @@ use crate::{
     transport::Transport,
 };
 use alloc::vec::Vec;
+use log::info;
 pub use raw::VirtIONetRaw;
 
 /// Driver for a VirtIO network device.
@@ -37,12 +38,17 @@ impl<H: Hal<QUEUE_SIZE>, T: Transport, const QUEUE_SIZE: usize> VirtIONet<H, T, 
 
         const NONE_BUF: Vec<u8> = Vec::new();
         let mut rx_buffers = [NONE_BUF; QUEUE_SIZE];
+        info!(
+            "virtio-net: prefill rx buffers, queue_size={}, buf_len={}",
+            QUEUE_SIZE, buf_len
+        );
         for (i, rx_buf) in rx_buffers.iter_mut().enumerate() {
             rx_buf.resize(buf_len, 0);
             // Safe because the buffer lives as long as the queue.
             let token = inner.receive_begin(rx_buf.as_mut())?;
             assert_eq!(token, i as u16);
         }
+        info!("virtio-net: prefill rx buffers done");
 
         Ok(VirtIONet { inner, rx_buffers })
     }

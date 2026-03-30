@@ -12,9 +12,24 @@ pub fn enumerate_pci_devices<H: ::acpi::Handler>(tables: &::acpi::AcpiTables<H>)
     // MCFG 决定了 PCI 配置空间的真实布局。
     if let Ok(pci_regions) = ::acpi::platform::PciConfigRegions::new(tables) {
         for region in pci_regions.regions.iter() {
+            let segment = region.pci_segment_group;
+            let bus_start = region.bus_number_start;
             let bus_end = region.bus_number_end;
             let base = region.base_address;
-            let bus_count = (bus_end - region.bus_number_start) as usize + 1;
+
+            if segment != 0 {
+                warn!(
+                    "[bus][x86_64][acpi][pci] segment={} not fully supported in minimal model, keep scanning as-is",
+                    segment
+                );
+            }
+            if bus_start != 0 {
+                warn!(
+                    "[bus][x86_64][acpi][pci] bus_start={} not fully supported in minimal model, keep scanning from ecam base",
+                    bus_start
+                );
+            }
+            let bus_count = (bus_end - bus_start) as usize + 1;
             let size = bus_count << 20;
             devices.push(ecam_device(CommonDeviceInfo {
                 address_range: PhysAddr::from(base as usize)

@@ -61,8 +61,6 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::platform_init_percpu_primary(boot_cpu_id);
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
-    warn!("\n\n\n\n\n\ntest warning\n\n\n\n\n\n");
-
     mem::init_memory_system(true);
     trap::init_trap_subsystem();
 

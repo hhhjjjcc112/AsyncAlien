@@ -159,7 +159,10 @@ impl BlkDomainProxy {
         let tick = TimeTick::new("Reinit and state transfer");
         // stage3: init the new domain before swap
         let device_info = self.resource.get().unwrap();
-        let info = device_info.as_ref().downcast_ref::<Range<usize>>().unwrap();
+        let info = device_info
+            .as_ref()
+            .downcast_ref::<VirtioInitInfo>()
+            .unwrap();
 
         let new_domain_id = new_domain.domain_id();
         new_domain.init(info).unwrap();

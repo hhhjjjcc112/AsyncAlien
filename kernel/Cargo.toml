@@ -16,7 +16,7 @@ pconst = { path = "../utils/pconst", features = [
 spin = "0"
 
 ksync = { path = "../domain-lib/ksync" }
-arch = { path = "../domain-lib/arch" }
+arch = { path = "../domain-lib/arch", features = ["percpu_cpu_id"] }
 config = { path = "../domain-lib/config" }
 shared_heap = { path = "../domain-lib/shared_heap" }
 interface = { path = "../domain-lib/interface" }
@@ -56,7 +56,7 @@ aml = "0.16.4"
 
 
 [features]
-default = ["rust-unwind", "time-tick", "test"]
+default = ["rust-unwind", "time-tick"]
 rust-unwind = ["dep:unwinding"]
 bench = []
 test = []

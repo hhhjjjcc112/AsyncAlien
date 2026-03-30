@@ -1,4 +1,5 @@
 use core::arch::global_asm;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::{
@@ -27,11 +28,21 @@ unsafe extern "C" {
     fn syscall_entry();
 }
 
+static SYSCALL_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+
 #[unsafe(no_mangle)]
 pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     let frame = current_trap_frame();
 
     let parameters = frame.parameters();
+    let trace_idx = SYSCALL_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if trace_idx < 32 {
+        log::warn!(
+            "[x86 syscall] id={}, args={:#x?}",
+            parameters[0],
+            &parameters[1..]
+        );
+    }
     let result = crate::syscall_domain!().call(
         parameters[0],
         [

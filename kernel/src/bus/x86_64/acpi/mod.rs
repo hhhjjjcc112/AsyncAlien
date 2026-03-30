@@ -44,11 +44,12 @@ pub fn enumerate_uart_from_aml() -> Option<CommonDeviceType> {
     // 步骤1：复用 ACPI 表，进入 AML 回退路径。
     let tables = acpi_tables();
     if let Some(tables) = tables {
-        debug!("[bus][x86_64] enumerate UART from AML fallback path");
+        warn!("[bus][x86_64][acpi] enter AML UART fallback path");
         return enumerate_aml_devices(tables)
             .into_iter()
             .find(|dev| matches!(dev, CommonDeviceType::Uart(_)));
     }
+    warn!("[bus][x86_64][acpi] ACPI tables unavailable, AML UART fallback skipped");
     None
 }
 

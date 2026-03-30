@@ -51,7 +51,13 @@ struct ParsedResource {
 /// 函数说明：执行对应的总线处理步骤。
 fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec::Vec<ParsedResource>> {
     // _CRS 常见为 buffer 或 resource template；这里统一按字节流扫描。
-    let buffer = value.as_buffer(ctx).ok()?;
+    let buffer = match value.as_buffer(ctx) {
+        Ok(buffer) => buffer,
+        Err(_) => {
+            warn!("[bus][x86_64][acpi][aml] _CRS is not buffer, skip descriptor parse");
+            return None;
+        }
+    };
     let bytes = buffer.lock();
     let bytes = bytes.as_slice();
 
@@ -69,6 +75,10 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
             // 大项描述符：0x80 置位后，高 7 位是类型号，后两字节是长度。
             let descriptor_type = tag & 0x7f;
             if index + 2 >= bytes.len() {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS large descriptor(type={:#x}) header truncated",
+                    descriptor_type
+                );
                 break;
             }
 
@@ -76,30 +86,23 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
             let payload_start = index + 3;
             let payload_end = payload_start.saturating_add(length);
             if payload_end > bytes.len() {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS large descriptor(type={:#x}) payload truncated",
+                    descriptor_type
+                );
                 break;
             }
 
-            if descriptor_type == 0x06 && length >= 12 {
-                // 0x06 对应 32 位固定/子类型端口资源，提取端口基址和长度即可。
-                let base_address = u32::from_le_bytes([
-                    bytes[payload_start + 1],
-                    bytes[payload_start + 2],
-                    bytes[payload_start + 3],
-                    bytes[payload_start + 4],
-                ]);
-                let range_length = u32::from_le_bytes([
-                    bytes[payload_start + 5],
-                    bytes[payload_start + 6],
-                    bytes[payload_start + 7],
-                    bytes[payload_start + 8],
-                ]);
-
-                parsed.push(ParsedResource {
-                    kind: ResourceKind::IoPort,
-                    irq: None,
-                    base: Some(base_address as usize),
-                    length: Some(range_length as usize),
-                });
+            // 最小实现只支持 UART 常用的 IRQ/IO/FixedIO，其他资源先忽略并告警。
+            if descriptor_type == 0x06 {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS large descriptor(type=0x06, fixed memory) ignored in minimal parser"
+                );
+            } else {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS large descriptor(type={:#x}) ignored in minimal parser",
+                    descriptor_type
+                );
             }
 
             index = payload_end;
@@ -111,6 +114,10 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
         let payload_start = index + 1;
         let payload_end = payload_start.saturating_add(length);
         if payload_end > bytes.len() {
+            warn!(
+                "[bus][x86_64][acpi][aml] _CRS small descriptor(type={:#x}) payload truncated",
+                descriptor_type
+            );
             break;
         }
 
@@ -126,6 +133,9 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
                     length: None,
                 });
             }
+            0x04 => {
+                warn!("[bus][x86_64][acpi][aml] _CRS IRQ descriptor length({}) invalid", length);
+            }
             0x08 if length >= 7 => {
                 // 传统 I/O 端口资源，最常用的是串口、RTC 一类设备。
                 let base = u16::from_le_bytes([bytes[payload_start + 1], bytes[payload_start + 2]]) as usize;
@@ -137,7 +147,10 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
                     length: Some(length),
                 });
             }
-            0x09 if length >= 2 => {
+            0x08 => {
+                warn!("[bus][x86_64][acpi][aml] _CRS IO descriptor length({}) invalid", length);
+            }
+            0x09 if length >= 3 => {
                 // 固定端口资源有时会直接写死基址，这里尽量兜底解析。
                 let base = u16::from_le_bytes([bytes[payload_start], bytes[payload_start + 1]]) as usize;
                 let length = bytes[payload_start + 2] as usize;
@@ -148,7 +161,18 @@ fn read_resource_bytes(ctx: &AmlContext, value: &AmlValue) -> Option<alloc::vec:
                     length: Some(length),
                 });
             }
-            _ => {}
+            0x09 => {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS fixed IO descriptor length({}) invalid",
+                    length
+                );
+            }
+            _ => {
+                warn!(
+                    "[bus][x86_64][acpi][aml] _CRS small descriptor(type={:#x}) ignored in minimal parser",
+                    descriptor_type
+                );
+            }
         }
 
         index = payload_end;

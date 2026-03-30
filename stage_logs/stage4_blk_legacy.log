@@ -6,9 +6,10 @@ Building...
 ARCH: x86_64
 PLATFORM: plat_qemu_x86_64
 TARGET: x86_64-unknown-none
-SMP: 1
+SMP: 2
 VF2_SD: n
 PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG=DEBUG cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default,memory_self_test,trap_self_test
+   Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
 warning: unused import: `AtomicUsize`
  --> domain-lib/arch/src/x86_64.rs:5:37
   |
@@ -18,6 +19,9 @@ warning: unused import: `AtomicUsize`
   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
 
 warning: `arch` (lib) generated 1 warning (run `cargo fix --lib -p arch` to apply 1 suggestion)
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling platform v0.1.0 (/home/hjch/AsyncAlien/base/platform)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
 warning: function `cpu_num` is never used
   --> base/platform/src/common_x86_64/ap.rs:61:8
    |
@@ -44,6 +48,12 @@ warning: function `apic_timer_frequency` is never used
 71 | pub fn apic_timer_frequency() -> u64 {
    |        ^^^^^^^^^^^^^^^^^^^^
 
+warning: function `set_timer_at_tsc` is never used
+  --> base/platform/src/common_x86_64/time/apic_timer.rs:99:8
+   |
+99 | pub fn set_timer_at_tsc(deadline_tsc: u64) {
+   |        ^^^^^^^^^^^^^^^^
+
 warning: function `disable_apic_timer` is never used
    --> base/platform/src/common_x86_64/time/apic_timer.rs:113:8
     |
@@ -62,13 +72,20 @@ warning: function `current_wall_time_nanos` is never used
 30 | pub fn current_wall_time_nanos() -> u128 {
    |        ^^^^^^^^^^^^^^^^^^^^^^^
 
+warning: function `ticks_to_nanos` is never used
+  --> base/platform/src/common_x86_64/time/tsc.rs:72:8
+   |
+72 | pub fn ticks_to_nanos(ticks: u64) -> u64 {
+   |        ^^^^^^^^^^^^^^
+
 warning: function `ticks_since_init` is never used
   --> base/platform/src/common_x86_64/time/tsc.rs:93:8
    |
 93 | pub fn ticks_since_init() -> u64 {
    |        ^^^^^^^^^^^^^^^^
 
-warning: `platform` (lib) generated 8 warnings
+   Compiling mem v0.1.0 (/home/hjch/AsyncAlien/base/mem)
+warning: `platform` (lib) generated 10 warnings
    Compiling kernel v0.1.0 (/home/hjch/AsyncAlien/kernel)
 warning: static `PLIC_DOMAIN` is never used
   --> kernel/src/trap/mod.rs:41:12
@@ -85,8 +102,9 @@ warning: function `register_plic_domain` is never used
    |        ^^^^^^^^^^^^^^^^^^^^
 
 warning: `kernel` (bin "kernel") generated 2 warnings
-    Finished `release` profile [optimized] target(s) in 13.37s
+    Finished `release` profile [optimized] target(s) in 12.33s
 [minimal-x86] run qemu
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit 21]
 qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit 21]
 c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
 
@@ -103,11 +121,11 @@ Booting from ROM..[11511200913578585177] [x86_boot] main_entry magic=0x2badb002 
   / ___ \  | | | | |  __/ | | | |
  /_/   \_\ |_| |_|  \___| |_| |_|
 
-[0] Initrd from multiboot: 0xb4e000..0xd924e4
+[0] Initrd from multiboot: 0xb4e000..0xd70b60
 [0] Init logger Some("DEBUG")
 [0] Frame range: 0x10b4d000..0x7ffdd000, pages=0x6f490
-[0] initrd copy: src=0xb4e000, size=2376932, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0xef92ec99, dst=0xef92ec99
+[0] initrd copy: src=0xb4e000, size=2239328, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0x6c9e6c1d, dst=0x6c9e6c1d
 [0] Relocate initrd data to 0x10b5b000
 [0] Frame allocator init success
 [0] Talloc allocator init success
@@ -135,16 +153,17 @@ Booting from ROM..[11511200913578585177] [x86_boot] main_entry magic=0x2badb002 
 [0] ++++ setup interrupt ++++
 [0] ++++ setup interrupt done, enable:true ++++
 [0] [trap_self_test] trigger breakpoint
-[0] [trap_self_test] hit breakpoint at RIP=0x2ba587
-[0] [trap_self_test] breakpoint entered at RIP=0x2ba587
-[0] [35m[INFO] Breakpoint at RIP=0x2ba587[0m
+[0] Kernel trap: vector=3, RIP=0x2b9e77, error=0x0
+[0] [trap_self_test] hit breakpoint at RIP=0x2b9e77
+[0] [trap_self_test] breakpoint entered at RIP=0x2b9e77
+[0] [35m[INFO] Breakpoint at RIP=0x2b9e77[0m
 [0] [trap_self_test] breakpoint self-test passed
 [0] Boot CPU 0
 [0] Machine: qemu-x86_64-pc
-SMP:     1 CPUs
+SMP:     2 CPUs
 Memory:  0x100000..0x7ffdd000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb4e000..0xd924e4
+Initrd:  0xb4e000..0xd70b60
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] [32m[DEBUG] [bus][x86_64][init_with_acpi] step1: enumerate ACPI static devices[0m
@@ -213,143 +232,143 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: task
 [0] <register domain>: vfs
 [0] <register domain>: uart16550
-[0] <register domain>: virtio_blk
+[0] <register domain>: virtio_mmio_block
 [0] <register domain>: net_stack
 [0] <register domain>: logger
 [0] <register domain>: domainfs
 [0] <register domain>: local_apic
 [0] <register domain>: io_apic
 [0] <register domain>: apic
-[0] <register domain>: virtio_net
-[0] <register domain>: virtio_input
-[0] <register domain>: virtio_gpu
+[0] <register domain>: virtio_mmio_net
+[0] <register domain>: virtio_mmio_input
+[0] <register domain>: virtio_mmio_gpu
 [0] [35m[INFO] init data allocator success[0m
 [0] [35m[INFO] Load SchedulerDomain domain, size: 81KB[0m
-[0] [32m[DEBUG] Domain address:0xdc8fa0[0m
+[0] [32m[DEBUG] Domain address:0xd6f978[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x801dd000, size: 0x15000[0m
 [0] [35m[INFO] create domain database for domain_id: 1[0m
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 5431 us[0m
+[0] [31m[Load new domain] Time elapsed: 4810 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
 [0] [35m[INFO] Load LogDomain domain, size: 72KB[0m
-[0] [32m[DEBUG] Domain address:0xee37c8[0m
+[0] [32m[DEBUG] Domain address:0xe87ed8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x801f2000, size: 0x12000[0m
 [0] [35m[INFO] create domain database for domain_id: 2[0m
-[0] [31m[Load new domain] Time elapsed: 1083 us[0m
+[0] [31m[Load new domain] Time elapsed: 1035 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
 [0] [35m[INFO] Load FsDomain domain, size: 340KB[0m
-[0] [32m[DEBUG] Domain address:0xce3ea8[0m
+[0] [32m[DEBUG] Domain address:0xce08a0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80204000, size: 0x55000[0m
 [0] [35m[INFO] create domain database for domain_id: 3[0m
-[0] [31m[Load new domain] Time elapsed: 2490 us[0m
+[0] [31m[Load new domain] Time elapsed: 2269 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xd9baa8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80259000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 4[0m
-[0] [31m[Load new domain] Time elapsed: 1476 us[0m
+[0] [31m[Load new domain] Time elapsed: 1388 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
 [0] [35m[INFO] Load DevFsDomain domain, size: 290KB[0m
-[0] [32m[DEBUG] Domain address:0xc87e38[0m
+[0] [32m[DEBUG] Domain address:0xc97e40[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8029d000, size: 0x49000[0m
 [0] [35m[INFO] create domain database for domain_id: 5[0m
-[0] [31m[Load new domain] Time elapsed: 2368 us[0m
+[0] [31m[Load new domain] Time elapsed: 2291 us[0m
 [0] <attach domain>: devfs, it's name is devfs
 [0] [35m[INFO] Load FsDomain domain, size: 273KB[0m
-[0] [32m[DEBUG] Domain address:0xe9f3a0[0m
+[0] [32m[DEBUG] Domain address:0xe43ab0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x802e6000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 6[0m
-[0] [31m[Load new domain] Time elapsed: 1903 us[0m
+[0] [31m[Load new domain] Time elapsed: 1993 us[0m
 [0] <attach domain>: procfs, it's name is procfs
 [0] [35m[INFO] Load FsDomain domain, size: 250KB[0m
-[0] [32m[DEBUG] Domain address:0xe21848[0m
+[0] [32m[DEBUG] Domain address:0xddfc88[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8032a000, size: 0x3f000[0m
 [0] [35m[INFO] create domain database for domain_id: 7[0m
-[0] [31m[Load new domain] Time elapsed: 1924 us[0m
+[0] [31m[Load new domain] Time elapsed: 1842 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
 [0] [35m[INFO] Load FsDomain domain, size: 250KB[0m
-[0] [32m[DEBUG] Domain address:0xc05248[0m
+[0] [32m[DEBUG] Domain address:0xc15250[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80369000, size: 0x3f000[0m
 [0] [35m[INFO] create domain database for domain_id: 8[0m
-[0] [31m[Load new domain] Time elapsed: 1929 us[0m
+[0] [31m[Load new domain] Time elapsed: 1850 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xc43ac0[0m
+[0] [32m[DEBUG] Domain address:0xc53ac8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x803a8000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 9[0m
-[0] [31m[Load new domain] Time elapsed: 2469 us[0m
+[0] [31m[Load new domain] Time elapsed: 2232 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
 [0] [35m[INFO] Load VfsDomain domain, size: 374KB[0m
-[0] [32m[DEBUG] Domain address:0xf5f040[0m
+[0] [32m[DEBUG] Domain address:0xf1d528[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x803ec000, size: 0x5e000[0m
 [0] [35m[INFO] create domain database for domain_id: 10[0m
-[0] [31m[Load new domain] Time elapsed: 1687 us[0m
+[0] [31m[Load new domain] Time elapsed: 1682 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [35m[INFO] Load TaskDomain domain, size: 162KB[0m
-[0] [32m[DEBUG] Domain address:0xd8f1d0[0m
+[0] [35m[INFO] Load TaskDomain domain, size: 59KB[0m
+[0] [32m[DEBUG] Domain address:0xd35ac0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8044a000, size: 0x29000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8044a000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 11[0m
-[0] [31m[Load new domain] Time elapsed: 1004 us[0m
+[0] [31m[Load new domain] Time elapsed: 753 us[0m
 [0] <attach domain>: task, it's name is task
 [0] [35m[INFO] Load APICDomain domain, size: 59KB[0m
 [0] [32m[DEBUG] Domain address:0xb8bd10[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80473000, size: 0xf000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80459000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 12[0m
-[0] [31m[Load new domain] Time elapsed: 1328 us[0m
+[0] [31m[Load new domain] Time elapsed: 1141 us[0m
 [0] <attach domain>: apic, it's name is apic
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 59KB[0m
-[0] [32m[DEBUG] Domain address:0xfbc9b0[0m
+[0] [32m[DEBUG] Domain address:0xf7ae98[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80482000, size: 0xf000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80468000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 13[0m
-[0] [31m[Load new domain] Time elapsed: 949 us[0m
+[0] [31m[Load new domain] Time elapsed: 766 us[0m
 [0] <attach domain>: local_apic, it's name is local_apic
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 59KB[0m
 [0] [32m[DEBUG] Domain address:0xb9aa58[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80491000, size: 0xf000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80477000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 14[0m
-[0] [31m[Load new domain] Time elapsed: 776 us[0m
+[0] [31m[Load new domain] Time elapsed: 698 us[0m
 [0] <attach domain>: io_apic, it's name is io_apic
 [0] [93m[WARN] rtc device detected, rtc domain is not wired yet[0m
 [0] [35m[INFO] Load UartDomain domain, size: 59KB[0m
-[0] [32m[DEBUG] Domain address:0xef59f8[0m
+[0] [32m[DEBUG] Domain address:0xe9a108[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804a0000, size: 0xf000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80486000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 15[0m
-[0] [31m[Load new domain] Time elapsed: 842 us[0m
+[0] [31m[Load new domain] Time elapsed: 763 us[0m
 [0] <attach domain>: uart, it's name is uart
 [0] [35m[INFO] Load BufUartDomain domain, size: 77KB[0m
-[0] [32m[DEBUG] Domain address:0xb5f9f0[0m
+[0] [32m[DEBUG] Domain address:0xb786b0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804af000, size: 0x14000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80495000, size: 0x14000[0m
 [0] [35m[INFO] create domain database for domain_id: 16[0m
-[0] [31m[Load new domain] Time elapsed: 1182 us[0m
+[0] [31m[Load new domain] Time elapsed: 1040 us[0m
 [0][Domain:16] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0] [32m[DEBUG] <drop> for DVec[0m
-[0] [32m[DEBUG] <drop> for DBox 0xd4a5b8[0m
-[0] [32m[DEBUG] <custom_drop> for DBox 0xd4a5b8[0m
+[0] [32m[DEBUG] <drop> for DBox 0xbceca8[0m
+[0] [32m[DEBUG] <custom_drop> for DBox 0xbceca8[0m
 [0] [32m[DEBUG] default for u8[0m
 [0] [35m[INFO] Load BlkDeviceDomain domain, size: 103KB[0m
-[0] [32m[DEBUG] Domain address:0xba97a0[0m
+[0] [32m[DEBUG] Domain address:0xeca978[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804c3000, size: 0x1a000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804a9000, size: 0x1a000[0m
 [0] [35m[INFO] create domain database for domain_id: 17[0m
-[0] [31m[Load new domain] Time elapsed: 1283 us[0m
+[0] [31m[Load new domain] Time elapsed: 1229 us[0m
 [0][Domain:17] virtio_blk_pci(legacy): 0000:00:04.0, io=0xc000-0xc100
 [0][Domain:17] virtio_blk_pci: create blk driver
 [0][Domain:17] virtio_blk_pci: driver ready
@@ -358,32 +377,32 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <attach domain>: block, it's name is block-1
 [0] [93m[WARN] nic device not found, skip net_stack init[0m
 [0] [35m[INFO] Load ShadowBlockDomain domain, size: 81KB[0m
-[0] [32m[DEBUG] Domain address:0xf4aaf8[0m
+[0] [32m[DEBUG] Domain address:0xf08fe0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804dd000, size: 0x15000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804c3000, size: 0x15000[0m
 [0] [35m[INFO] create domain database for domain_id: 18[0m
-[0] [31m[Load new domain] Time elapsed: 1062 us[0m
+[0] [31m[Load new domain] Time elapsed: 966 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
 [0] [35m[INFO] Load CacheBlkDeviceDomain domain, size: 85KB[0m
-[0] [32m[DEBUG] Domain address:0xe89de0[0m
+[0] [32m[DEBUG] Domain address:0xe2e4f0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804f2000, size: 0x16000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804d8000, size: 0x16000[0m
 [0] [35m[INFO] create domain database for domain_id: 19[0m
-[0] [31m[Load new domain] Time elapsed: 3028 us[0m
+[0] [31m[Load new domain] Time elapsed: 2840 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 63KB[0m
-[0] [32m[DEBUG] Domain address:0xd390c8[0m
+[0] [32m[DEBUG] Domain address:0xbbcdb0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80508000, size: 0x10000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804ee000, size: 0x10000[0m
 [0] [35m[INFO] create domain database for domain_id: 20[0m
-[0] [31m[Load new domain] Time elapsed: 780 us[0m
+[0] [31m[Load new domain] Time elapsed: 841 us[0m
 [0] <attach domain>: null, it's name is null
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 63KB[0m
-[0] [32m[DEBUG] Domain address:0xe79df0[0m
+[0] [32m[DEBUG] Domain address:0xe1e500[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80518000, size: 0x10000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804fe000, size: 0x10000[0m
 [0] [35m[INFO] create domain database for domain_id: 21[0m
-[0] [31m[Load new domain] Time elapsed: 736 us[0m
+[0] [31m[Load new domain] Time elapsed: 779 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -392,16 +411,15 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:7] sysfs FsDomain init
 [0][Domain:9] get domain info success
 [0][Domain:9] domainfs FsDomain init
-[0] load_domains: before vfs init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xd9baa8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80528000, size: 0x44000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8050e000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 22[0m
-[0] [31m[Load new domain] Time elapsed: 1623 us[0m
+[0] [31m[Load new domain] Time elapsed: 1400 us[0m
 [0][Domain:22] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
 [0][Domain:22] ramfs mount success
@@ -414,68 +432,25 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xd9baa8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8056c000, size: 0x44000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80552000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 23[0m
-[0] [31m[Load new domain] Time elapsed: 2363 us[0m
+[0] [31m[Load new domain] Time elapsed: 1395 us[0m
 [0][Domain:23] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
 [0][Domain:23] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xd9baa8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x805b0000, size: 0x44000[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80596000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 24[0m
-[0] [31m[Load new domain] Time elapsed: 2029 us[0m
+[0] [31m[Load new domain] Time elapsed: 1588 us[0m
 [0][Domain:24] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
 [0][Domain:24] ramfs mount success
 [0][Domain:9] domainfs mount success
 [0][Domain:10] Initrd populate success
-[0][Domain:10] fatfs mount begin: /tests
-[0][Domain:10] fatfs 已打开块设备 /dev/sda
-[0][Domain:3] fatfs mount success
-[0][Domain:10] fatfs mount success: /tests
-[0][Domain:10] Vfs Tree:
-drwxr-xr-x      4KB root 
-drwxr-xr-x      4KB var 
-drwxr-xr-x      4KB etc 
-drwxr-xr-x      4KB dev 
-drwxr-xr-x      4KB proc 
-drwxr-xr-x      4KB sys 
-drwxrwxrwx      4KB tmp 
-drwxr-xr-x      4KB tests 
-drwxr-xr-x      4KB domain 
-drwxr-xr-x      4KB bin 
-drwxr-xr-x      4KB sbin 
-[0][Domain:10] Init filesystem success
-[0][Domain:10] vfs init success
-[0] load_domains: after vfs init
-[0] Drop initrd data
-[0] load_domains: before task init
-[0] [93m[WARN] <add_task>: tid=0, cx=TaskContext { kstack_top: 328048640, rsp: 328048584, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0] [93m[WARN] <add_task>: tid=1, cx=TaskContext { kstack_top: 338059264, rsp: 338059208, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0][Domain:11] Init task domain success
-[0] load_domains: after task init
-[0] [35m[INFO] Load SysCallDomain domain, size: 134KB[0m
-[0] [32m[DEBUG] Domain address:0xf04780[0m
-[0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x805f4000, size: 0x22000[0m
-[0] [35m[INFO] create domain database for domain_id: 25[0m
-[0][Domain:25] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 2902 us[0m
-[0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
-[0][Domain:25] syscall domain init
-[0] <attach domain>: syscall, it's name is syscall
-[0] Load domains done
-[0] Register task domain and syscall domain to trap system
-[0] Begin run task...
-[0] run_task bootstrap wake 0 tasks
-[0] [93m[WARN] switch to task 0, cx=TaskContext { kstack_top: 328048640, rsp: 328048584, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0][Domain:11] kthread_init start...
-[0] [93m[WARN] yield_now: 0[0m
-[0] [93m[WARN] <add_task>: tid=0, cx=TaskContext { kstack_top: 328048640, rsp: 328047120, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 255, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 65535, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0] [93m[WARN] switch to task 1, cx=TaskContext { kstack_top: 338059264, rsp: 338059208, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
+qemu-system-x86_64: terminating on signal 15 from pid 2549 (timeout)

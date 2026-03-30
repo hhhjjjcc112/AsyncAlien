@@ -3,6 +3,7 @@ mod resource;
 mod scheduler;
 
 use alloc::sync::Arc;
+use alloc::vec::Vec;
 use core::arch::global_asm;
 #[cfg(target_arch = "x86_64")]
 use x86_64::registers::model_specific::Msr;
@@ -85,6 +86,12 @@ pub fn register_task_domain(task_domain: Arc<dyn TaskDomain>) {
 }
 
 pub fn run_task() {
+    // 启动初期兜底：确保已创建的初始任务进入调度队列。
+    let wait_tids: Vec<usize> = TASK_WAIT_QUEUE.lock().keys().copied().collect();
+    println!("run_task bootstrap wake {} tasks", wait_tids.len());
+    for tid in wait_tids {
+        scheduler::wake_up_wait_task(tid);
+    }
     processor::cpu_loop();
 }
 

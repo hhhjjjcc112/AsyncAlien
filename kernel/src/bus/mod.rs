@@ -23,6 +23,61 @@ pub struct CommonDeviceInfo {
     pub compatible: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceClass {
+    Plic,
+    LocalApic,
+    IoApic,
+    Uart,
+    Rtc,
+    PciHost,
+    VirtioMmio,
+    VirtioPci,
+    Ramdisk,
+    LoopBack,
+    SdCard,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceTransport {
+    Platform,
+    Mmio,
+    Pci,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FirmwareSource {
+    Fdt,
+    Acpi,
+    Aml,
+    PciScan,
+    Fallback,
+    Synthetic,
+}
+
+#[derive(Debug, Clone)]
+pub enum DeviceLocator {
+    Mmio(Range<PhysAddr>),
+    Pio(Range<u16>),
+    PciBdf {
+        segment: u16,
+        bus: u8,
+        device: u8,
+        function: u8,
+    },
+    None,
+}
+
+#[derive(Debug, Clone)]
+pub struct DiscoveredDevice {
+    pub class: DeviceClass,
+    pub locator: DeviceLocator,
+    pub transport: DeviceTransport,
+    pub irq: Option<u32>,
+    pub compatible: Option<String>,
+    pub fw_source: FirmwareSource,
+}
+
 #[cfg(target_arch = "riscv64")]
 pub use self::riscv64::CommonDeviceType;
 #[cfg(target_arch = "x86_64")]

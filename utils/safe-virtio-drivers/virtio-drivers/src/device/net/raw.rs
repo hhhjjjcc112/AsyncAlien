@@ -39,9 +39,24 @@ impl<H: Hal<QUEUE_SIZE>, T: Transport, const QUEUE_SIZE: usize> VirtIONetRaw<H, 
             config.status.read(io_region)
         );
 
-        let recv_queue = VirtIoQueue::new(&mut transport, QUEUE_RECEIVE)?;
-        let send_queue = VirtIoQueue::new(&mut transport, QUEUE_TRANSMIT)?;
+        info!("virtio-net: create receive queue");
+        let recv_queue = match VirtIoQueue::new(&mut transport, QUEUE_RECEIVE) {
+            Ok(q) => q,
+            Err(e) => {
+                info!("virtio-net: create receive queue failed: {:?}", e);
+                return Err(e);
+            }
+        };
+        info!("virtio-net: create transmit queue");
+        let send_queue = match VirtIoQueue::new(&mut transport, QUEUE_TRANSMIT) {
+            Ok(q) => q,
+            Err(e) => {
+                info!("virtio-net: create transmit queue failed: {:?}", e);
+                return Err(e);
+            }
+        };
 
+        info!("virtio-net: finish transport init");
         transport.finish_init()?;
 
         Ok(VirtIONetRaw {

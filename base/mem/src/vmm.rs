@@ -7,7 +7,7 @@ use config::{FRAME_SIZE, KERNEL_HEAP_SIZE, TRAMPOLINE};
 #[cfg(target_arch = "x86_64")]
 use config::{LOW_PHYS_MAP_BASE, LOW_PHYS_MAP_SIZE, PERCPU_MIRROR_BASE};
 use ksync::RwLock;
-use log::info;
+use log::{info, warn};
 use page_table::MappingFlags;
 use platform::{config::DEVICE_SPACE, MemIf, Platform, println};
 use ptable::{PhysPage, VmArea, VmAreaEqual, VmAreaType, VmSpace};
@@ -238,8 +238,8 @@ pub fn build_kernel_address_space() {
         );
         kernel_space.map(VmAreaType::VmAreaEqual(io_area)).unwrap();
         println!("map {}: {:#x?}-{:#x?}", pair.0, pair.1, pair.1 + pair.2);
-        map_max = map_max.max(pair.1 + pair.2);
     }
+    // 模块映射基址仅使用可分配内存上界，避免被 MMIO 区抬到高地址。
     KERNEL_MAP_MAX.store(map_max, core::sync::atomic::Ordering::SeqCst);
 }
 
@@ -332,7 +332,25 @@ impl VirtDomainArea {
 
 pub fn map_domain_region(size: usize) -> VirtDomainArea {
     assert_eq!(size % FRAME_SIZE, 0);
-    let virt_start = KERNEL_MAP_MAX.fetch_add(size, core::sync::atomic::Ordering::Relaxed);
+    let mut virt_start = KERNEL_MAP_MAX.load(core::sync::atomic::Ordering::Relaxed);
+    let mut kernel_space = KERNEL_SPACE.write();
+    // 跳过已映射区间（如 ACPI 保留尾段），确保域镜像映射到空闲地址。
+    loop {
+        let mut overlap = false;
+        let mut addr = virt_start;
+        while addr < virt_start + size {
+            if kernel_space.query(addr).is_ok() {
+                overlap = true;
+                break;
+            }
+            addr += FRAME_SIZE;
+        }
+        if !overlap {
+            break;
+        }
+        virt_start += FRAME_SIZE;
+    }
+    KERNEL_MAP_MAX.store(virt_start + size, core::sync::atomic::Ordering::Relaxed);
     // 分配物理页并映射到内核虚拟地址。
     log::error!(
         "[alloc_free_module_region] virt_start: {:#x}, size: {:#x}",
@@ -344,7 +362,6 @@ pub fn map_domain_region(size: usize) -> VirtDomainArea {
         let frame = Box::new(alloc_frame_trackers(1));
         phy_frames.push(frame);
     }
-    let mut kernel_space = KERNEL_SPACE.write();
     let vm_area = VmArea::new(
         virt_start..virt_start + size,
         MappingFlags::READ | MappingFlags::WRITE,
@@ -364,13 +381,13 @@ pub fn unmap_domain_area(area: VirtDomainArea) {
 
 pub fn set_memory_x(virt_addr: usize, numpages: usize) -> AlienResult<()> {
     let mut kernel_space = KERNEL_SPACE.write();
-    // kernel_space.set_flags(virt_addr, numpages, MappingFlags::READ | MappingFlags::WRITE | MappingFlags::EXECUTE).unwrap();
     let mut addr = virt_addr;
     for _ in 0..numpages {
+        let (_, flags, _) = kernel_space.query(addr).unwrap();
         kernel_space
             .protect(
                 addr..addr + FRAME_SIZE,
-                MappingFlags::READ | MappingFlags::EXECUTE,
+                flags | MappingFlags::EXECUTE,
             )
             .unwrap();
         addr += FRAME_SIZE;
@@ -378,4 +395,38 @@ pub fn set_memory_x(virt_addr: usize, numpages: usize) -> AlienResult<()> {
     // 刷新 TLB。
     sfence_vma_all();
     Ok(())
+}
+
+/// 为设备 MMIO 物理区间补充恒等映射（phys == virt）。
+/// 仅补未映射页，已映射页保持不变。
+pub fn map_device_phys_range(range: core::ops::Range<usize>) {
+    if range.start >= range.end {
+        return;
+    }
+    let start = range.start & !(FRAME_SIZE - 1);
+    let end = (range.end + FRAME_SIZE - 1) & !(FRAME_SIZE - 1);
+    let mut kernel_space = KERNEL_SPACE.write();
+    let mut changed = false;
+    for addr in (start..end).step_by(FRAME_SIZE) {
+        if kernel_space.query(addr).is_ok() {
+            continue;
+        }
+        let ppn = addr >> FRAME_BITS;
+        let area = VmArea::new(
+            addr..addr + FRAME_SIZE,
+            MappingFlags::READ | MappingFlags::WRITE,
+            vec![Box::new(FrameTracker::new(ppn, 1, false))],
+        );
+        if kernel_space.map(VmAreaType::VmArea(area)).is_ok() {
+            changed = true;
+        } else {
+            warn!(
+                "[mem] map device phys range failed @ {:#x} in {:#x?}",
+                addr, range
+            );
+        }
+    }
+    if changed {
+        sfence_vma_all();
+    }
 }

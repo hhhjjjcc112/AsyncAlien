@@ -62,16 +62,22 @@ endif
 PROFILE := release
 KERNEL := target/$(TARGET2)/$(PROFILE)/kernel
 NET ?= y
+NET_HOSTFWD ?= y
+NET_FWD_PORT_TCP ?= 55555
+NET_FWD_PORT_UDP ?= 5555
 SMP ?= 2
 MEMORY_SIZE := 2048M
 X86_CPU ?= Icelake-Server,+x2apic
 X86_UINTR_CPU ?= max,+x2apic,+uintr
+VIRTIO_FORCE_LEGACY ?= y
 LOG ?=
 GUI ?=n
 FS ?=fat
 IMG := build/sdcard.img
 FSMOUNT := ./diskfs
 FEATURES := default
+DOMAIN_PROFILE ?=
+INITRD_REBUILD_USER ?= y
 name ?=
 VF2 ?= n
 TFTPBOOT := /home/godones/projects/tftpboot/
@@ -85,20 +91,35 @@ space:= $(empty) $(empty)
 QEMU_ARGS :=
 
 ifeq ($(ARCH_KIND),x86_64)
+    # x86_64 迁移阶段默认单核启动，避免 AP bring-up 干扰主链路。
+    ifneq ($(origin SMP),command line)
+        ifneq ($(origin SMP),environment)
+            SMP := 1
+        endif
+    endif
     # x86_64 QEMU args
+    VIRTIO_PCI_OPTS :=
+    ifeq ($(VIRTIO_FORCE_LEGACY),y)
+        VIRTIO_PCI_OPTS := ,disable-modern=on,disable-legacy=off,x-disable-pcie=on
+    endif
     ifeq ($(GUI),y)
-        QEMU_ARGS += -device virtio-gpu-pci \
-                     -device virtio-keyboard-pci \
-                     -device virtio-mouse-pci
+        QEMU_ARGS += -device virtio-gpu-pci$(VIRTIO_PCI_OPTS) \
+                     -device virtio-keyboard-pci$(VIRTIO_PCI_OPTS) \
+                     -device virtio-mouse-pci$(VIRTIO_PCI_OPTS)
     else
         QEMU_ARGS += -nographic
     endif
     ifeq ($(NET),y)
-        QEMU_ARGS += -device virtio-net-pci,netdev=net0 \
-                     -netdev user,id=net0,hostfwd=tcp::55555-:55555,hostfwd=udp::5555-:5555
+        ifeq ($(NET_HOSTFWD),y)
+            QEMU_ARGS += -device virtio-net-pci,netdev=net0$(VIRTIO_PCI_OPTS) \
+                         -netdev user,id=net0,hostfwd=tcp::$(NET_FWD_PORT_TCP)-:$(NET_FWD_PORT_TCP),hostfwd=udp::$(NET_FWD_PORT_UDP)-:$(NET_FWD_PORT_UDP)
+        else
+            QEMU_ARGS += -device virtio-net-pci,netdev=net0$(VIRTIO_PCI_OPTS) \
+                         -netdev user,id=net0
+        endif
     endif
     QEMU_ARGS += -drive file=$(IMG),if=none,format=raw,id=x0 \
-                 -device virtio-blk-pci,drive=x0
+                 -device virtio-blk-pci,drive=x0$(VIRTIO_PCI_OPTS)
 else
     # riscv64 QEMU args
     ifeq ($(GUI),y)
@@ -109,8 +130,13 @@ else
         QEMU_ARGS += -nographic
     endif
     ifeq ($(NET),y)
-        QEMU_ARGS += -device virtio-net-device,netdev=net0 \
-                     -netdev user,id=net0,hostfwd=tcp::55555-:55555,hostfwd=udp::5555-:5555
+        ifeq ($(NET_HOSTFWD),y)
+            QEMU_ARGS += -device virtio-net-device,netdev=net0 \
+                         -netdev user,id=net0,hostfwd=tcp::$(NET_FWD_PORT_TCP)-:$(NET_FWD_PORT_TCP),hostfwd=udp::$(NET_FWD_PORT_UDP)-:$(NET_FWD_PORT_UDP)
+        else
+            QEMU_ARGS += -device virtio-net-device,netdev=net0 \
+                         -netdev user,id=net0
+        endif
     endif
     QEMU_ARGS += -drive file=$(IMG),if=none,format=raw,id=x0 \
                  -device virtio-blk-device,drive=x0
@@ -269,17 +295,25 @@ mount:
 
 domains:
 	@if [ ! -d "build" ]; then mkdir build; fi
-	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) cargo domain build-all -l "$(LOG)" -o $(abspath build)
+	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) DOMAIN_PROFILE=$(DOMAIN_PROFILE) cargo domain build-all -l "$(LOG)" -o $(abspath build)
 	@make initrd
 
 domain:
-	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) cargo domain build -n $(name) -l "$(LOG)" -o $(abspath build)
+	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) DOMAIN_PROFILE=$(DOMAIN_PROFILE) cargo domain build -n $(name) -l "$(LOG)" -o $(abspath build)
 	@make initrd
 
 initrd:
-	@make -C user/initrd ARCH=$(ARCH_KIND)
+	@if [ "$(INITRD_REBUILD_USER)" = "y" ]; then \
+		echo "[initrd] build user/initrd ARCH=$(ARCH_KIND)"; \
+		if ! make -C user/initrd ARCH=$(ARCH_KIND); then \
+			echo "[WARN] user/initrd 构建失败，回退使用现有 initramfs-$(ARCH_KIND)"; \
+		fi; \
+	else \
+		echo "[initrd] skip user/initrd rebuild (INITRD_REBUILD_USER=$(INITRD_REBUILD_USER))"; \
+	fi
 	@mkdir -p ./initrd
 	@cp ./build/init/g* ./initrd
+	@rm -f ./initrd/gvirtio_blk ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu
 	@if [ -d ./user/initrd/initramfs-$(ARCH_KIND) ]; then \
 		cp ./user/initrd/initramfs-$(ARCH_KIND)/* ./initrd -r; \
 	else \

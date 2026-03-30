@@ -163,12 +163,12 @@ pub fn cpu_loop() {
         if let Some(next_task) = fetch_task() {
             next_task.lock().set_status(TaskStatus::Running);
             let next_task_ctx_ptr = next_task.lock().get_context_raw_mut_ptr();
-            // log::warn!(
-            //     "[tid: {:?}] switch to task {:?}",
-            //     tid,
-            //     next_task.lock().tid()
-            // );
             let next_tid = next_task.lock().tid();
+            if next_tid <= 1 {
+                log::warn!("switch to task {}, cx={:?}", next_tid, next_task.lock().basic_info.context);
+            } else {
+                log::warn!("switch to task {}", next_tid);
+            }
             cpu.set_current(next_task);
             set_tp(tp_from_tid(next_tid));
             let cpu_context = cpu.get_idle_task_cx_ptr();

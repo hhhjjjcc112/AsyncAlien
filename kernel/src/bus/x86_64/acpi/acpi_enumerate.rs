@@ -182,7 +182,7 @@ pub fn enumerate_uart(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
             Some(compatible),
         )));
     } else {
-        debug!("[bus][x86_64][acpi] SPCR missing, skip UART static enumeration");
+        warn!("[bus][x86_64][acpi] SPCR missing, fallback to AML/COM path");
     }
 
     devices
@@ -190,20 +190,27 @@ pub fn enumerate_uart(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
 
 /// 函数说明：执行对应的总线处理步骤。
 pub fn enumerate_rtc(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
-    // 步骤1：检测 FADT 是否存在，存在则接入 CMOS RTC 固定端口。
+    // 步骤1：最小实现统一接入 CMOS RTC；FADT 仅用于判定是否命中标准路径。
     let mut devices = Vec::new();
 
     if tables.find_table::<Fadt>().is_some() {
-        // CMOS RTC 在 PC 架构是固定硬件，FADT 存在即可按固定 I/O 端口接入。
-        devices.push(CommonDeviceType::Rtc(make_common_device(
-            DEFAULT_RTC_IO_BASE,
-            DEFAULT_RTC_IO_SIZE,
-            Some(DEFAULT_RTC_IRQ),
-            Some("cmos_rtc"),
-        )));
+        debug!("[bus][x86_64][acpi] FADT present, use CMOS RTC fixed io range");
     } else {
-        debug!("[bus][x86_64][acpi] FADT missing, skip RTC static enumeration");
+        warn!(
+            "[bus][x86_64][acpi] FADT missing, fallback RTC io={:#x}..{:#x}, irq={}",
+            DEFAULT_RTC_IO_BASE,
+            DEFAULT_RTC_IO_BASE + DEFAULT_RTC_IO_SIZE,
+            DEFAULT_RTC_IRQ
+        );
     }
+
+    // CMOS RTC 在 PC 架构是固定硬件，最小路径统一接入。
+    devices.push(CommonDeviceType::Rtc(make_common_device(
+        DEFAULT_RTC_IO_BASE,
+        DEFAULT_RTC_IO_SIZE,
+        Some(DEFAULT_RTC_IRQ),
+        Some("cmos_rtc"),
+    )));
 
     devices
 }

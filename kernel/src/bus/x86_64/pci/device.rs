@@ -28,6 +28,15 @@ pub struct PciEndpointDevice {
     header_type: u8,
 }
 
+#[derive(Debug, Clone)]
+pub struct VirtioPciModernInfo {
+    pub common: Range<usize>,
+    pub notify: Range<usize>,
+    pub notify_off_multiplier: u32,
+    pub isr: Range<usize>,
+    pub device: Range<usize>,
+}
+
 #[derive(Debug)]
 pub struct PciCommonDevice {
     io_region: SafeIORegion,
@@ -49,12 +58,15 @@ impl PciBus {
         #[cfg(target_arch = "x86_64")]
         if endpoints.is_empty() {
             // 某些平台（如传统 i440fx）没有可用 ECAM，这里回退到 CF8/CFC 机制。
+            warn!("[bus][x86_64][pci] ECAM scan empty, fallback to CF8/CFC");
             endpoints = legacy_scan_endpoints();
             if !endpoints.is_empty() {
-                println!(
+                warn!(
                     "[bus][x86_64][pci] ECAM empty, fallback CF8/CFC found {} endpoint(s)",
                     endpoints.len()
                 );
+            } else {
+                warn!("[bus][x86_64][pci] fallback CF8/CFC found no endpoint");
             }
         }
         if !endpoints.is_empty() {
@@ -96,6 +108,15 @@ fn legacy_cfg_read32(address: PciAddress, offset: u16) -> u32 {
     unsafe {
         x86::io::outl(0xcf8, legacy_cfg_address(address, offset));
         x86::io::inl(0xcfc)
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+/// 函数说明：执行对应的总线处理步骤。
+fn legacy_cfg_write32(address: PciAddress, offset: u16, value: u32) {
+    unsafe {
+        x86::io::outl(0xcf8, legacy_cfg_address(address, offset));
+        x86::io::outl(0xcfc, value);
     }
 }
 
@@ -257,7 +278,17 @@ impl PciCommonDevice {
                 }
 
                 // header_type 的 bit7 表示 multifunction。只有置位时才需要继续扫 function 1..7。
-                let header_type = self.read_config_u8(bus, device, 0, 0x0e).unwrap_or(0);
+                let header_type = match self.read_config_u8(bus, device, 0, 0x0e) {
+                    Some(v) => v,
+                    None => {
+                        warn!(
+                            "[bus][x86_64][pci] config read header_type failed @ {:02x}:{:02x}.0, fallback 0",
+                            bus,
+                            device
+                        );
+                        0
+                    }
+                };
                 let multifunction = header_type & 0x80 != 0;
 
                 for function in 0..8u8 {
@@ -283,7 +314,18 @@ impl PciCommonDevice {
                         continue;
                     };
                     // header_type 再读一次，去掉 multifunction 位后保留真实头类型。
-                    let header_type = self.read_config_u8(bus, device, function, 0x0e).unwrap_or(0) & 0x7f;
+                    let header_type = match self.read_config_u8(bus, device, function, 0x0e) {
+                        Some(v) => v & 0x7f,
+                        None => {
+                            warn!(
+                                "[bus][x86_64][pci] config read header_type failed @ {:02x}:{:02x}.{}, fallback 0",
+                                bus,
+                                device,
+                                function
+                            );
+                            0
+                        }
+                    };
 
                     endpoints.push_back(PciEndpointDevice {
                         // 这里把 BDF 保存下来，后续驱动可以直接定位这个 function。
@@ -302,6 +344,24 @@ impl PciCommonDevice {
 }
 
 impl PciEndpointDevice {
+    #[cfg(target_arch = "x86_64")]
+    const PCI_STATUS: u16 = 0x06;
+    #[cfg(target_arch = "x86_64")]
+    const PCI_COMMAND: u16 = 0x04;
+    #[cfg(target_arch = "x86_64")]
+    const PCI_CAP_PTR: u16 = 0x34;
+    #[cfg(target_arch = "x86_64")]
+    const PCI_CAP_ID_VNDR: u8 = 0x09;
+
+    #[cfg(target_arch = "x86_64")]
+    const VIRTIO_PCI_CAP_COMMON_CFG: u8 = 1;
+    #[cfg(target_arch = "x86_64")]
+    const VIRTIO_PCI_CAP_NOTIFY_CFG: u8 = 2;
+    #[cfg(target_arch = "x86_64")]
+    const VIRTIO_PCI_CAP_ISR_CFG: u8 = 3;
+    #[cfg(target_arch = "x86_64")]
+    const VIRTIO_PCI_CAP_DEVICE_CFG: u8 = 4;
+
     /// 端点的 PCI 地址。
     pub fn address(&self) -> PciAddress {
         self.address
@@ -355,6 +415,7 @@ impl PciEndpointDevice {
             return match ty {
                 1 => Some("virtio-net"),
                 2 => Some("virtio-blk"),
+                16 => Some("virtio-gpu"),
                 18 => Some("virtio-input"),
                 _ => None,
             };
@@ -364,8 +425,121 @@ impl PciEndpointDevice {
         match self.device_id {
             0x1000 => Some("virtio-net"),
             0x1001 => Some("virtio-blk"),
+            0x1010 => Some("virtio-gpu"),
             0x1012 => Some("virtio-input"),
             _ => None,
         }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    fn cap_bar_window(&self, bar: u8, cap_offset: u32, cap_length: u32) -> Option<Range<usize>> {
+        if cap_length == 0 {
+            return None;
+        }
+        let bar_reg = 0x10u16 + (bar as u16) * 4;
+        let bar_val = legacy_cfg_read32(self.address, bar_reg);
+        // 仅处理 MMIO BAR。
+        if bar_val & 0x1 != 0 {
+            return None;
+        }
+        let mem_type = (bar_val >> 1) & 0x3;
+        let base_low = (bar_val & 0xfffffff0) as u64;
+        let base = if mem_type == 0x2 {
+            let bar_high = legacy_cfg_read32(self.address, bar_reg + 4) as u64;
+            (bar_high << 32) | base_low
+        } else {
+            base_low
+        };
+        if base == 0 {
+            return None;
+        }
+        let start = base.checked_add(cap_offset as u64)?;
+        let end = start.checked_add(cap_length as u64)?;
+        Some((start as usize)..(end as usize))
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    fn enable_mem_space(&self) {
+        let mut cmd = legacy_cfg_read32(self.address, Self::PCI_COMMAND);
+        // 现代 virtio 需要 MMIO + DMA。
+        cmd |= (1 << 1) | (1 << 2);
+        legacy_cfg_write32(self.address, Self::PCI_COMMAND, cmd);
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    pub fn virtio_modern_info(&self) -> Option<VirtioPciModernInfo> {
+        if self.vendor_id != 0x1af4 {
+            return None;
+        }
+        let status = legacy_cfg_read16(self.address, Self::PCI_STATUS);
+        // 没有 capability list 时直接返回。
+        if status & (1 << 4) == 0 {
+            return None;
+        }
+
+        self.enable_mem_space();
+
+        let mut common = None;
+        let mut notify = None;
+        let mut notify_mul = None;
+        let mut isr = None;
+        let mut device = None;
+
+        let mut cap_ptr = legacy_cfg_read8(self.address, Self::PCI_CAP_PTR) as u16;
+        let mut guard = 0usize;
+        while cap_ptr >= 0x40 && guard < 64 {
+            let cap_id = legacy_cfg_read8(self.address, cap_ptr);
+            let next = legacy_cfg_read8(self.address, cap_ptr + 1) as u16;
+            if cap_id == Self::PCI_CAP_ID_VNDR {
+                let cfg_type = legacy_cfg_read8(self.address, cap_ptr + 3);
+                let bar = legacy_cfg_read8(self.address, cap_ptr + 4);
+                let off = legacy_cfg_read32(self.address, cap_ptr + 8);
+                let len = legacy_cfg_read32(self.address, cap_ptr + 12);
+                let window = self.cap_bar_window(bar, off, len);
+                match cfg_type {
+                    Self::VIRTIO_PCI_CAP_COMMON_CFG => common = window,
+                    Self::VIRTIO_PCI_CAP_NOTIFY_CFG => {
+                        notify = window;
+                        notify_mul = Some(legacy_cfg_read32(self.address, cap_ptr + 16));
+                    }
+                    Self::VIRTIO_PCI_CAP_ISR_CFG => isr = window,
+                    Self::VIRTIO_PCI_CAP_DEVICE_CFG => device = window,
+                    _ => {}
+                }
+            }
+            if next == cap_ptr {
+                break;
+            }
+            cap_ptr = next;
+            guard += 1;
+        }
+
+        Some(VirtioPciModernInfo {
+            common: common?,
+            notify: notify?,
+            notify_off_multiplier: notify_mul?,
+            isr: isr?,
+            device: device?,
+        })
+    }
+
+    #[cfg(target_arch = "x86_64")]
+/// 函数说明：执行对应的总线处理步骤。
+    pub fn legacy_io_range(&self) -> Option<Range<usize>> {
+        let bar0 = legacy_cfg_read32(self.address, 0x10);
+        if bar0 & 0x1 == 0 {
+            return None;
+        }
+        let base = (bar0 & !0x3) as usize;
+        if base == 0 {
+            return None;
+        }
+
+        // legacy 设备通常使用 0x20~0x100 端口窗口，这里给保守 0x100 便于兼容。
+        let mut cmd = legacy_cfg_read32(self.address, 0x04);
+        // 传统 virtio 也需要开启 DMA。
+        cmd |= (1 << 0) | (1 << 2);
+        legacy_cfg_write32(self.address, 0x04, cmd);
+        Some(base..base + 0x100)
     }
 }

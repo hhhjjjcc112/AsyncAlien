@@ -15,7 +15,7 @@ use ty::*;
 mod ty;
 
 const SUPPORTED_FEATURES: BlkFeature = BlkFeature::FLUSH;
-const QUEUE_SIZE: usize = 16;
+const QUEUE_SIZE: usize = 256;
 pub const SECTOR_SIZE: usize = 512;
 
 pub struct VirtIOBlk<H: Hal<QUEUE_SIZE>, T: Transport> {
