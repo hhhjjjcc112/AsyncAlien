@@ -272,6 +272,7 @@ document_iter! {
 #[doc(hidden)]
 pub use crate::value_iter::*;
 
+#[allow(non_local_definitions)]
 const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
         let head = T::registry().head.load(Ordering::Acquire);

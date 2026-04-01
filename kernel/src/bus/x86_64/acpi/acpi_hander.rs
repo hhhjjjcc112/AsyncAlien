@@ -2,10 +2,11 @@ use core::{ptr::NonNull, sync::atomic::{AtomicU32, Ordering}};
 
 use acpi::{Handle, Handler as AcpiHandler, PhysicalMapping, PciAddress};
 use spin::Mutex;
+use x86_pci::{cfg_read16, cfg_read32, cfg_read8, cfg_write16, cfg_write32, cfg_write8};
 
 use platform::TimeIf;
 
-use super::aml_handler::{pci_cfg_read32, pci_cfg_write32, phys_to_virt};
+use super::aml_handler::phys_to_virt;
 
 const AML_MUTEX_MAX: usize = 64;
 
@@ -111,40 +112,71 @@ impl AcpiHandler for AcpiHost {
 
 /// 函数说明：执行对应的总线处理步骤。
     fn read_pci_u8(&self, address: PciAddress, offset: u16) -> u8 {
-        ((pci_cfg_read32(address, offset & !0x3) >> ((offset & 0x3) * 8)) & 0xff) as u8
+        cfg_read8(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+        )
     }
 
 /// 函数说明：执行对应的总线处理步骤。
     fn read_pci_u16(&self, address: PciAddress, offset: u16) -> u16 {
-        ((pci_cfg_read32(address, offset & !0x3) >> ((offset & 0x2) * 8)) & 0xffff) as u16
+        cfg_read16(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+        )
     }
 
 /// 函数说明：执行对应的总线处理步骤。
     fn read_pci_u32(&self, address: PciAddress, offset: u16) -> u32 {
-        pci_cfg_read32(address, offset)
+        cfg_read32(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+        )
     }
 
 /// 函数说明：执行对应的总线处理步骤。
     fn write_pci_u8(&self, address: PciAddress, offset: u16, value: u8) {
-        let aligned = offset & !0x3;
-        let mut cur = pci_cfg_read32(address, aligned);
-        let shift = (offset & 0x3) * 8;
-        cur = (cur & !(0xff << shift)) | ((value as u32) << shift);
-        pci_cfg_write32(address, aligned, cur);
+        cfg_write8(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+            value,
+        );
     }
 
 /// 函数说明：执行对应的总线处理步骤。
     fn write_pci_u16(&self, address: PciAddress, offset: u16, value: u16) {
-        let aligned = offset & !0x3;
-        let mut cur = pci_cfg_read32(address, aligned);
-        let shift = (offset & 0x2) * 8;
-        cur = (cur & !(0xffff << shift)) | ((value as u32) << shift);
-        pci_cfg_write32(address, aligned, cur);
+        cfg_write16(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+            value,
+        );
     }
 
 /// 函数说明：执行对应的总线处理步骤。
     fn write_pci_u32(&self, address: PciAddress, offset: u16, value: u32) {
-        pci_cfg_write32(address, offset, value)
+        cfg_write32(
+            address.segment(),
+            address.bus(),
+            address.device(),
+            address.function(),
+            offset,
+            value,
+        )
     }
 
 /// 函数说明：执行对应的总线处理步骤。

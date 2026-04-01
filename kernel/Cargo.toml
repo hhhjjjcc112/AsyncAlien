@@ -53,6 +53,8 @@ x86 = "0.52.0"
 x86_64 = "0.14.0"
 acpi = "6.1.0"
 aml = "0.16.4"
+acpi-resource-parser = { path = "../utils/acpi-resource-parser" }
+x86-pci = { path = "../utils/x86-pci" }
 
 
 [features]

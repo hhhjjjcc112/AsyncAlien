@@ -24,17 +24,6 @@ pub enum CommonDeviceType {
     Virtio(String),
 }
 
-fn parse_bdf(bdf: &str) -> Option<(u16, u8, u8, u8)> {
-    let (seg, rest) = bdf.split_once(':')?;
-    let (bus, rest) = rest.split_once(':')?;
-    let (dev, func) = rest.split_once('.')?;
-    let segment = u16::from_str_radix(seg, 16).ok()?;
-    let bus = u8::from_str_radix(bus, 16).ok()?;
-    let device = u8::from_str_radix(dev, 16).ok()?;
-    let function = func.parse::<u8>().ok()?;
-    Some((segment, bus, device, function))
-}
-
 fn info_locator(info: &CommonDeviceInfo) -> DeviceLocator {
     let start = info.address_range.start.as_usize();
     let end = info.address_range.end.as_usize();
@@ -88,7 +77,7 @@ fn from_common_device(ty: CommonDeviceType) -> DiscoveredDevice {
             fw_source: FirmwareSource::Acpi,
         },
         CommonDeviceType::Virtio(bdf) => {
-            let locator = parse_bdf(&bdf)
+            let locator = x86_pci::parse_bdf(&bdf)
                 .map(|(segment, bus, device, function)| DeviceLocator::PciBdf {
                     segment,
                     bus,

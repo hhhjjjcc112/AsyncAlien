@@ -8,6 +8,60 @@ use crate::transport::{DeviceStatus, DeviceType, Transport};
 use crate::{align_up, PhysAddr, PAGE_SIZE};
 use core::mem::size_of;
 
+pub mod bus;
+
+pub use self::bus::{
+    Cam, ConfigurationAccess, DeviceFunction, DeviceFunctionInfo, PciError, PciRoot,
+    PCI_CAP_ID_VNDR,
+};
+
+/// VirtIO 的 PCI vendor id。
+pub const VIRTIO_VENDOR_ID: u16 = 0x1af4;
+
+const PCI_DEVICE_ID_OFFSET: u16 = 0x1040;
+const TRANSITIONAL_NETWORK: u16 = 0x1000;
+const TRANSITIONAL_BLOCK: u16 = 0x1001;
+const TRANSITIONAL_MEMORY_BALLOONING: u16 = 0x1002;
+const TRANSITIONAL_CONSOLE: u16 = 0x1003;
+const TRANSITIONAL_SCSI_HOST: u16 = 0x1004;
+const TRANSITIONAL_ENTROPY_SOURCE: u16 = 0x1005;
+const TRANSITIONAL_9P_TRANSPORT: u16 = 0x1009;
+const TRANSITIONAL_GPU: u16 = 0x1010;
+const TRANSITIONAL_INPUT: u16 = 0x1012;
+
+/// 由 PCI device id 推导 VirtIO 设备类型。
+pub fn device_type(pci_device_id: u16) -> Option<DeviceType> {
+    match pci_device_id {
+        TRANSITIONAL_NETWORK => Some(DeviceType::Network),
+        TRANSITIONAL_BLOCK => Some(DeviceType::Block),
+        TRANSITIONAL_MEMORY_BALLOONING => Some(DeviceType::MemoryBalloon),
+        TRANSITIONAL_CONSOLE => Some(DeviceType::Console),
+        TRANSITIONAL_SCSI_HOST => Some(DeviceType::ScsiHost),
+        TRANSITIONAL_ENTROPY_SOURCE => Some(DeviceType::EntropySource),
+        TRANSITIONAL_9P_TRANSPORT => Some(DeviceType::_9P),
+        TRANSITIONAL_GPU => Some(DeviceType::GPU),
+        TRANSITIONAL_INPUT => Some(DeviceType::Input),
+        id if id >= PCI_DEVICE_ID_OFFSET => {
+            let ty = DeviceType::from(id - PCI_DEVICE_ID_OFFSET);
+            if ty == DeviceType::Invalid {
+                None
+            } else {
+                Some(ty)
+            }
+        }
+        _ => None,
+    }
+}
+
+/// 根据 PCI 设备信息识别 VirtIO 设备类型。
+pub fn virtio_device_type(device_function_info: &DeviceFunctionInfo) -> Option<DeviceType> {
+    if device_function_info.vendor_id == VIRTIO_VENDOR_ID {
+        device_type(device_function_info.device_id)
+    } else {
+        None
+    }
+}
+
 #[derive(Debug)]
 struct LegacyPciConfigIo {
     io_region: Arc<dyn VirtIoDeviceIo>,

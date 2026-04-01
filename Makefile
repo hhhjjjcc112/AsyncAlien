@@ -67,8 +67,16 @@ NET_FWD_PORT_TCP ?= 55555
 NET_FWD_PORT_UDP ?= 5555
 SMP ?= 2
 MEMORY_SIZE := 2048M
-X86_CPU ?= Icelake-Server,+x2apic
-X86_UINTR_CPU ?= max,+x2apic,+uintr
+X86_MACHINE ?= q35
+X86_ACCEL ?= tcg
+X86_CPU_TCG ?= max
+X86_CPU_KVM ?= host,+x2apic
+ifeq ($(X86_ACCEL),kvm)
+X86_CPU ?= $(X86_CPU_KVM)
+else
+X86_CPU ?= $(X86_CPU_TCG)
+endif
+X86_UINTR_CPU ?= max,+uintr
 VIRTIO_FORCE_LEGACY ?= y
 LOG ?=
 GUI ?=n
@@ -98,6 +106,7 @@ ifeq ($(ARCH_KIND),x86_64)
         endif
     endif
     # x86_64 QEMU args
+	QEMU_ARGS += -machine $(X86_MACHINE),accel=$(X86_ACCEL)
     VIRTIO_PCI_OPTS :=
     ifeq ($(VIRTIO_FORCE_LEGACY),y)
         VIRTIO_PCI_OPTS := ,disable-modern=on,disable-legacy=off,x-disable-pcie=on
@@ -187,7 +196,9 @@ help:
 	@echo "Options:"
 	@echo "  SMP=n                   Number of CPUs (default: 2)"
 	@echo "  NET=y/n                 Enable network (default: y)"
-	@echo "  X86_CPU=...             x86 CPU model/features (default: Icelake-Server,+x2apic)"
+	@echo "  X86_MACHINE=...         x86 machine type (default: q35)"
+	@echo "  X86_ACCEL=tcg/kvm       x86 accelerator (default: tcg)"
+	@echo "  X86_CPU=...             x86 CPU model/features (default: max@tcg, host,+x2apic@kvm)"
 	@echo "  GUI=y/n                 Enable GUI (default: n)"
 	@echo "  LOG=level               Log level"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"

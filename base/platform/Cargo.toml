@@ -27,6 +27,7 @@ x86_rtc = "0.1.1"
 multiboot = "0.8.0"
 int_ratio = "0.1"
 kspin = "0.1"
+x86-pci = { path = "../../utils/x86-pci" }
 
 # RISC-V specific dependencies
 [target.'cfg(target_arch = "riscv64")'.dependencies]

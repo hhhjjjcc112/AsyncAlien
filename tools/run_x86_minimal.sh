@@ -19,7 +19,26 @@ WITH_GPU="${WITH_GPU:-n}"
 VIRTIO_FORCE_LEGACY="${VIRTIO_FORCE_LEGACY:-y}"
 NET_HOSTFWD="${NET_HOSTFWD:-y}"
 NET_FWD_PORT="${NET_FWD_PORT:-55555}"
-X86_CPU="${X86_CPU:-max,+x2apic}"
+X86_MACHINE="${X86_MACHINE:-q35}"
+X86_ACCEL="${X86_ACCEL:-auto}"
+if [[ "$X86_ACCEL" == "auto" ]]; then
+  if [[ -r /dev/kvm && -w /dev/kvm ]]; then
+    X86_ACCEL="kvm"
+  else
+    X86_ACCEL="tcg"
+  fi
+fi
+if [[ "$X86_ACCEL" == "kvm" && ! -r /dev/kvm ]]; then
+  echo "[minimal-x86] /dev/kvm unavailable, fallback to tcg"
+  X86_ACCEL="tcg"
+fi
+if [[ -z "${X86_CPU:-}" ]]; then
+  if [[ "$X86_ACCEL" == "kvm" ]]; then
+    X86_CPU="host,+x2apic"
+  else
+    X86_CPU="max"
+  fi
+fi
 MEMORY_SELF_TEST="${MEMORY_SELF_TEST:-y}"
 TRAP_SELF_TEST="${TRAP_SELF_TEST:-y}"
 
@@ -42,6 +61,7 @@ fi
 echo "[minimal-x86] build kernel only"
 echo "[minimal-x86] features: $KERNEL_FEATURES"
 echo "[minimal-x86] log level: $LOG_LEVEL"
+echo "[minimal-x86] qemu machine: $X86_MACHINE accel: $X86_ACCEL cpu: $X86_CPU"
 echo "[minimal-x86] switches: initrd=$WITH_INITRD drive=$WITH_DRIVE net=$WITH_NET input=$WITH_INPUT gpu=$WITH_GPU"
 make build ARCH=x86_64 LOG="$LOG_LEVEL" FEATURES="$KERNEL_FEATURES"
 
@@ -51,6 +71,7 @@ if [[ "$VIRTIO_FORCE_LEGACY" == "y" ]]; then
 fi
 
 QEMU_ARGS=(
+  -machine "$X86_MACHINE,accel=$X86_ACCEL"
   -m "$MEMORY_SIZE"
   -smp "$SMP"
   -cpu "$X86_CPU"

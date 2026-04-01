@@ -4,6 +4,7 @@ use core::ops::Range;
 
 use basic::io::SafeIORegion;
 use mem::PhysAddr;
+use x86_pci::{cfg_read8, cfg_read16, cfg_read32, cfg_write32};
 
 use crate::bus::CommonDeviceInfo;
 
@@ -94,46 +95,51 @@ impl PciBus {
 
 #[cfg(target_arch = "x86_64")]
 /// 函数说明：执行对应的总线处理步骤。
-fn legacy_cfg_address(address: PciAddress, offset: u16) -> u32 {
-    (1u32 << 31)
-        | ((address.bus() as u32) << 16)
-        | ((address.device() as u32) << 11)
-        | ((address.function() as u32) << 8)
-        | ((offset as u32) & 0xfc)
-}
-
-#[cfg(target_arch = "x86_64")]
-/// 函数说明：执行对应的总线处理步骤。
 fn legacy_cfg_read32(address: PciAddress, offset: u16) -> u32 {
-    unsafe {
-        x86::io::outl(0xcf8, legacy_cfg_address(address, offset));
-        x86::io::inl(0xcfc)
-    }
+    cfg_read32(
+        address.segment(),
+        address.bus(),
+        address.device(),
+        address.function(),
+        offset,
+    )
 }
 
 #[cfg(target_arch = "x86_64")]
 /// 函数说明：执行对应的总线处理步骤。
 fn legacy_cfg_write32(address: PciAddress, offset: u16, value: u32) {
-    unsafe {
-        x86::io::outl(0xcf8, legacy_cfg_address(address, offset));
-        x86::io::outl(0xcfc, value);
-    }
+    cfg_write32(
+        address.segment(),
+        address.bus(),
+        address.device(),
+        address.function(),
+        offset,
+        value,
+    )
 }
 
 #[cfg(target_arch = "x86_64")]
 /// 函数说明：执行对应的总线处理步骤。
 fn legacy_cfg_read16(address: PciAddress, offset: u16) -> u16 {
-    let aligned = offset & !0x3;
-    let v = legacy_cfg_read32(address, aligned);
-    ((v >> ((offset & 0x2) * 8)) & 0xffff) as u16
+    cfg_read16(
+        address.segment(),
+        address.bus(),
+        address.device(),
+        address.function(),
+        offset,
+    )
 }
 
 #[cfg(target_arch = "x86_64")]
 /// 函数说明：执行对应的总线处理步骤。
 fn legacy_cfg_read8(address: PciAddress, offset: u16) -> u8 {
-    let aligned = offset & !0x3;
-    let v = legacy_cfg_read32(address, aligned);
-    ((v >> ((offset & 0x3) * 8)) & 0xff) as u8
+    cfg_read8(
+        address.segment(),
+        address.bus(),
+        address.device(),
+        address.function(),
+        offset,
+    )
 }
 
 #[cfg(target_arch = "x86_64")]

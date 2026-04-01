@@ -1,0 +1,7 @@
+[package]
+name = "x86-pci"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+x86 = "0.52.0"
