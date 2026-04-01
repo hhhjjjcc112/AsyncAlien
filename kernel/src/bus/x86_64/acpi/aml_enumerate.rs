@@ -64,15 +64,31 @@ fn classify_aml_device(ctx: &mut AmlContext, path: &AmlName) -> Option<CommonDev
     } else {
         trace!("[bus][x86_64][acpi][aml] {} ids={:?}", path, ids);
     }
-    let crs = lookup_aml_value(ctx, path, &CRS)
-        .and_then(|(abs_path, value)| handle_crs_amlvalue(ctx, &abs_path, value));
-
     if !should_enumerate_by_sta(path, sta) {
         return None;
     }
 
-    if let Some(dev) = classify_uart_device(ctx, path, &ids, crs.as_ref()) {
-        return Some(dev);
+    let path_str = path.as_string();
+    let uart_hint = uart_hint_by_path(&path_str);
+    let is_uart_hid = ids
+        .iter()
+        .any(|id| matches!(id.as_str(), "PNP0500" | "PNP0501" | "PNP0502" | "PNP0503"));
+    let is_uart_by_name = uart_hint.is_some();
+
+    if is_uart_hid {
+        debug!("[bus][x86_64][acpi][aml] {} matched UART HID", path);
+    }
+    if let Some((hint, _, _)) = uart_hint {
+        debug!("[bus][x86_64][acpi][aml] {} matched UART path hint {}", path, hint);
+    }
+
+    // 仅在 UART 候选设备上读取/执行 _CRS，避免无关设备触发 AML 方法副作用。
+    if is_uart_hid || is_uart_by_name {
+        let crs = lookup_aml_value(ctx, path, &CRS)
+            .and_then(|(abs_path, value)| handle_crs_amlvalue(ctx, &abs_path, value));
+        if let Some(dev) = classify_uart_device(ctx, path, is_uart_hid, uart_hint, crs.as_ref()) {
+            return Some(dev);
+        }
     }
 
     classify_known_non_uart_device(path, &ids);
@@ -123,14 +139,10 @@ fn should_enumerate_by_sta(path: &AmlName, sta: Option<Option<StatusObject>>) ->
 fn classify_uart_device(
     ctx: &AmlContext,
     path: &AmlName,
-    ids: &[String],
+    is_uart_hid: bool,
+    uart_hint: Option<(&'static str, usize, Option<u32>)>,
     crs: Option<&AmlValue>,
 ) -> Option<CommonDeviceType> {
-    let path_str = path.as_string();
-    let is_uart_hid = ids
-        .iter()
-        .any(|id| matches!(id.as_str(), "PNP0500" | "PNP0501" | "PNP0502" | "PNP0503"));
-    let uart_hint = uart_hint_by_path(&path_str);
     let is_uart_by_name = uart_hint.is_some();
 
     if !is_uart_hid && !is_uart_by_name {
@@ -199,14 +211,26 @@ fn uart_hint_by_path(path: &str) -> Option<(&'static str, usize, Option<u32>)> {
     if path.ends_with(".COM1") {
         return Some(("COM1", 0x3f8, Some(4)));
     }
+    if path.ends_with(".COMA") {
+        return Some(("COMA", 0x3f8, Some(4)));
+    }
     if path.ends_with(".COM2") {
         return Some(("COM2", 0x2f8, Some(3)));
+    }
+    if path.ends_with(".COMB") {
+        return Some(("COMB", 0x2f8, Some(3)));
     }
     if path.ends_with(".COM3") {
         return Some(("COM3", 0x3e8, Some(4)));
     }
+    if path.ends_with(".COMC") {
+        return Some(("COMC", 0x3e8, Some(4)));
+    }
     if path.ends_with(".COM4") {
         return Some(("COM4", 0x2e8, Some(3)));
+    }
+    if path.ends_with(".COMD") {
+        return Some(("COMD", 0x2e8, Some(3)));
     }
     None
 }
@@ -325,14 +349,14 @@ fn handle_crs_amlvalue(ctx: &mut AmlContext, path: &AmlName, value: AmlValue) ->
         AmlValue::Buffer(buffer) => Some(AmlValue::Buffer(buffer)),
         AmlValue::Method { flags, .. } => {
             if flags.arg_count() != 0 {
-                warn!("[bus][x86_64][acpi][aml] {}._CRS is method(arg_count={}), skip", path, flags.arg_count());
+                warn!("[bus][x86_64][acpi][aml] {} is method(arg_count={}), skip", path, flags.arg_count());
                 return None;
             }
 
             let ret = match ctx.invoke_method(path, Args::EMPTY) {
                 Ok(v) => v,
                 Err(e) => {
-                    warn!("[bus][x86_64][acpi][aml] invoke {}._CRS failed: {:?}", path, e);
+                    warn!("[bus][x86_64][acpi][aml] invoke {} failed: {:?}", path, e);
                     return None;
                 }
             };
@@ -340,7 +364,7 @@ fn handle_crs_amlvalue(ctx: &mut AmlContext, path: &AmlName, value: AmlValue) ->
             if ret.as_buffer(ctx).is_ok() {
                 Some(ret)
             } else {
-                warn!("[bus][x86_64][acpi][aml] {}._CRS method returned unsupported AML type {:?}, skip", path, ret.type_of());
+                warn!("[bus][x86_64][acpi][aml] {} method returned unsupported AML type {:?}, skip", path, ret.type_of());
                 None
             }
         },
@@ -348,7 +372,7 @@ fn handle_crs_amlvalue(ctx: &mut AmlContext, path: &AmlName, value: AmlValue) ->
             if other.as_buffer(ctx).is_ok() {
                 Some(other)
             } else {
-                warn!("[bus][x86_64][acpi][aml] {}._CRS has unsupported AML type {:?}, skip", path, other.type_of());
+                warn!("[bus][x86_64][acpi][aml] {} has unsupported AML type {:?}, skip", path, other.type_of());
                 None
             }
         }

@@ -2,7 +2,13 @@ ARCH ?= riscv64
 TARGET_riscv64 := riscv64gc-unknown-linux-musl
 TARGET_x86_64 := x86_64-unknown-linux-musl
 TARGET := $(TARGET_$(ARCH))
-compile := cargo build --release -Z build-std=core,std,panic_abort
+LINKER_riscv64 := riscv64-linux-musl-gcc
+LINKER_x86_64 := x86_64-linux-musl-gcc
+LINKER := $(LINKER_$(ARCH))
+LINKER_ENV_riscv64 := CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER
+LINKER_ENV_x86_64 := CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER
+LINKER_ENV := $(LINKER_ENV_$(ARCH))
+compile := $(LINKER_ENV)=$(LINKER) cargo build --release --target $(TARGET) -Z build-std=core,std,panic_abort
 mode := release
 target := ../../target/$(TARGET)/$(mode)/
 FSMOUNT := ../../diskfs

@@ -191,6 +191,7 @@ help:
 	@echo "  GUI=y/n                 Enable GUI (default: n)"
 	@echo "  LOG=level               Log level"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
+	@echo "  INITRD_REBUILD_USER=y/n initrd 是否重建 user/initrd (default: y)"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make ARCH=riscv64 PLATFORM=plat_qemu_riscv run"

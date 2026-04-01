@@ -1,3 +1,6 @@
+[check] 2026-04-01T10:49:15+08:00
+[check] warm sudo credential
+[sudo] password for hjch: ===== timeout 120s tools/run_x86_minimal.sh =====
 [minimal-x86] build kernel only
 [minimal-x86] features: default,memory_self_test,trap_self_test
 [minimal-x86] log level: DEBUG
@@ -69,7 +72,6 @@ warning: function `ticks_since_init` is never used
    |        ^^^^^^^^^^^^^^^^
 
 warning: `platform` (lib) generated 8 warnings
-   Compiling kernel v0.1.0 (/home/hjch/AsyncAlien/kernel)
 warning: static `PLIC_DOMAIN` is never used
   --> kernel/src/trap/mod.rs:41:12
    |
@@ -85,7 +87,7 @@ warning: function `register_plic_domain` is never used
    |        ^^^^^^^^^^^^^^^^^^^^
 
 warning: `kernel` (bin "kernel") generated 2 warnings
-    Finished `release` profile [optimized] target(s) in 13.37s
+    Finished `release` profile [optimized] target(s) in 0.46s
 [minimal-x86] run qemu
 qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit 21]
 c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
@@ -103,11 +105,11 @@ Booting from ROM..[11511200913578585177] [x86_boot] main_entry magic=0x2badb002 
   / ___ \  | | | | |  __/ | | | |
  /_/   \_\ |_| |_|  \___| |_| |_|
 
-[0] Initrd from multiboot: 0xb4e000..0xd924e4
+[0] Initrd from multiboot: 0xb4e000..0xd95fd3
 [0] Init logger Some("DEBUG")
 [0] Frame range: 0x10b4d000..0x7ffdd000, pages=0x6f490
-[0] initrd copy: src=0xb4e000, size=2376932, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0xef92ec99, dst=0xef92ec99
+[0] initrd copy: src=0xb4e000, size=2392019, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xf8e48850, dst=0xf8e48850
 [0] Relocate initrd data to 0x10b5b000
 [0] Frame allocator init success
 [0] Talloc allocator init success
@@ -135,16 +137,16 @@ Booting from ROM..[11511200913578585177] [x86_boot] main_entry magic=0x2badb002 
 [0] ++++ setup interrupt ++++
 [0] ++++ setup interrupt done, enable:true ++++
 [0] [trap_self_test] trigger breakpoint
-[0] [trap_self_test] hit breakpoint at RIP=0x2ba587
-[0] [trap_self_test] breakpoint entered at RIP=0x2ba587
-[0] [35m[INFO] Breakpoint at RIP=0x2ba587[0m
+[0] [trap_self_test] hit breakpoint at RIP=0x299ff7
+[0] [trap_self_test] breakpoint entered at RIP=0x299ff7
+[0] [35m[INFO] Breakpoint at RIP=0x299ff7[0m
 [0] [trap_self_test] breakpoint self-test passed
 [0] Boot CPU 0
 [0] Machine: qemu-x86_64-pc
 SMP:     1 CPUs
 Memory:  0x100000..0x7ffdd000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb4e000..0xd924e4
+Initrd:  0xb4e000..0xd95fd3
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] [32m[DEBUG] [bus][x86_64][init_with_acpi] step1: enumerate ACPI static devices[0m
@@ -163,16 +165,9 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] [32m[DEBUG] [bus][x86_64][acpi] AML tables loaded: 1[0m
 [0] [35m[INFO] Invoking _INI at level: \_SB_.PCI0.PRES[0m
 [0] [93m[WARN] [bus][x86_64][acpi][aml] \_SB_.HPET filtered by _STA: present=false, enabled=false[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [93m[WARN] [bus][x86_64][acpi][aml] invoke \_SB_.LNKA._CRS._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [93m[WARN] [bus][x86_64][acpi][aml] invoke \_SB_.LNKB._CRS._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
 [0] [93m[WARN] [bus][x86_64][acpi][aml] \_SB_.LNKC filtered by _STA: present=true, enabled=false[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [31m[ERROR] Failed to execute control method: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
-[0] [93m[WARN] [bus][x86_64][acpi][aml] invoke \_SB_.LNKD._CRS._CRS failed: TypeCannotBeWrittenToBufferField(FieldUnit)[0m
+[0] [32m[DEBUG] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.COM1 matched UART HID[0m
+[0] [32m[DEBUG] [bus][x86_64][acpi][aml] \_SB_.PCI0.ISA_.COM1 matched UART path hint COM1[0m
 [0] [32m[DEBUG] [bus][x86_64][init_with_acpi] step3: enumerate PCI devices[0m
 [0] [93m[WARN] [bus][x86_64][acpi][pci] MCFG unavailable, fallback ecam=0xb0000000..0xc0000000[0m
 [0] [32m[DEBUG] [bus][x86_64][init_with_acpi] step4: register base devices[0m
@@ -213,177 +208,169 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: task
 [0] <register domain>: vfs
 [0] <register domain>: uart16550
-[0] <register domain>: virtio_blk
+[0] [93m[WARN] initrd missing domain elf: virtio_blk, skip pre-register[0m
 [0] <register domain>: net_stack
 [0] <register domain>: logger
 [0] <register domain>: domainfs
 [0] <register domain>: local_apic
 [0] <register domain>: io_apic
 [0] <register domain>: apic
-[0] <register domain>: virtio_net
-[0] <register domain>: virtio_input
-[0] <register domain>: virtio_gpu
+[0] [93m[WARN] initrd missing domain elf: virtio_net, skip pre-register[0m
+[0] [93m[WARN] initrd missing domain elf: virtio_input, skip pre-register[0m
+[0] [93m[WARN] initrd missing domain elf: virtio_gpu, skip pre-register[0m
 [0] [35m[INFO] init data allocator success[0m
 [0] [35m[INFO] Load SchedulerDomain domain, size: 81KB[0m
-[0] [32m[DEBUG] Domain address:0xdc8fa0[0m
+[0] [32m[DEBUG] Domain address:0xdb7cd8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x801dd000, size: 0x15000[0m
 [0] [35m[INFO] create domain database for domain_id: 1[0m
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 5431 us[0m
+[0] [31m[Load new domain] Time elapsed: 5403 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
 [0] [35m[INFO] Load LogDomain domain, size: 72KB[0m
-[0] [32m[DEBUG] Domain address:0xee37c8[0m
+[0] [32m[DEBUG] Domain address:0xed0238[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x801f2000, size: 0x12000[0m
 [0] [35m[INFO] create domain database for domain_id: 2[0m
-[0] [31m[Load new domain] Time elapsed: 1083 us[0m
+[0] [31m[Load new domain] Time elapsed: 952 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
 [0] [35m[INFO] Load FsDomain domain, size: 340KB[0m
-[0] [32m[DEBUG] Domain address:0xce3ea8[0m
+[0] [32m[DEBUG] Domain address:0xce08a0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80204000, size: 0x55000[0m
 [0] [35m[INFO] create domain database for domain_id: 3[0m
-[0] [31m[Load new domain] Time elapsed: 2490 us[0m
+[0] [31m[Load new domain] Time elapsed: 3018 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xde3e08[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80259000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 4[0m
-[0] [31m[Load new domain] Time elapsed: 1476 us[0m
+[0] [31m[Load new domain] Time elapsed: 1320 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
 [0] [35m[INFO] Load DevFsDomain domain, size: 290KB[0m
-[0] [32m[DEBUG] Domain address:0xc87e38[0m
+[0] [32m[DEBUG] Domain address:0xc97e40[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8029d000, size: 0x49000[0m
 [0] [35m[INFO] create domain database for domain_id: 5[0m
-[0] [31m[Load new domain] Time elapsed: 2368 us[0m
+[0] [31m[Load new domain] Time elapsed: 2105 us[0m
 [0] <attach domain>: devfs, it's name is devfs
 [0] [35m[INFO] Load FsDomain domain, size: 273KB[0m
-[0] [32m[DEBUG] Domain address:0xe9f3a0[0m
+[0] [32m[DEBUG] Domain address:0xe8be10[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x802e6000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 6[0m
-[0] [31m[Load new domain] Time elapsed: 1903 us[0m
+[0] [31m[Load new domain] Time elapsed: 1784 us[0m
 [0] <attach domain>: procfs, it's name is procfs
 [0] [35m[INFO] Load FsDomain domain, size: 250KB[0m
-[0] [32m[DEBUG] Domain address:0xe21848[0m
+[0] [32m[DEBUG] Domain address:0xe27fe8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8032a000, size: 0x3f000[0m
 [0] [35m[INFO] create domain database for domain_id: 7[0m
-[0] [31m[Load new domain] Time elapsed: 1924 us[0m
+[0] [31m[Load new domain] Time elapsed: 1757 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
 [0] [35m[INFO] Load FsDomain domain, size: 250KB[0m
-[0] [32m[DEBUG] Domain address:0xc05248[0m
+[0] [32m[DEBUG] Domain address:0xc15250[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80369000, size: 0x3f000[0m
 [0] [35m[INFO] create domain database for domain_id: 8[0m
-[0] [31m[Load new domain] Time elapsed: 1929 us[0m
+[0] [31m[Load new domain] Time elapsed: 1717 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xc43ac0[0m
+[0] [32m[DEBUG] Domain address:0xc53ac8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x803a8000, size: 0x44000[0m
 [0] [35m[INFO] create domain database for domain_id: 9[0m
-[0] [31m[Load new domain] Time elapsed: 2469 us[0m
+[0] [31m[Load new domain] Time elapsed: 2262 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
 [0] [35m[INFO] Load VfsDomain domain, size: 374KB[0m
-[0] [32m[DEBUG] Domain address:0xf5f040[0m
+[0] [32m[DEBUG] Domain address:0xf68b30[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x803ec000, size: 0x5e000[0m
 [0] [35m[INFO] create domain database for domain_id: 10[0m
-[0] [31m[Load new domain] Time elapsed: 1687 us[0m
+[0] [31m[Load new domain] Time elapsed: 2130 us[0m
 [0] <attach domain>: vfs, it's name is vfs
 [0] [35m[INFO] Load TaskDomain domain, size: 162KB[0m
-[0] [32m[DEBUG] Domain address:0xd8f1d0[0m
+[0] [32m[DEBUG] Domain address:0xd641d0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8044a000, size: 0x29000[0m
 [0] [35m[INFO] create domain database for domain_id: 11[0m
-[0] [31m[Load new domain] Time elapsed: 1004 us[0m
+[0] [31m[Load new domain] Time elapsed: 834 us[0m
 [0] <attach domain>: task, it's name is task
 [0] [35m[INFO] Load APICDomain domain, size: 59KB[0m
 [0] [32m[DEBUG] Domain address:0xb8bd10[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80473000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 12[0m
-[0] [31m[Load new domain] Time elapsed: 1328 us[0m
+[0] [31m[Load new domain] Time elapsed: 1089 us[0m
 [0] <attach domain>: apic, it's name is apic
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 59KB[0m
-[0] [32m[DEBUG] Domain address:0xfbc9b0[0m
+[0] [32m[DEBUG] Domain address:0xfc64a0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80482000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 13[0m
-[0] [31m[Load new domain] Time elapsed: 949 us[0m
+[0] [31m[Load new domain] Time elapsed: 677 us[0m
 [0] <attach domain>: local_apic, it's name is local_apic
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 59KB[0m
 [0] [32m[DEBUG] Domain address:0xb9aa58[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80491000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 14[0m
-[0] [31m[Load new domain] Time elapsed: 776 us[0m
+[0] [31m[Load new domain] Time elapsed: 612 us[0m
 [0] <attach domain>: io_apic, it's name is io_apic
 [0] [93m[WARN] rtc device detected, rtc domain is not wired yet[0m
 [0] [35m[INFO] Load UartDomain domain, size: 59KB[0m
-[0] [32m[DEBUG] Domain address:0xef59f8[0m
+[0] [32m[DEBUG] Domain address:0xee2468[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804a0000, size: 0xf000[0m
 [0] [35m[INFO] create domain database for domain_id: 15[0m
-[0] [31m[Load new domain] Time elapsed: 842 us[0m
+[0] [31m[Load new domain] Time elapsed: 683 us[0m
 [0] <attach domain>: uart, it's name is uart
 [0] [35m[INFO] Load BufUartDomain domain, size: 77KB[0m
-[0] [32m[DEBUG] Domain address:0xb5f9f0[0m
+[0] [32m[DEBUG] Domain address:0xb786b0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
 [0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804af000, size: 0x14000[0m
 [0] [35m[INFO] create domain database for domain_id: 16[0m
-[0] [31m[Load new domain] Time elapsed: 1182 us[0m
+[0] [31m[Load new domain] Time elapsed: 926 us[0m
 [0][Domain:16] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0] [32m[DEBUG] <drop> for DVec[0m
-[0] [32m[DEBUG] <drop> for DBox 0xd4a5b8[0m
-[0] [32m[DEBUG] <custom_drop> for DBox 0xd4a5b8[0m
+[0] [32m[DEBUG] <drop> for DBox 0xdde9b0[0m
+[0] [32m[DEBUG] <custom_drop> for DBox 0xdde9b0[0m
 [0] [32m[DEBUG] default for u8[0m
-[0] [35m[INFO] Load BlkDeviceDomain domain, size: 103KB[0m
-[0] [32m[DEBUG] Domain address:0xba97a0[0m
-[0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804c3000, size: 0x1a000[0m
-[0] [35m[INFO] create domain database for domain_id: 17[0m
-[0] [31m[Load new domain] Time elapsed: 1283 us[0m
-[0][Domain:17] virtio_blk_pci(legacy): 0000:00:04.0, io=0xc000-0xc100
-[0][Domain:17] virtio_blk_pci: create blk driver
-[0][Domain:17] virtio_blk_pci: driver ready
+[0] Create empty domain: virtio_blk
 [0] virtio-pci block @ 0000:00:04.0
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
 [0] [93m[WARN] nic device not found, skip net_stack init[0m
 [0] [35m[INFO] Load ShadowBlockDomain domain, size: 81KB[0m
-[0] [32m[DEBUG] Domain address:0xf4aaf8[0m
+[0] [32m[DEBUG] Domain address:0xf545e8[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804dd000, size: 0x15000[0m
-[0] [35m[INFO] create domain database for domain_id: 18[0m
-[0] [31m[Load new domain] Time elapsed: 1062 us[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804c3000, size: 0x15000[0m
+[0] [35m[INFO] create domain database for domain_id: 17[0m
+[0] [31m[Load new domain] Time elapsed: 957 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
 [0] [35m[INFO] Load CacheBlkDeviceDomain domain, size: 85KB[0m
-[0] [32m[DEBUG] Domain address:0xe89de0[0m
+[0] [32m[DEBUG] Domain address:0xe76850[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804f2000, size: 0x16000[0m
-[0] [35m[INFO] create domain database for domain_id: 19[0m
-[0] [31m[Load new domain] Time elapsed: 3028 us[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804d8000, size: 0x16000[0m
+[0] [35m[INFO] create domain database for domain_id: 18[0m
+[0] [31m[Load new domain] Time elapsed: 3959 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 63KB[0m
-[0] [32m[DEBUG] Domain address:0xd390c8[0m
+[0] [32m[DEBUG] Domain address:0xbbcdb0[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80508000, size: 0x10000[0m
-[0] [35m[INFO] create domain database for domain_id: 20[0m
-[0] [31m[Load new domain] Time elapsed: 780 us[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804ee000, size: 0x10000[0m
+[0] [35m[INFO] create domain database for domain_id: 19[0m
+[0] [31m[Load new domain] Time elapsed: 763 us[0m
 [0] <attach domain>: null, it's name is null
 [0] [35m[INFO] Load EmptyDeviceDomain domain, size: 63KB[0m
-[0] [32m[DEBUG] Domain address:0xe79df0[0m
+[0] [32m[DEBUG] Domain address:0xe66860[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80518000, size: 0x10000[0m
-[0] [35m[INFO] create domain database for domain_id: 21[0m
-[0] [31m[Load new domain] Time elapsed: 736 us[0m
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x804fe000, size: 0x10000[0m
+[0] [35m[INFO] create domain database for domain_id: 20[0m
+[0] [31m[Load new domain] Time elapsed: 646 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -397,14 +384,14 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xde3e08[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80528000, size: 0x44000[0m
-[0] [35m[INFO] create domain database for domain_id: 22[0m
-[0] [31m[Load new domain] Time elapsed: 1623 us[0m
-[0][Domain:22] ramfs FsDomain init
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8050e000, size: 0x44000[0m
+[0] [35m[INFO] create domain database for domain_id: 21[0m
+[0] [31m[Load new domain] Time elapsed: 1327 us[0m
+[0][Domain:21] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
-[0][Domain:22] ramfs mount success
+[0][Domain:21] ramfs mount success
 [0][Domain:10] procfs init success
 [0][Domain:5] devfs mount success
 [0][Domain:10] gpu domain not found
@@ -414,68 +401,938 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xde3e08[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x8056c000, size: 0x44000[0m
-[0] [35m[INFO] create domain database for domain_id: 23[0m
-[0] [31m[Load new domain] Time elapsed: 2363 us[0m
-[0][Domain:23] ramfs FsDomain init
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80552000, size: 0x44000[0m
+[0] [35m[INFO] create domain database for domain_id: 22[0m
+[0] [31m[Load new domain] Time elapsed: 1475 us[0m
+[0][Domain:22] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
-[0][Domain:23] ramfs mount success
+[0][Domain:22] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
 [0] [35m[INFO] Load FsDomain domain, size: 272KB[0m
-[0] [32m[DEBUG] Domain address:0xddd668[0m
+[0] [32m[DEBUG] Domain address:0xde3e08[0m
 [0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x805b0000, size: 0x44000[0m
-[0] [35m[INFO] create domain database for domain_id: 24[0m
-[0] [31m[Load new domain] Time elapsed: 2029 us[0m
-[0][Domain:24] ramfs FsDomain init
+[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x80596000, size: 0x44000[0m
+[0] [35m[INFO] create domain database for domain_id: 23[0m
+[0] [31m[Load new domain] Time elapsed: 1319 us[0m
+[0][Domain:23] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
-[0][Domain:24] ramfs mount success
+[0][Domain:23] ramfs mount success
 [0][Domain:9] domainfs mount success
 [0][Domain:10] Initrd populate success
 [0][Domain:10] fatfs mount begin: /tests
 [0][Domain:10] fatfs 已打开块设备 /dev/sda
-[0][Domain:3] fatfs mount success
-[0][Domain:10] fatfs mount success: /tests
-[0][Domain:10] Vfs Tree:
-drwxr-xr-x      4KB root 
-drwxr-xr-x      4KB var 
-drwxr-xr-x      4KB etc 
-drwxr-xr-x      4KB dev 
-drwxr-xr-x      4KB proc 
-drwxr-xr-x      4KB sys 
-drwxrwxrwx      4KB tmp 
-drwxr-xr-x      4KB tests 
-drwxr-xr-x      4KB domain 
-drwxr-xr-x      4KB bin 
-drwxr-xr-x      4KB sbin 
-[0][Domain:10] Init filesystem success
-[0][Domain:10] vfs init success
-[0] load_domains: after vfs init
-[0] Drop initrd data
-[0] load_domains: before task init
-[0] [93m[WARN] <add_task>: tid=0, cx=TaskContext { kstack_top: 328048640, rsp: 328048584, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0] [93m[WARN] <add_task>: tid=1, cx=TaskContext { kstack_top: 338059264, rsp: 338059208, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0][Domain:11] Init task domain success
-[0] load_domains: after task init
-[0] [35m[INFO] Load SysCallDomain domain, size: 134KB[0m
-[0] [32m[DEBUG] Domain address:0xf04780[0m
-[0] [32m[DEBUG] Domain type:SharedObject[0m
-[0] [31m[ERROR] [alloc_free_module_region] virt_start: 0x805f4000, size: 0x22000[0m
-[0] [35m[INFO] create domain database for domain_id: 25[0m
-[0][Domain:25] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 2902 us[0m
-[0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
-[0][Domain:25] syscall domain init
-[0] <attach domain>: syscall, it's name is syscall
-[0] Load domains done
-[0] Register task domain and syscall domain to trap system
-[0] Begin run task...
-[0] run_task bootstrap wake 0 tasks
-[0] [93m[WARN] switch to task 0, cx=TaskContext { kstack_top: 328048640, rsp: 328048584, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0][Domain:11] kthread_init start...
-[0] [93m[WARN] yield_now: 0[0m
-[0] [93m[WARN] <add_task>: tid=0, cx=TaskContext { kstack_top: 328048640, rsp: 328047120, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 255, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 65535, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
-[0] [93m[WARN] switch to task 1, cx=TaskContext { kstack_top: 338059264, rsp: 338059208, fs_base: 0, gs_base: 0, fp_simd: FpSimdState { fcw: 895, fsw: 0, ftw: 65535, fop: 0, fip: 0, fdp: 0, mxcsr: 8064, mxcsr_mask: 0, st: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], xmm: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], padding: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }[0m
+qemu-system-x86_64: terminating on signal 15 from pid 14960 (timeout)
+rc_run_x86_minimal=0
+===== timeout 120s make initrd ARCH=x86_64 =====
+[initrd] build user/initrd ARCH=x86_64
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/initrd'
+Busybox exists
+CROSS_COMPILE=x86_64-linux-musl- ARCH=x86_64 make -j 12 -C /home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64
+make[2]: Entering directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64'
+make[2]: Leaving directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64'
+CROSS_COMPILE=x86_64-linux-musl- ARCH=x86_64 make install -C /home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64
+make[2]: Entering directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64'
+  ./_install//bin/arch -> busybox
+  ./_install//bin/ash -> busybox
+  ./_install//bin/base32 -> busybox
+  ./_install//bin/base64 -> busybox
+  ./_install//bin/cat -> busybox
+  ./_install//bin/chattr -> busybox
+  ./_install//bin/chgrp -> busybox
+  ./_install//bin/chmod -> busybox
+  ./_install//bin/chown -> busybox
+  ./_install//bin/conspy -> busybox
+  ./_install//bin/cp -> busybox
+  ./_install//bin/cpio -> busybox
+  ./_install//bin/cttyhack -> busybox
+  ./_install//bin/date -> busybox
+  ./_install//bin/dd -> busybox
+  ./_install//bin/df -> busybox
+  ./_install//bin/dmesg -> busybox
+  ./_install//bin/dnsdomainname -> busybox
+  ./_install//bin/dumpkmap -> busybox
+  ./_install//bin/echo -> busybox
+  ./_install//bin/ed -> busybox
+  ./_install//bin/egrep -> busybox
+  ./_install//bin/false -> busybox
+  ./_install//bin/fatattr -> busybox
+  ./_install//bin/fdflush -> busybox
+  ./_install//bin/fgrep -> busybox
+  ./_install//bin/fsync -> busybox
+  ./_install//bin/getopt -> busybox
+  ./_install//bin/grep -> busybox
+  ./_install//bin/gunzip -> busybox
+  ./_install//bin/gzip -> busybox
+  ./_install//bin/hostname -> busybox
+  ./_install//bin/hush -> busybox
+  ./_install//bin/ionice -> busybox
+  ./_install//bin/iostat -> busybox
+  ./_install//bin/ipcalc -> busybox
+  ./_install//bin/kbd_mode -> busybox
+  ./_install//bin/kill -> busybox
+  ./_install//bin/link -> busybox
+  ./_install//bin/linux32 -> busybox
+  ./_install//bin/linux64 -> busybox
+  ./_install//bin/ln -> busybox
+  ./_install//bin/login -> busybox
+  ./_install//bin/ls -> busybox
+  ./_install//bin/lsattr -> busybox
+  ./_install//bin/lzop -> busybox
+  ./_install//bin/makemime -> busybox
+  ./_install//bin/mkdir -> busybox
+  ./_install//bin/mknod -> busybox
+  ./_install//bin/mktemp -> busybox
+  ./_install//bin/more -> busybox
+  ./_install//bin/mount -> busybox
+  ./_install//bin/mountpoint -> busybox
+  ./_install//bin/mpstat -> busybox
+  ./_install//bin/mt -> busybox
+  ./_install//bin/mv -> busybox
+  ./_install//bin/netstat -> busybox
+  ./_install//bin/nice -> busybox
+  ./_install//bin/nuke -> busybox
+  ./_install//bin/pidof -> busybox
+  ./_install//bin/ping -> busybox
+  ./_install//bin/ping6 -> busybox
+  ./_install//bin/pipe_progress -> busybox
+  ./_install//bin/printenv -> busybox
+  ./_install//bin/ps -> busybox
+  ./_install//bin/pwd -> busybox
+  ./_install//bin/reformime -> busybox
+  ./_install//bin/resume -> busybox
+  ./_install//bin/rev -> busybox
+  ./_install//bin/rm -> busybox
+  ./_install//bin/rmdir -> busybox
+  ./_install//bin/rpm -> busybox
+  ./_install//bin/run-parts -> busybox
+  ./_install//bin/scriptreplay -> busybox
+  ./_install//bin/sed -> busybox
+  ./_install//bin/setarch -> busybox
+  ./_install//bin/setpriv -> busybox
+  ./_install//bin/setserial -> busybox
+  ./_install//bin/sh -> busybox
+  ./_install//bin/sleep -> busybox
+  ./_install//bin/stat -> busybox
+  ./_install//bin/stty -> busybox
+  ./_install//bin/su -> busybox
+  ./_install//bin/sync -> busybox
+  ./_install//bin/tar -> busybox
+  ./_install//bin/touch -> busybox
+  ./_install//bin/true -> busybox
+  ./_install//bin/umount -> busybox
+  ./_install//bin/uname -> busybox
+  ./_install//bin/usleep -> busybox
+  ./_install//bin/vi -> busybox
+  ./_install//bin/watch -> busybox
+  ./_install//bin/zcat -> busybox
+  ./_install//linuxrc -> bin/busybox
+  ./_install//sbin/acpid -> ../bin/busybox
+  ./_install//sbin/adjtimex -> ../bin/busybox
+  ./_install//sbin/arp -> ../bin/busybox
+  ./_install//sbin/blkid -> ../bin/busybox
+  ./_install//sbin/blockdev -> ../bin/busybox
+  ./_install//sbin/bootchartd -> ../bin/busybox
+  ./_install//sbin/depmod -> ../bin/busybox
+  ./_install//sbin/devmem -> ../bin/busybox
+  ./_install//sbin/fbsplash -> ../bin/busybox
+  ./_install//sbin/fdisk -> ../bin/busybox
+  ./_install//sbin/findfs -> ../bin/busybox
+  ./_install//sbin/freeramdisk -> ../bin/busybox
+  ./_install//sbin/fsck -> ../bin/busybox
+  ./_install//sbin/fsck.minix -> ../bin/busybox
+  ./_install//sbin/fstrim -> ../bin/busybox
+  ./_install//sbin/getty -> ../bin/busybox
+  ./_install//sbin/halt -> ../bin/busybox
+  ./_install//sbin/hdparm -> ../bin/busybox
+  ./_install//sbin/hwclock -> ../bin/busybox
+  ./_install//sbin/ifconfig -> ../bin/busybox
+  ./_install//sbin/ifdown -> ../bin/busybox
+  ./_install//sbin/ifenslave -> ../bin/busybox
+  ./_install//sbin/ifup -> ../bin/busybox
+  ./_install//sbin/init -> ../bin/busybox
+  ./_install//sbin/insmod -> ../bin/busybox
+  ./_install//sbin/ip -> ../bin/busybox
+  ./_install//sbin/ipaddr -> ../bin/busybox
+  ./_install//sbin/iplink -> ../bin/busybox
+  ./_install//sbin/ipneigh -> ../bin/busybox
+  ./_install//sbin/iproute -> ../bin/busybox
+  ./_install//sbin/iprule -> ../bin/busybox
+  ./_install//sbin/iptunnel -> ../bin/busybox
+  ./_install//sbin/klogd -> ../bin/busybox
+  ./_install//sbin/loadkmap -> ../bin/busybox
+  ./_install//sbin/logread -> ../bin/busybox
+  ./_install//sbin/losetup -> ../bin/busybox
+  ./_install//sbin/lsmod -> ../bin/busybox
+  ./_install//sbin/makedevs -> ../bin/busybox
+  ./_install//sbin/mdev -> ../bin/busybox
+  ./_install//sbin/mkdosfs -> ../bin/busybox
+  ./_install//sbin/mke2fs -> ../bin/busybox
+  ./_install//sbin/mkfs.ext2 -> ../bin/busybox
+  ./_install//sbin/mkfs.minix -> ../bin/busybox
+  ./_install//sbin/mkfs.vfat -> ../bin/busybox
+  ./_install//sbin/mkswap -> ../bin/busybox
+  ./_install//sbin/modinfo -> ../bin/busybox
+  ./_install//sbin/modprobe -> ../bin/busybox
+  ./_install//sbin/nameif -> ../bin/busybox
+  ./_install//sbin/pivot_root -> ../bin/busybox
+  ./_install//sbin/poweroff -> ../bin/busybox
+  ./_install//sbin/raidautorun -> ../bin/busybox
+  ./_install//sbin/reboot -> ../bin/busybox
+  ./_install//sbin/rmmod -> ../bin/busybox
+  ./_install//sbin/route -> ../bin/busybox
+  ./_install//sbin/run-init -> ../bin/busybox
+  ./_install//sbin/runlevel -> ../bin/busybox
+  ./_install//sbin/setconsole -> ../bin/busybox
+  ./_install//sbin/slattach -> ../bin/busybox
+  ./_install//sbin/start-stop-daemon -> ../bin/busybox
+  ./_install//sbin/sulogin -> ../bin/busybox
+  ./_install//sbin/swapoff -> ../bin/busybox
+  ./_install//sbin/swapon -> ../bin/busybox
+  ./_install//sbin/switch_root -> ../bin/busybox
+  ./_install//sbin/sysctl -> ../bin/busybox
+  ./_install//sbin/syslogd -> ../bin/busybox
+  ./_install//sbin/tc -> ../bin/busybox
+  ./_install//sbin/tunctl -> ../bin/busybox
+  ./_install//sbin/udhcpc -> ../bin/busybox
+  ./_install//sbin/uevent -> ../bin/busybox
+  ./_install//sbin/vconfig -> ../bin/busybox
+  ./_install//sbin/watchdog -> ../bin/busybox
+  ./_install//sbin/zcip -> ../bin/busybox
+  ./_install//usr/bin/[ -> ../../bin/busybox
+  ./_install//usr/bin/[[ -> ../../bin/busybox
+  ./_install//usr/bin/awk -> ../../bin/busybox
+  ./_install//usr/bin/basename -> ../../bin/busybox
+  ./_install//usr/bin/bc -> ../../bin/busybox
+  ./_install//usr/bin/beep -> ../../bin/busybox
+  ./_install//usr/bin/blkdiscard -> ../../bin/busybox
+  ./_install//usr/bin/bunzip2 -> ../../bin/busybox
+  ./_install//usr/bin/bzcat -> ../../bin/busybox
+  ./_install//usr/bin/bzip2 -> ../../bin/busybox
+  ./_install//usr/bin/cal -> ../../bin/busybox
+  ./_install//usr/bin/chpst -> ../../bin/busybox
+  ./_install//usr/bin/chrt -> ../../bin/busybox
+  ./_install//usr/bin/chvt -> ../../bin/busybox
+  ./_install//usr/bin/cksum -> ../../bin/busybox
+  ./_install//usr/bin/clear -> ../../bin/busybox
+  ./_install//usr/bin/cmp -> ../../bin/busybox
+  ./_install//usr/bin/comm -> ../../bin/busybox
+  ./_install//usr/bin/crontab -> ../../bin/busybox
+  ./_install//usr/bin/cryptpw -> ../../bin/busybox
+  ./_install//usr/bin/cut -> ../../bin/busybox
+  ./_install//usr/bin/dc -> ../../bin/busybox
+  ./_install//usr/bin/deallocvt -> ../../bin/busybox
+  ./_install//usr/bin/diff -> ../../bin/busybox
+  ./_install//usr/bin/dirname -> ../../bin/busybox
+  ./_install//usr/bin/dos2unix -> ../../bin/busybox
+  ./_install//usr/bin/dpkg -> ../../bin/busybox
+  ./_install//usr/bin/dpkg-deb -> ../../bin/busybox
+  ./_install//usr/bin/du -> ../../bin/busybox
+  ./_install//usr/bin/dumpleases -> ../../bin/busybox
+  ./_install//usr/bin/eject -> ../../bin/busybox
+  ./_install//usr/bin/env -> ../../bin/busybox
+  ./_install//usr/bin/envdir -> ../../bin/busybox
+  ./_install//usr/bin/envuidgid -> ../../bin/busybox
+  ./_install//usr/bin/expand -> ../../bin/busybox
+  ./_install//usr/bin/expr -> ../../bin/busybox
+  ./_install//usr/bin/factor -> ../../bin/busybox
+  ./_install//usr/bin/fallocate -> ../../bin/busybox
+  ./_install//usr/bin/fgconsole -> ../../bin/busybox
+  ./_install//usr/bin/find -> ../../bin/busybox
+  ./_install//usr/bin/flock -> ../../bin/busybox
+  ./_install//usr/bin/fold -> ../../bin/busybox
+  ./_install//usr/bin/free -> ../../bin/busybox
+  ./_install//usr/bin/ftpget -> ../../bin/busybox
+  ./_install//usr/bin/ftpput -> ../../bin/busybox
+  ./_install//usr/bin/fuser -> ../../bin/busybox
+  ./_install//usr/bin/groups -> ../../bin/busybox
+  ./_install//usr/bin/hd -> ../../bin/busybox
+  ./_install//usr/bin/head -> ../../bin/busybox
+  ./_install//usr/bin/hexdump -> ../../bin/busybox
+  ./_install//usr/bin/hexedit -> ../../bin/busybox
+  ./_install//usr/bin/hostid -> ../../bin/busybox
+  ./_install//usr/bin/id -> ../../bin/busybox
+  ./_install//usr/bin/install -> ../../bin/busybox
+  ./_install//usr/bin/ipcrm -> ../../bin/busybox
+  ./_install//usr/bin/ipcs -> ../../bin/busybox
+  ./_install//usr/bin/killall -> ../../bin/busybox
+  ./_install//usr/bin/last -> ../../bin/busybox
+  ./_install//usr/bin/less -> ../../bin/busybox
+  ./_install//usr/bin/logger -> ../../bin/busybox
+  ./_install//usr/bin/logname -> ../../bin/busybox
+  ./_install//usr/bin/lpq -> ../../bin/busybox
+  ./_install//usr/bin/lpr -> ../../bin/busybox
+  ./_install//usr/bin/lsof -> ../../bin/busybox
+  ./_install//usr/bin/lspci -> ../../bin/busybox
+  ./_install//usr/bin/lsscsi -> ../../bin/busybox
+  ./_install//usr/bin/lsusb -> ../../bin/busybox
+  ./_install//usr/bin/lzcat -> ../../bin/busybox
+  ./_install//usr/bin/lzma -> ../../bin/busybox
+  ./_install//usr/bin/man -> ../../bin/busybox
+  ./_install//usr/bin/md5sum -> ../../bin/busybox
+  ./_install//usr/bin/mesg -> ../../bin/busybox
+  ./_install//usr/bin/microcom -> ../../bin/busybox
+  ./_install//usr/bin/mkfifo -> ../../bin/busybox
+  ./_install//usr/bin/mkpasswd -> ../../bin/busybox
+  ./_install//usr/bin/nc -> ../../bin/busybox
+  ./_install//usr/bin/nl -> ../../bin/busybox
+  ./_install//usr/bin/nmeter -> ../../bin/busybox
+  ./_install//usr/bin/nohup -> ../../bin/busybox
+  ./_install//usr/bin/nproc -> ../../bin/busybox
+  ./_install//usr/bin/nsenter -> ../../bin/busybox
+  ./_install//usr/bin/nslookup -> ../../bin/busybox
+  ./_install//usr/bin/od -> ../../bin/busybox
+  ./_install//usr/bin/openvt -> ../../bin/busybox
+  ./_install//usr/bin/passwd -> ../../bin/busybox
+  ./_install//usr/bin/paste -> ../../bin/busybox
+  ./_install//usr/bin/patch -> ../../bin/busybox
+  ./_install//usr/bin/pgrep -> ../../bin/busybox
+  ./_install//usr/bin/pkill -> ../../bin/busybox
+  ./_install//usr/bin/pmap -> ../../bin/busybox
+  ./_install//usr/bin/printf -> ../../bin/busybox
+  ./_install//usr/bin/pscan -> ../../bin/busybox
+  ./_install//usr/bin/pstree -> ../../bin/busybox
+  ./_install//usr/bin/pwdx -> ../../bin/busybox
+  ./_install//usr/bin/readlink -> ../../bin/busybox
+  ./_install//usr/bin/realpath -> ../../bin/busybox
+  ./_install//usr/bin/renice -> ../../bin/busybox
+  ./_install//usr/bin/reset -> ../../bin/busybox
+  ./_install//usr/bin/resize -> ../../bin/busybox
+  ./_install//usr/bin/rpm2cpio -> ../../bin/busybox
+  ./_install//usr/bin/runsv -> ../../bin/busybox
+  ./_install//usr/bin/runsvdir -> ../../bin/busybox
+  ./_install//usr/bin/rx -> ../../bin/busybox
+  ./_install//usr/bin/script -> ../../bin/busybox
+  ./_install//usr/bin/seq -> ../../bin/busybox
+  ./_install//usr/bin/setfattr -> ../../bin/busybox
+  ./_install//usr/bin/setkeycodes -> ../../bin/busybox
+  ./_install//usr/bin/setsid -> ../../bin/busybox
+  ./_install//usr/bin/setuidgid -> ../../bin/busybox
+  ./_install//usr/bin/sha1sum -> ../../bin/busybox
+  ./_install//usr/bin/sha256sum -> ../../bin/busybox
+  ./_install//usr/bin/sha3sum -> ../../bin/busybox
+  ./_install//usr/bin/sha512sum -> ../../bin/busybox
+  ./_install//usr/bin/showkey -> ../../bin/busybox
+  ./_install//usr/bin/shred -> ../../bin/busybox
+  ./_install//usr/bin/shuf -> ../../bin/busybox
+  ./_install//usr/bin/smemcap -> ../../bin/busybox
+  ./_install//usr/bin/softlimit -> ../../bin/busybox
+  ./_install//usr/bin/sort -> ../../bin/busybox
+  ./_install//usr/bin/split -> ../../bin/busybox
+  ./_install//usr/bin/ssl_client -> ../../bin/busybox
+  ./_install//usr/bin/strings -> ../../bin/busybox
+  ./_install//usr/bin/sum -> ../../bin/busybox
+  ./_install//usr/bin/sv -> ../../bin/busybox
+  ./_install//usr/bin/svc -> ../../bin/busybox
+  ./_install//usr/bin/svok -> ../../bin/busybox
+  ./_install//usr/bin/tac -> ../../bin/busybox
+  ./_install//usr/bin/tail -> ../../bin/busybox
+  ./_install//usr/bin/taskset -> ../../bin/busybox
+  ./_install//usr/bin/tcpsvd -> ../../bin/busybox
+  ./_install//usr/bin/tee -> ../../bin/busybox
+  ./_install//usr/bin/telnet -> ../../bin/busybox
+  ./_install//usr/bin/test -> ../../bin/busybox
+  ./_install//usr/bin/tftp -> ../../bin/busybox
+  ./_install//usr/bin/time -> ../../bin/busybox
+  ./_install//usr/bin/timeout -> ../../bin/busybox
+  ./_install//usr/bin/top -> ../../bin/busybox
+  ./_install//usr/bin/tr -> ../../bin/busybox
+  ./_install//usr/bin/traceroute -> ../../bin/busybox
+  ./_install//usr/bin/traceroute6 -> ../../bin/busybox
+  ./_install//usr/bin/truncate -> ../../bin/busybox
+  ./_install//usr/bin/ts -> ../../bin/busybox
+  ./_install//usr/bin/tty -> ../../bin/busybox
+  ./_install//usr/bin/ttysize -> ../../bin/busybox
+  ./_install//usr/bin/udhcpc6 -> ../../bin/busybox
+  ./_install//usr/bin/udpsvd -> ../../bin/busybox
+  ./_install//usr/bin/unexpand -> ../../bin/busybox
+  ./_install//usr/bin/uniq -> ../../bin/busybox
+  ./_install//usr/bin/unix2dos -> ../../bin/busybox
+  ./_install//usr/bin/unlink -> ../../bin/busybox
+  ./_install//usr/bin/unlzma -> ../../bin/busybox
+  ./_install//usr/bin/unshare -> ../../bin/busybox
+  ./_install//usr/bin/unxz -> ../../bin/busybox
+  ./_install//usr/bin/unzip -> ../../bin/busybox
+  ./_install//usr/bin/uptime -> ../../bin/busybox
+  ./_install//usr/bin/users -> ../../bin/busybox
+  ./_install//usr/bin/uudecode -> ../../bin/busybox
+  ./_install//usr/bin/uuencode -> ../../bin/busybox
+  ./_install//usr/bin/vlock -> ../../bin/busybox
+  ./_install//usr/bin/volname -> ../../bin/busybox
+  ./_install//usr/bin/w -> ../../bin/busybox
+  ./_install//usr/bin/wall -> ../../bin/busybox
+  ./_install//usr/bin/wc -> ../../bin/busybox
+  ./_install//usr/bin/wget -> ../../bin/busybox
+  ./_install//usr/bin/which -> ../../bin/busybox
+  ./_install//usr/bin/who -> ../../bin/busybox
+  ./_install//usr/bin/whoami -> ../../bin/busybox
+  ./_install//usr/bin/whois -> ../../bin/busybox
+  ./_install//usr/bin/xargs -> ../../bin/busybox
+  ./_install//usr/bin/xxd -> ../../bin/busybox
+  ./_install//usr/bin/xz -> ../../bin/busybox
+  ./_install//usr/bin/xzcat -> ../../bin/busybox
+  ./_install//usr/bin/yes -> ../../bin/busybox
+  ./_install//usr/sbin/add-shell -> ../../bin/busybox
+  ./_install//usr/sbin/addgroup -> ../../bin/busybox
+  ./_install//usr/sbin/adduser -> ../../bin/busybox
+  ./_install//usr/sbin/arping -> ../../bin/busybox
+  ./_install//usr/sbin/brctl -> ../../bin/busybox
+  ./_install//usr/sbin/chat -> ../../bin/busybox
+  ./_install//usr/sbin/chpasswd -> ../../bin/busybox
+  ./_install//usr/sbin/chroot -> ../../bin/busybox
+  ./_install//usr/sbin/crond -> ../../bin/busybox
+  ./_install//usr/sbin/delgroup -> ../../bin/busybox
+  ./_install//usr/sbin/deluser -> ../../bin/busybox
+  ./_install//usr/sbin/dhcprelay -> ../../bin/busybox
+  ./_install//usr/sbin/dnsd -> ../../bin/busybox
+  ./_install//usr/sbin/ether-wake -> ../../bin/busybox
+  ./_install//usr/sbin/fakeidentd -> ../../bin/busybox
+  ./_install//usr/sbin/fbset -> ../../bin/busybox
+  ./_install//usr/sbin/fdformat -> ../../bin/busybox
+  ./_install//usr/sbin/fsfreeze -> ../../bin/busybox
+  ./_install//usr/sbin/ftpd -> ../../bin/busybox
+  ./_install//usr/sbin/httpd -> ../../bin/busybox
+  ./_install//usr/sbin/i2cdetect -> ../../bin/busybox
+  ./_install//usr/sbin/i2cdump -> ../../bin/busybox
+  ./_install//usr/sbin/i2cget -> ../../bin/busybox
+  ./_install//usr/sbin/i2cset -> ../../bin/busybox
+  ./_install//usr/sbin/i2ctransfer -> ../../bin/busybox
+  ./_install//usr/sbin/ifplugd -> ../../bin/busybox
+  ./_install//usr/sbin/inetd -> ../../bin/busybox
+  ./_install//usr/sbin/killall5 -> ../../bin/busybox
+  ./_install//usr/sbin/loadfont -> ../../bin/busybox
+  ./_install//usr/sbin/lpd -> ../../bin/busybox
+  ./_install//usr/sbin/mim -> ../../bin/busybox
+  ./_install//usr/sbin/nanddump -> ../../bin/busybox
+  ./_install//usr/sbin/nandwrite -> ../../bin/busybox
+  ./_install//usr/sbin/nbd-client -> ../../bin/busybox
+  ./_install//usr/sbin/nologin -> ../../bin/busybox
+  ./_install//usr/sbin/ntpd -> ../../bin/busybox
+  ./_install//usr/sbin/partprobe -> ../../bin/busybox
+  ./_install//usr/sbin/popmaildir -> ../../bin/busybox
+  ./_install//usr/sbin/powertop -> ../../bin/busybox
+  ./_install//usr/sbin/rdate -> ../../bin/busybox
+  ./_install//usr/sbin/rdev -> ../../bin/busybox
+  ./_install//usr/sbin/readahead -> ../../bin/busybox
+  ./_install//usr/sbin/readprofile -> ../../bin/busybox
+  ./_install//usr/sbin/remove-shell -> ../../bin/busybox
+  ./_install//usr/sbin/rtcwake -> ../../bin/busybox
+  ./_install//usr/sbin/sendmail -> ../../bin/busybox
+  ./_install//usr/sbin/setfont -> ../../bin/busybox
+  ./_install//usr/sbin/setlogcons -> ../../bin/busybox
+  ./_install//usr/sbin/svlogd -> ../../bin/busybox
+  ./_install//usr/sbin/telnetd -> ../../bin/busybox
+  ./_install//usr/sbin/tftpd -> ../../bin/busybox
+  ./_install//usr/sbin/ubiattach -> ../../bin/busybox
+  ./_install//usr/sbin/ubidetach -> ../../bin/busybox
+  ./_install//usr/sbin/ubimkvol -> ../../bin/busybox
+  ./_install//usr/sbin/ubirename -> ../../bin/busybox
+  ./_install//usr/sbin/ubirmvol -> ../../bin/busybox
+  ./_install//usr/sbin/ubirsvol -> ../../bin/busybox
+  ./_install//usr/sbin/ubiupdatevol -> ../../bin/busybox
+  ./_install//usr/sbin/udhcpd -> ../../bin/busybox
+
+
+--------------------------------------------------
+You will probably need to make your busybox binary
+setuid root to ensure all configured applets will
+work properly.
+--------------------------------------------------
+
+make[2]: Leaving directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64'
+cp -r /home/hjch/AsyncAlien/user/initrd/busybox-build-x86_64/_install/* initramfs-x86_64
+cd initramfs-x86_64 && find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs-x86_64.cpio.gz
+.
+./init
+./linuxrc
+./bin
+./bin/setserial
+./bin/grep
+./bin/dmesg
+./bin/df
+./bin/sh
+./bin/pidof
+./bin/reformime
+./bin/mknod
+./bin/gzip
+./bin/chmod
+./bin/fsync
+./bin/more
+./bin/ionice
+./bin/gunzip
+./bin/false
+./bin/tar
+./bin/rmdir
+./bin/linux32
+./bin/linux64
+./bin/mktemp
+./bin/kill
+./bin/mv
+./bin/cat
+./bin/login
+./bin/netstat
+./bin/cp
+./bin/touch
+./bin/chattr
+./bin/getopt
+./bin/cpio
+./bin/ping
+./bin/chown
+./bin/nuke
+./bin/usleep
+./bin/fatattr
+./bin/resume
+./bin/run-parts
+./bin/stat
+./bin/link
+./bin/kbd_mode
+./bin/lsattr
+./bin/fgrep
+./bin/setpriv
+./bin/hostname
+./bin/iostat
+./bin/pipe_progress
+./bin/dnsdomainname
+./bin/rm
+./bin/ed
+./bin/rev
+./bin/nice
+./bin/stty
+./bin/fdflush
+./bin/setarch
+./bin/umount
+./bin/conspy
+./bin/uname
+./bin/scriptreplay
+./bin/ps
+./bin/cttyhack
+./bin/printenv
+./bin/base32
+./bin/arch
+./bin/sleep
+./bin/rpm
+./bin/ping6
+./bin/ash
+./bin/hush
+./bin/dd
+./bin/busybox
+./bin/mt
+./bin/date
+./bin/ln
+./bin/dumpkmap
+./bin/base64
+./bin/pwd
+./bin/chgrp
+./bin/egrep
+./bin/mkdir
+./bin/true
+./bin/mpstat
+./bin/mountpoint
+./bin/ipcalc
+./bin/ls
+./bin/zcat
+./bin/echo
+./bin/su
+./bin/sed
+./bin/lzop
+./bin/makemime
+./bin/sync
+./bin/vi
+./bin/watch
+./bin/mount
+./usr
+./usr/bin
+./usr/bin/unix2dos
+./usr/bin/uptime
+./usr/bin/envdir
+./usr/bin/uudecode
+./usr/bin/crontab
+./usr/bin/printf
+./usr/bin/sum
+./usr/bin/strings
+./usr/bin/fuser
+./usr/bin/sv
+./usr/bin/nsenter
+./usr/bin/tr
+./usr/bin/showkey
+./usr/bin/nproc
+./usr/bin/fgconsole
+./usr/bin/nc
+./usr/bin/sha256sum
+./usr/bin/dpkg
+./usr/bin/pwdx
+./usr/bin/mkpasswd
+./usr/bin/dc
+./usr/bin/sha3sum
+./usr/bin/beep
+./usr/bin/lspci
+./usr/bin/chrt
+./usr/bin/shred
+./usr/bin/sort
+./usr/bin/rx
+./usr/bin/which
+./usr/bin/taskset
+./usr/bin/env
+./usr/bin/pmap
+./usr/bin/lzcat
+./usr/bin/[[
+./usr/bin/envuidgid
+./usr/bin/patch
+./usr/bin/md5sum
+./usr/bin/shuf
+./usr/bin/logname
+./usr/bin/svc
+./usr/bin/dpkg-deb
+./usr/bin/chvt
+./usr/bin/time
+./usr/bin/ipcrm
+./usr/bin/wget
+./usr/bin/lsscsi
+./usr/bin/nslookup
+./usr/bin/mkfifo
+./usr/bin/rpm2cpio
+./usr/bin/find
+./usr/bin/yes
+./usr/bin/pgrep
+./usr/bin/ts
+./usr/bin/xzcat
+./usr/bin/resize
+./usr/bin/lpq
+./usr/bin/runsv
+./usr/bin/openvt
+./usr/bin/head
+./usr/bin/killall
+./usr/bin/lsof
+./usr/bin/sha1sum
+./usr/bin/deallocvt
+./usr/bin/traceroute
+./usr/bin/bzcat
+./usr/bin/reset
+./usr/bin/setsid
+./usr/bin/fold
+./usr/bin/users
+./usr/bin/softlimit
+./usr/bin/dirname
+./usr/bin/awk
+./usr/bin/realpath
+./usr/bin/last
+./usr/bin/free
+./usr/bin/seq
+./usr/bin/truncate
+./usr/bin/diff
+./usr/bin/top
+./usr/bin/nohup
+./usr/bin/unexpand
+./usr/bin/test
+./usr/bin/man
+./usr/bin/bunzip2
+./usr/bin/sha512sum
+./usr/bin/du
+./usr/bin/flock
+./usr/bin/passwd
+./usr/bin/cut
+./usr/bin/pstree
+./usr/bin/lsusb
+./usr/bin/udpsvd
+./usr/bin/xxd
+./usr/bin/w
+./usr/bin/install
+./usr/bin/ftpput
+./usr/bin/nmeter
+./usr/bin/mesg
+./usr/bin/setuidgid
+./usr/bin/who
+./usr/bin/unshare
+./usr/bin/unzip
+./usr/bin/xargs
+./usr/bin/cal
+./usr/bin/vlock
+./usr/bin/unxz
+./usr/bin/tty
+./usr/bin/timeout
+./usr/bin/smemcap
+./usr/bin/ftpget
+./usr/bin/less
+./usr/bin/hexedit
+./usr/bin/unlink
+./usr/bin/id
+./usr/bin/fallocate
+./usr/bin/hostid
+./usr/bin/uuencode
+./usr/bin/telnet
+./usr/bin/tail
+./usr/bin/cryptpw
+./usr/bin/paste
+./usr/bin/bc
+./usr/bin/ttysize
+./usr/bin/tftp
+./usr/bin/tcpsvd
+./usr/bin/lpr
+./usr/bin/readlink
+./usr/bin/tac
+./usr/bin/factor
+./usr/bin/svok
+./usr/bin/ipcs
+./usr/bin/pscan
+./usr/bin/wall
+./usr/bin/uniq
+./usr/bin/basename
+./usr/bin/renice
+./usr/bin/runsvdir
+./usr/bin/expand
+./usr/bin/lzma
+./usr/bin/od
+./usr/bin/blkdiscard
+./usr/bin/clear
+./usr/bin/udhcpc6
+./usr/bin/eject
+./usr/bin/nl
+./usr/bin/unlzma
+./usr/bin/wc
+./usr/bin/microcom
+./usr/bin/groups
+./usr/bin/pkill
+./usr/bin/whois
+./usr/bin/script
+./usr/bin/[
+./usr/bin/expr
+./usr/bin/hexdump
+./usr/bin/ssl_client
+./usr/bin/whoami
+./usr/bin/hd
+./usr/bin/tee
+./usr/bin/setfattr
+./usr/bin/xz
+./usr/bin/chpst
+./usr/bin/dos2unix
+./usr/bin/traceroute6
+./usr/bin/comm
+./usr/bin/bzip2
+./usr/bin/dumpleases
+./usr/bin/volname
+./usr/bin/cmp
+./usr/bin/split
+./usr/bin/logger
+./usr/bin/setkeycodes
+./usr/bin/cksum
+./usr/sbin
+./usr/sbin/nandwrite
+./usr/sbin/chat
+./usr/sbin/rtcwake
+./usr/sbin/mim
+./usr/sbin/telnetd
+./usr/sbin/crond
+./usr/sbin/svlogd
+./usr/sbin/setfont
+./usr/sbin/ether-wake
+./usr/sbin/addgroup
+./usr/sbin/rdate
+./usr/sbin/dnsd
+./usr/sbin/ubirsvol
+./usr/sbin/ubimkvol
+./usr/sbin/rdev
+./usr/sbin/lpd
+./usr/sbin/tftpd
+./usr/sbin/ifplugd
+./usr/sbin/sendmail
+./usr/sbin/nbd-client
+./usr/sbin/ubiupdatevol
+./usr/sbin/i2cdetect
+./usr/sbin/udhcpd
+./usr/sbin/remove-shell
+./usr/sbin/ntpd
+./usr/sbin/deluser
+./usr/sbin/i2cdump
+./usr/sbin/ftpd
+./usr/sbin/killall5
+./usr/sbin/i2cset
+./usr/sbin/brctl
+./usr/sbin/powertop
+./usr/sbin/adduser
+./usr/sbin/ubirmvol
+./usr/sbin/dhcprelay
+./usr/sbin/httpd
+./usr/sbin/nanddump
+./usr/sbin/inetd
+./usr/sbin/fbset
+./usr/sbin/ubirename
+./usr/sbin/i2cget
+./usr/sbin/fsfreeze
+./usr/sbin/add-shell
+./usr/sbin/delgroup
+./usr/sbin/ubidetach
+./usr/sbin/readprofile
+./usr/sbin/readahead
+./usr/sbin/chpasswd
+./usr/sbin/popmaildir
+./usr/sbin/loadfont
+./usr/sbin/setlogcons
+./usr/sbin/arping
+./usr/sbin/partprobe
+./usr/sbin/ubiattach
+./usr/sbin/i2ctransfer
+./usr/sbin/chroot
+./usr/sbin/fakeidentd
+./usr/sbin/fdformat
+./usr/sbin/nologin
+./sbin
+./sbin/halt
+./sbin/setconsole
+./sbin/init
+./sbin/ipaddr
+./sbin/zcip
+./sbin/reboot
+./sbin/losetup
+./sbin/mke2fs
+./sbin/tunctl
+./sbin/fdisk
+./sbin/logread
+./sbin/tc
+./sbin/blockdev
+./sbin/freeramdisk
+./sbin/poweroff
+./sbin/syslogd
+./sbin/mdev
+./sbin/raidautorun
+./sbin/vconfig
+./sbin/fstrim
+./sbin/fsck.minix
+./sbin/slattach
+./sbin/ipneigh
+./sbin/iproute
+./sbin/klogd
+./sbin/arp
+./sbin/makedevs
+./sbin/uevent
+./sbin/sulogin
+./sbin/adjtimex
+./sbin/depmod
+./sbin/ifdown
+./sbin/findfs
+./sbin/fbsplash
+./sbin/mkfs.vfat
+./sbin/getty
+./sbin/iptunnel
+./sbin/lsmod
+./sbin/bootchartd
+./sbin/mkswap
+./sbin/iplink
+./sbin/modprobe
+./sbin/blkid
+./sbin/route
+./sbin/udhcpc
+./sbin/sysctl
+./sbin/hwclock
+./sbin/ifenslave
+./sbin/mkfs.minix
+./sbin/nameif
+./sbin/switch_root
+./sbin/pivot_root
+./sbin/ifup
+./sbin/runlevel
+./sbin/rmmod
+./sbin/mkfs.ext2
+./sbin/loadkmap
+./sbin/devmem
+./sbin/fsck
+./sbin/hdparm
+./sbin/ifconfig
+./sbin/acpid
+./sbin/ip
+./sbin/modinfo
+./sbin/swapon
+./sbin/swapoff
+./sbin/iprule
+./sbin/insmod
+./sbin/mkdosfs
+./sbin/run-init
+./sbin/watchdog
+./sbin/start-stop-daemon
+2350 blocks
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/initrd'
+10910 blocks
+rc_initrd=0
+===== timeout 120s make sdcard ARCH=x86_64 =====
+dd if=/dev/zero of=build/sdcard.img bs=1M count=72;
+72+0 records in
+72+0 records out
+75497472 bytes (75 MB, 72 MiB) copied, 0.0766424 s, 985 MB/s
+mkfs.fat 4.2 (2021-01-31)
+Mounting build/sdcard.img to ./diskfs
+umount: ./diskfs: no mount point specified.
+make: [Makefile:290: mount] Error 32 (ignored)
+mkdir ./diskfs
+Building user apps
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/apps'
+Building apps
+init dtest dgpu dtask dlog dinput dnet dvfs ping client out nice
+    Finished `release` profile [optimized] target(s) in 0.22s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.14s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.15s
+    Finished `release` profile [optimized] target(s) in 0.13s
+    Finished `release` profile [optimized] target(s) in 0.13s
+Moving apps to ../diskfs/bin
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/apps'
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/musl'
+Building apps
+(CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p hello);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p async_test);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p ftest);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p fs_update);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p pingpong);
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+warning: function `read_once_test` is never used
+  --> user/musl/ftest/src/main.rs:41:4
+   |
+41 | fn read_once_test() {
+   |    ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ftest` (bin "ftest") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.22s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.16s
+Moving apps to ../../diskfs
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/musl'
+Building user apps done
+async_test
+bash
+client
+dgpu
+dinput
+dlog
+dnet
+domains
+dtask
+dtest
+dvfs
+fs_update
+ftest
+gloopback
+grandom_scheduler
+gsshadow_blk
+gvfs2
+gvirtio_mmio_gpu
+gvirtio_mmio_input
+gvirtio_mmio_net
+gxlogger
+hello
+init
+nice
+out
+ping
+pingpong
+redis-benchmark
+redis-cli
+redis-server
+redis.conf
+rc_sdcard=0
+initrd_ok
+sdcard_ok
