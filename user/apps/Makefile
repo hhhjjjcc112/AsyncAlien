@@ -8,11 +8,16 @@ compile := cargo build --release --target $(TARGET)
 mode := release
 target := ../../target/$(TARGET)/$(mode)/
 APPS_NAME := $(shell ls -d */ | cut -d '/' -f 1)
-FSMOUNT := ../../diskfs
+IMG ?= ../../build/sdcard.img
+MTOOLS_MCOPY ?= mcopy
 
-all:build
-	@echo "Moving apps to ../diskfs/bin"
-	@$(foreach dir, $(BUILD_CRATES), (sudo cp $(target)$(dir) $(FSMOUNT)/$(dir););)
+all: build install
+
+install:
+	@command -v $(MTOOLS_MCOPY) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MCOPY)，请安装 mtools"; exit 1; }
+	@[ -f "$(IMG)" ] || { echo "[ERR] 镜像 $(IMG) 不存在，请先执行顶层 make fat/sdcard"; exit 1; }
+	@echo "Moving apps to $(IMG)"
+	@$(foreach dir, $(BUILD_CRATES), ($(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$(dir) ::/$(dir););)
 
 
 build:

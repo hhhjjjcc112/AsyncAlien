@@ -67,11 +67,6 @@ fn calibrate_apic_timer() {
     }
 }
 
-/// Get APIC timer frequency in Hz
-pub fn apic_timer_frequency() -> u64 {
-    APIC_TIMER_FREQUENCY.load(Ordering::Relaxed)
-}
-
 /// Set APIC timer to fire after specified nanoseconds
 ///
 /// This is used for implementing `set_timer` platform interface

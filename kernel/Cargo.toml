@@ -65,6 +65,7 @@ test = []
 time-tick = []
 memory_self_test = ["mem/memory_self_test"]
 trap_self_test = []
+domain_self_test = []
 
 
 [lints.rust]

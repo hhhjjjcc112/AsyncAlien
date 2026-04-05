@@ -25,12 +25,6 @@ pub fn set_scheduler(scheduler: Arc<dyn SchedulerDomain>) {
 
 pub fn add_task(task_meta: Arc<Mutex<TaskMetaExt>>) {
     let mut guard = task_meta.lock();
-    let tid = guard.tid();
-    if tid <= 1 {
-        log::warn!("<add_task>: tid={}, cx={:?}", tid, guard.basic_info.context);
-    } else {
-        log::warn!("<add_task>: {:?}", tid);
-    }
     let scheduling_info = guard.take_scheduling_info();
     drop(guard);
     TASK_MAP.lock().insert(scheduling_info.tid, task_meta);
@@ -74,8 +68,6 @@ pub fn wake_up_wait_task(tid: Tid) {
 pub fn yield_now() {
     let task = current_task().unwrap();
     task.lock().set_status(TaskStatus::Ready);
-    let tid = task.lock().tid();
-    log::warn!("yield_now: {:?}", tid);
     schedule();
 }
 

@@ -7,8 +7,6 @@ use platform;
 use crate::{task_domain, timer};
 #[cfg(target_arch = "riscv64")]
 use crate::plic_domain;
-#[cfg(target_arch = "x86_64")]
-use crate::apic_domain;
 
 #[cfg(feature = "trap_self_test")]
 use super::self_test;
@@ -83,14 +81,25 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
         vectors::PAGE_FAULT => {
             let fault_addr = fault_address();
-            task_domain!()
-                .do_load_page_fault(fault_addr)
-                .expect("do_load_page_fault failed");
-            log::debug!(
-                "Page fault handled: addr={:#x}, RIP={:#x}",
-                fault_addr,
-                frame.rip
-            );
+            match task_domain!().do_load_page_fault(fault_addr) {
+                Ok(()) => {
+                    log::debug!(
+                        "Page fault handled: addr={:#x}, RIP={:#x}",
+                        fault_addr,
+                        frame.rip
+                    );
+                }
+                Err(err) => {
+                    panic!(
+                        "do_load_page_fault failed: addr={:#x}, rip={:#x}, rsp={:#x}, err_code={:#x}, err={:?}",
+                        fault_addr,
+                        frame.rip,
+                        frame.rsp,
+                        frame.error_code,
+                        err
+                    );
+                }
+            }
         }
         vectors::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
 
@@ -109,7 +118,11 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
             let irq = (v - vectors::IRQ_BASE) as usize;
-            apic_domain!().handle_irq(irq).expect("handle_irq failed");
+            if let Some(apic) = crate::trap::APIC_DOMAIN.get() {
+                apic.handle_irq(irq).expect("handle_irq failed");
+            } else {
+                log::warn!("APIC domain not ready, drop irq {}", irq);
+            }
             send_apic_eoi();
         }
 
@@ -173,7 +186,11 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
             #[cfg(target_arch = "x86_64")]
             {
                 let irq = (v - vectors::IRQ_BASE) as usize;
-                apic_domain!().handle_irq(irq).expect("handle_irq failed");
+                if let Some(apic) = crate::trap::APIC_DOMAIN.get() {
+                    apic.handle_irq(irq).expect("handle_irq failed");
+                } else {
+                    log::warn!("APIC domain not ready, drop irq {}", irq);
+                }
             }
             #[cfg(target_arch = "riscv64")]
             plic_domain!().handle_irq().expect("handle_irq failed");
@@ -206,10 +223,10 @@ fn send_apic_eoi() {
 #[unsafe(no_mangle)]
 pub extern "C" fn trap_return() -> ! {
     // 该入口用于任务上下文首次/再次返回用户态，不走常规函数返回。
-    let task_domain = task_domain!();
-    let (user_cr3, trap_cx_ptr) = task_domain
-        .page_table_token_with_trap_frame_virt_addr()
-        .unwrap();
+    let UserTrapResult {
+        user_cr3,
+        trap_cx_ptr,
+    } = prepare_user_return();
     let trace_idx = USER_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
     if trace_idx < 8 {
         log::warn!(

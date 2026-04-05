@@ -1,0 +1,43 @@
+[run] source=make ARCH=x86_64 run DOMAIN_PROFILE= INITRD_REBUILD_USER=n NET=y LOG=INFO
+[run] log=run.txt
+[milestone] after_task_init=1
+[milestone] begin_run_task=1
+[milestone] switch_to_task_1=1
+[milestone] shell_probe=0
+
+domain             | register  | load      | attach    | note
+-------------------+-----------+-----------+-----------+-------------------------------------
+syscall            | yes       | yes       | yes       | 
+task               | yes       | yes       | yes       | 
+vfs                | yes       | yes       | yes       | 
+buf_uart           | yes       | yes       | yes       | 
+buf_input          | yes       | no        | no        | no-input-device
+cache_blk          | yes       | yes       | yes       | 
+null               | yes       | yes       | yes       | 
+random             | yes       | yes       | yes       | 
+shadow_blk         | yes       | yes       | yes       | 
+apic               | yes       | yes       | yes       | 
+uart16550          | yes       | yes       | yes       | attach-name=uart
+virtio_blk         | yes       | yes       | yes       | attach-name=virtio_block/block
+virtio_net         | no        | empty     | yes       | initrd-missing,dynamic-pci
+virtio_input       | no        | no        | no        | initrd-missing,no-input-device
+virtio_gpu         | no        | no        | no        | initrd-missing,no-gpu-device
+devfs              | yes       | yes       | yes       | 
+fatfs              | yes       | yes       | yes       | 
+pipefs             | yes       | yes       | yes       | 
+ramfs              | yes       | yes       | yes       | 
+sysfs              | yes       | yes       | yes       | 
+procfs             | yes       | yes       | yes       | 
+fifo_scheduler     | yes       | yes       | yes       | attach-name=scheduler
+logger             | yes       | yes       | yes       | 
+net_stack          | yes       | yes       | yes       | 
+domainfs           | yes       | yes       | yes       | 
+mem_block          | no        | no        | no        | expected-in-init-list-not-observed
+
+disk-members       | register  | load      | attach    | note
+-------------------+-----------+-----------+-----------+-------------------------------------
+sshadow_blk        | no        | no        | no        | not-observed-before-task1
+random_scheduler   | no        | no        | no        | not-observed-before-task1
+xlogger            | no        | no        | no        | not-observed-before-task1
+vfs2               | no        | no        | no        | not-observed-before-task1
+loopback           | no        | no        | no        | not-observed-before-task1

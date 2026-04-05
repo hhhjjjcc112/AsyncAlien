@@ -437,6 +437,22 @@ impl PciEndpointDevice {
         }
     }
 
+    /// 是否为 transitional virtio 设备（通常同时支持 legacy I/O BAR）。
+    pub fn is_transitional_virtio(&self) -> bool {
+        self.vendor_id == 0x1af4 && self.device_id < 0x1040
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    /// 读取 PCI Interrupt Line（0xff 表示未连接）。
+    pub fn interrupt_line(&self) -> Option<u8> {
+        let line = legacy_cfg_read8(self.address, 0x3c);
+        if line == 0xff {
+            None
+        } else {
+            Some(line)
+        }
+    }
+
     #[cfg(target_arch = "x86_64")]
     fn cap_bar_window(&self, bar: u8, cap_offset: u32, cap_length: u32) -> Option<Range<usize>> {
         if cap_length == 0 {

@@ -81,17 +81,22 @@ VIRTIO_FORCE_LEGACY ?= y
 LOG ?=
 GUI ?=n
 FS ?=fat
+MTOOLS_MCOPY ?= mcopy
+MTOOLS_MMD ?= mmd
+MTOOLS_MDIR ?= mdir
 IMG := build/sdcard.img
 FSMOUNT := ./diskfs
 FEATURES := default
 DOMAIN_PROFILE ?=
-INITRD_REBUILD_USER ?= y
 name ?=
 VF2 ?= n
 TFTPBOOT := /home/godones/projects/tftpboot/
 VF2_SD ?= n
 BUILD_CFG ?=  -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem
 BENCH ?= n
+USER_INITRD_DIR := user/initrd
+USER_INITRAMFS_DIR := $(USER_INITRD_DIR)/initramfs-$(ARCH_KIND)
+USER_INITRD_STAMP := build/.user_initrd_$(ARCH_KIND).stamp
 comma:= ,
 empty:=
 space:= $(empty) $(empty)
@@ -202,7 +207,6 @@ help:
 	@echo "  GUI=y/n                 Enable GUI (default: n)"
 	@echo "  LOG=level               Log level"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
-	@echo "  INITRD_REBUILD_USER=y/n initrd 是否重建 user/initrd (default: y)"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make ARCH=riscv64 PLATFORM=plat_qemu_riscv run"
@@ -276,20 +280,32 @@ fake_run:
             -serial mon:stdio
 endif
 
-user:
+check_mtools:
+	@command -v $(MTOOLS_MCOPY) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MCOPY)，请安装 mtools"; exit 1; }
+	@command -v $(MTOOLS_MMD) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MMD)，请安装 mtools"; exit 1; }
+	@command -v $(MTOOLS_MDIR) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MDIR)，请安装 mtools"; exit 1; }
+
+user: check_mtools
 	@echo "Building user apps"
-	@make all -C ./user/apps ARCH=$(ARCH_KIND)
-	@make all -C ./user/musl ARCH=$(ARCH_KIND)
+	@make all -C ./user/apps ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
+	@make all -C ./user/musl ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
 	@echo "Building user apps done"
 
 
-sdcard:$(FS) mount user #domains
-	@sudo cp build/disk/* $(FSMOUNT)/
-	@-sudo cp user/bin/* $(FSMOUNT)/
-	@sudo mkdir -p $(FSMOUNT)/domains
-	@sudo ls $(FSMOUNT)
-	@sudo umount $(FSMOUNT)
-	@rm -rf $(FSMOUNT)
+sdcard:$(FS) check_mtools user #domains
+	@echo "[sdcard] 使用 mtools 写入 $(IMG)"
+	@if [ -n "$$(find build/disk -mindepth 1 -maxdepth 1 -print -quit)" ]; then \
+		$(MTOOLS_MCOPY) -D o -i $(IMG) build/disk/* ::; \
+	else \
+		echo "[WARN] build/disk 为空，跳过写入"; \
+	fi
+	@if [ -n "$$(find user/bin -mindepth 1 -maxdepth 1 -print -quit)" ]; then \
+		$(MTOOLS_MCOPY) -D o -i $(IMG) user/bin/* ::; \
+	else \
+		echo "[sdcard] user/bin 为空，跳过写入"; \
+	fi
+	@$(MTOOLS_MMD) -i $(IMG) ::/domains >/dev/null 2>&1 || true
+	@$(MTOOLS_MDIR) -i $(IMG) ::
 
 fat:
 	dd if=/dev/zero of=$(IMG) bs=1M count=72;
@@ -308,24 +324,37 @@ mount:
 domains:
 	@if [ ! -d "build" ]; then mkdir build; fi
 	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) DOMAIN_PROFILE=$(DOMAIN_PROFILE) cargo domain build-all -l "$(LOG)" -o $(abspath build)
-	@make initrd
 
 domain:
 	cd domains && ARCH=$(ARCH) PLATFORM=$(PLATFORM) DOMAIN_PROFILE=$(DOMAIN_PROFILE) cargo domain build -n $(name) -l "$(LOG)" -o $(abspath build)
-	@make initrd
 
 initrd:
-	@if [ "$(INITRD_REBUILD_USER)" = "y" ]; then \
-		echo "[initrd] build user/initrd ARCH=$(ARCH_KIND)"; \
-		if ! make -C user/initrd ARCH=$(ARCH_KIND); then \
+	@need_rebuild=0; \
+	if [ ! -d "$(USER_INITRAMFS_DIR)" ] || [ ! -e "$(USER_INITRAMFS_DIR)/bin/busybox" ]; then \
+		need_rebuild=1; \
+	elif [ ! -f "$(USER_INITRD_STAMP)" ]; then \
+		need_rebuild=1; \
+	elif [ -n "$$(find $(USER_INITRD_DIR) -type f -newer "$(USER_INITRD_STAMP)" -print -quit)" ]; then \
+		need_rebuild=1; \
+	fi; \
+	if [ $$need_rebuild -eq 1 ]; then \
+		echo "[initrd] build user/initrd ARCH=$(ARCH_KIND) (auto-detected)"; \
+		if make -C $(USER_INITRD_DIR) ARCH=$(ARCH_KIND); then \
+			mkdir -p ./build; \
+			touch "$(USER_INITRD_STAMP)"; \
+		else \
 			echo "[WARN] user/initrd 构建失败，回退使用现有 initramfs-$(ARCH_KIND)"; \
 		fi; \
 	else \
-		echo "[initrd] skip user/initrd rebuild (INITRD_REBUILD_USER=$(INITRD_REBUILD_USER))"; \
+		echo "[initrd] skip user/initrd rebuild (up-to-date)"; \
 	fi
 	@mkdir -p ./initrd
 	@cp ./build/init/g* ./initrd
-	@rm -f ./initrd/gvirtio_blk ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu
+	@if [ "$(ARCH_KIND)" = "x86_64" ]; then \
+		rm -f ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
+	else \
+		rm -f ./initrd/gvirtio_blk ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
+	fi
 	@if [ -d ./user/initrd/initramfs-$(ARCH_KIND) ]; then \
 		cp ./user/initrd/initramfs-$(ARCH_KIND)/* ./initrd -r; \
 	else \

@@ -13,6 +13,7 @@
 #   0x08: rsp
 #   0x10: fs_base
 #   0x18: gs_base
+#   ？  : fp-simd
 
 .section .text
 .globl __switch

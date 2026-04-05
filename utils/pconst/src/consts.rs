@@ -143,7 +143,45 @@ impl syscall_table::ToIsize for LinuxErrno {
     }
 }
 
+pub const SYSCALL_ABI_TAG_BIT: usize = 1usize << (usize::BITS as usize - 1);
+pub const SYSCALL_ABI_LINUX_X86_64: usize = SYSCALL_ABI_TAG_BIT;
+pub const SYSCALL_ABI_RAW_MASK: usize = !SYSCALL_ABI_TAG_BIT;
+
+#[inline]
+pub const fn syscall_with_linux_x86_64_abi(raw_syscall_id: usize) -> usize {
+    (raw_syscall_id & SYSCALL_ABI_RAW_MASK) | SYSCALL_ABI_LINUX_X86_64
+}
+
+#[inline]
+pub const fn is_linux_x86_64_abi_syscall(syscall_id: usize) -> bool {
+    (syscall_id & SYSCALL_ABI_TAG_BIT) != 0
+}
+
+#[inline]
+pub const fn raw_syscall_id(syscall_id: usize) -> usize {
+    syscall_id & SYSCALL_ABI_RAW_MASK
+}
+
+#[cfg(target_arch = "x86_64")]
+pub const X86_64_RAW_SYSCALL_ARCH_PRCTL: usize = 0x9e;
+#[cfg(target_arch = "x86_64")]
+pub const X86_64_RAW_SYSCALL_SET_TID_ADDRESS: usize = 0xda;
+#[cfg(target_arch = "x86_64")]
+pub const SYSCALL_ARCH_PRCTL: usize = X86_64_RAW_SYSCALL_ARCH_PRCTL;
+
+#[cfg(target_arch = "x86_64")]
+pub const ARCH_SET_GS: usize = 0x1001;
+#[cfg(target_arch = "x86_64")]
+pub const ARCH_SET_FS: usize = 0x1002;
+#[cfg(target_arch = "x86_64")]
+pub const ARCH_GET_FS: usize = 0x1003;
+#[cfg(target_arch = "x86_64")]
+pub const ARCH_GET_GS: usize = 0x1004;
+
 pub const SYSCALL_GETCWD: usize = 17;
+pub const SYSCALL_EVENTFD2: usize = 19;
+pub const SYSCALL_EPOLL_CREATE1: usize = 20;
+pub const SYSCALL_EPOLL_CTL: usize = 21;
 pub const SYSCALL_DUP: usize = 23;
 pub const SYSCALL_DUP3: usize = 24;
 pub const SYSCALL_FCNTL: usize = 25;
@@ -203,11 +241,14 @@ pub const SYSCALL_SCHED_GETSCHEDULER: usize = 120;
 pub const SYSCALL_SCHED_SETSCHEDULER: usize = 119;
 pub const SYSCALL_KILL: usize = 129;
 pub const SYSCALL_TKILL: usize = 130;
+pub const SYSCALL_SIGALTSTACK: usize = 132;
 pub const SYSCALL_SIGSUSPEND: usize = 133;
 pub const SYSCALL_SIGACTION: usize = 134;
 pub const SYSCALL_SIGPROCMASK: usize = 135;
 pub const SYSCALL_SIGTIMEDWAIT: usize = 137;
 pub const SYSCALL_SIGRETURN: usize = 139;
+pub const SYSCALL_SET_PRIORITY: usize = 140;
+pub const SYSCALL_GET_PRIORITY: usize = 141;
 pub const SYSCALL_TIMES: usize = 153;
 pub const SYSCALL_SETPGID: usize = 154;
 pub const SYSCALL_GETPGID: usize = 155;
@@ -229,6 +270,7 @@ pub const SYSCALL_SHAMCTL: usize = 195;
 pub const SYSCALL_SHAMAT: usize = 196;
 pub const SYSCALL_SHAMDT: usize = 197;
 pub const SYSCALL_SOCKET: usize = 198;
+pub const SYSCALL_SOCKETPAIR: usize = 199;
 pub const SYSCALL_BIND: usize = 200;
 pub const SYSCALL_LISTEN: usize = 201;
 pub const SYSCALL_ACCEPT: usize = 202;
@@ -251,6 +293,7 @@ pub const SYSCALL_MADVISE: usize = 233;
 pub const SYSCALL_WAIT4: usize = 260;
 pub const SYSCALL_PRLIMIT: usize = 261;
 pub const SYSCALL_RENAMEAT2: usize = 276;
+pub const SYSCALL_GETRANDOM: usize = 278;
 pub const SYSCALL_MEMBARRIER: usize = 283;
 pub const SYSCALL_FACCESSAT2: usize = 439;
 pub const SYSCALL_SHUTDOWN: usize = 210;
@@ -259,6 +302,16 @@ pub const SYSCALL_COPY_FILE_RANGE: usize = 285;
 pub fn syscall_name(id: usize) -> &'static str {
     match id {
         SYSCALL_COPY_FILE_RANGE => "copy_file_range",
+        SYSCALL_GETRANDOM => "getrandom",
+        SYSCALL_SOCKETPAIR => "socketpair",
+        SYSCALL_GET_PRIORITY => "getpriority",
+        SYSCALL_SET_PRIORITY => "setpriority",
+        SYSCALL_SIGALTSTACK => "sigaltstack",
+        SYSCALL_EPOLL_CTL => "epoll_ctl",
+        SYSCALL_EPOLL_CREATE1 => "epoll_create1",
+        SYSCALL_EVENTFD2 => "eventfd2",
+        #[cfg(target_arch = "x86_64")]
+        SYSCALL_ARCH_PRCTL => "arch_prctl",
         SYSCALL_FCHOWN => "fchown",
         SYSCALL_SETSID => "setsid",
         SYSCALL_SIGSUSPEND => "sigsuspend",

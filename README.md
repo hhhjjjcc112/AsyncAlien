@@ -13,10 +13,14 @@
 - rust
 - riscv64-linux-musl-gcc
 - git submodule update --init --recursive
+- mtools (mcopy/mmd/mdir, for sudo-free sdcard image packaging)
 
 ```
 make run
 ```
+
+`make run` 路径中的 `sdcard` 打包已改为通过 mtools 直接写入镜像文件，不再依赖 `sudo mount/umount`。
+
 ```
 make build        # build kernel
 make sdcard       # build all domains and user app

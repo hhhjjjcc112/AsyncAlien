@@ -5,6 +5,7 @@ set -euo pipefail
 # 用法:
 #   tools/run_stage_matrix.sh stage0
 #   tools/run_stage_matrix.sh all
+#   DOMAIN_SELF_TEST=y tools/run_stage_matrix.sh task6
 #   tools/run_stage_matrix.sh riscv-min
 #   tools/run_stage_matrix.sh ab-stage4
 
@@ -118,6 +119,31 @@ check_keywords() {
   if [[ "$stage" == "stage4" ]]; then
     grep -q "<attach domain>: block" "$stage_log" || ok=0
     grep -q "<attach domain>: nic" "$stage_log" || ok=0
+  fi
+
+  if [[ "${DOMAIN_SELF_TEST:-n}" == "y" ]]; then
+    local l_syscall l_task l_apic l_uart l_block
+    l_syscall="$(grep -n "\[domain_self_test\] pass: syscall" "$stage_log" | head -n1 | cut -d: -f1)"
+    l_task="$(grep -n "\[domain_self_test\] pass: task" "$stage_log" | head -n1 | cut -d: -f1)"
+    l_apic="$(grep -n "\[domain_self_test\] pass: apic" "$stage_log" | head -n1 | cut -d: -f1)"
+    l_uart="$(grep -n "\[domain_self_test\] pass: uart" "$stage_log" | head -n1 | cut -d: -f1)"
+
+    [[ -n "$l_syscall" && -n "$l_task" && -n "$l_apic" && -n "$l_uart" ]] || ok=0
+    if [[ -n "$l_syscall" && -n "$l_task" && -n "$l_apic" && -n "$l_uart" ]]; then
+      [[ "$l_syscall" -lt "$l_task" && "$l_task" -lt "$l_apic" && "$l_apic" -lt "$l_uart" ]] || ok=0
+    fi
+
+    if [[ "$stage" == "stage0" ]]; then
+      grep -q "\[domain_self_test\] skip: block" "$stage_log" || ok=0
+    else
+      l_block="$(grep -n "\[domain_self_test\] pass: block" "$stage_log" | head -n1 | cut -d: -f1)"
+      [[ -n "$l_block" ]] || ok=0
+      if [[ -n "$l_block" && -n "$l_uart" ]]; then
+        [[ "$l_uart" -lt "$l_block" ]] || ok=0
+      fi
+    fi
+
+    grep -q "\[domain_self_test\] done" "$stage_log" || ok=0
   fi
 
   return $((1 - ok))
@@ -278,6 +304,16 @@ if [[ "$MODE" == "all" ]]; then
   if ! run_riscv_min; then
     failed=1
   fi
+  exit $failed
+fi
+
+if [[ "$MODE" == "task6" ]]; then
+  failed=0
+  for stage in stage0 stage1; do
+    if ! run_one_stage "$stage"; then
+      failed=1
+    fi
+  done
   exit $failed
 fi
 

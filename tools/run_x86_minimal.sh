@@ -41,6 +41,7 @@ if [[ -z "${X86_CPU:-}" ]]; then
 fi
 MEMORY_SELF_TEST="${MEMORY_SELF_TEST:-y}"
 TRAP_SELF_TEST="${TRAP_SELF_TEST:-y}"
+DOMAIN_SELF_TEST="${DOMAIN_SELF_TEST:-n}"
 
 KERNEL_FEATURES="${FEATURES:-default}"
 KERNEL_FEATURES="${KERNEL_FEATURES// /,}"
@@ -55,6 +56,13 @@ if [[ "$TRAP_SELF_TEST" == "y" ]]; then
   # 按需启用 trap 自检，避免默认启动行为变化。
   if [[ ",$KERNEL_FEATURES," != *",trap_self_test,"* ]]; then
     KERNEL_FEATURES="$KERNEL_FEATURES,trap_self_test"
+  fi
+fi
+
+if [[ "$DOMAIN_SELF_TEST" == "y" ]]; then
+  # 域自检默认关闭，仅在验证场景按需开启。
+  if [[ ",$KERNEL_FEATURES," != *",domain_self_test,"* ]]; then
+    KERNEL_FEATURES="$KERNEL_FEATURES,domain_self_test"
   fi
 fi
 

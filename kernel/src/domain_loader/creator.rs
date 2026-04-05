@@ -163,7 +163,11 @@ pub fn create_domain<T: ?Sized>(
     info!("Load {:?} domain, size: {}KB", ty, data.data.len() / 1024);
     let time_tick = TimeTick::new("Load new domain");
     let mut domain_loader = DomainLoader::new(data.data, domain_file_name);
-    domain_loader.load().unwrap();
+    if let Err(err) = domain_loader.load() {
+        error!("load domain [{}] failed: {:?}", domain_file_name, err);
+        drop(time_tick);
+        return None;
+    }
     let id = alloc_domain_id();
     let domain = domain_loader.call_main(id, use_old_id);
     drop(time_tick);
@@ -174,7 +178,11 @@ pub fn create_domain_with_loader<T: ?Sized>(
     mut domain_loader: DomainLoader,
     use_old_id: Option<u64>,
 ) -> Option<(u64, Box<T>, DomainLoader)> {
-    domain_loader.load().unwrap();
+    let (domain_name, _) = domain_loader.domain_file_info();
+    if let Err(err) = domain_loader.load() {
+        error!("load domain [{}] failed: {:?}", domain_name, err);
+        return None;
+    }
     let id = alloc_domain_id();
     let domain = domain_loader.call_main(id, use_old_id);
     Some((id, domain, domain_loader))

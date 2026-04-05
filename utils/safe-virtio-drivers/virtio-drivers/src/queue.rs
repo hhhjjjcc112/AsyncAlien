@@ -23,6 +23,8 @@ pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
 }
 
 impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+    const WAIT_USED_SPIN_LIMIT: usize = 5_000_000;
+
     const AVAIL_RING_OFFSET: usize = size_of::<Descriptor>() * SIZE;
     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
     const USED_RING_OFFSET: usize =
@@ -87,8 +89,19 @@ impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
             transport.notify(self.queue_idx)?;
         }
         // Wait until there is at least one element in the used ring.
+        let mut spin_count = 0usize;
         while !self.can_pop(token)? {
             spin_loop();
+            spin_count = spin_count.wrapping_add(1);
+            if spin_count >= Self::WAIT_USED_SPIN_LIMIT {
+                log::warn!(
+                    "virtqueue {} wait timeout: token={}, last_seen_used={}",
+                    self.queue_idx,
+                    token,
+                    self.last_seen_used
+                );
+                return Err(VirtIoError::NotReady);
+            }
         }
         self.pop_used(token)
     }

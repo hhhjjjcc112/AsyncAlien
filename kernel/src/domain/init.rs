@@ -4,6 +4,7 @@ use core2::io::Read;
 use interface::DomainTypeRaw;
 use log::warn;
 
+use crate::error::{AlienError, AlienResult};
 use crate::domain_loader::creator::register_domain_elf;
 
 const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
@@ -39,10 +40,6 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("logger", DomainTypeRaw::LogDomain),
     ("domainfs", DomainTypeRaw::FsDomain),
     #[cfg(target_arch = "x86_64")]
-    ("local_apic", DomainTypeRaw::EmptyDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("io_apic", DomainTypeRaw::EmptyDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
     ("apic", DomainTypeRaw::APICDomain),
     #[cfg(target_arch = "x86_64")]
     ("virtio_net", DomainTypeRaw::NetDeviceDomain),
@@ -60,15 +57,21 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("vf2_sd", DomainTypeRaw::BlkDeviceDomain),
 ];
 
-pub fn init_domains() {
+pub fn init_domains() -> AlienResult<()> {
     let initrd = mem::INITRD_DATA.lock();
-    if initrd.is_none() {
-        panic!("Initrd data is not initialized");
-    }
-    let data = initrd.as_ref().unwrap();
-    let mut decoder = libflate::gzip::Decoder::new(data.as_slice()).unwrap();
+    let data = initrd.as_ref().ok_or_else(|| {
+        log::error!("Initrd data is not initialized");
+        AlienError::EINVAL
+    })?;
+    let mut decoder = libflate::gzip::Decoder::new(data.as_slice()).map_err(|err| {
+        log::error!("failed to decode initrd gzip: {:?}", err);
+        AlienError::EINVAL
+    })?;
     let mut buf = vec![];
-    let _r = decoder.read_to_end(&mut buf).unwrap();
+    decoder.read_to_end(&mut buf).map_err(|err| {
+        log::error!("failed to read initrd archive: {:?}", err);
+        AlienError::EINVAL
+    })?;
 
     let mut map = BTreeMap::new();
     for entry in cpio_reader::iter_files(&buf) {
@@ -95,4 +98,6 @@ pub fn init_domains() {
     for (domain_file_name, domain) in INIT_DOMAIN_LIST {
         register(domain_file_name, *domain);
     }
+
+    Ok(())
 }

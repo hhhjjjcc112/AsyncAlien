@@ -6,7 +6,9 @@ use alloc::sync::Arc;
 use alloc::vec::Vec;
 use core::arch::global_asm;
 #[cfg(target_arch = "x86_64")]
-use x86_64::registers::model_specific::Msr;
+use x86_64::VirtAddr;
+#[cfg(target_arch = "x86_64")]
+use x86_64::registers::model_specific::{FsBase, KernelGsBase};
 
 use arch::cpu_id;
 use basic::{sync::Once, task::TaskContext};
@@ -14,6 +16,7 @@ use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;
 pub use processor::current_tid;
+pub use processor::current_task;
 pub use scheduler::{
     exit_now, get_task_priority, is_task_exit, remove_task, set_task_priority, wait_now,
     wake_up_wait_task, yield_now,
@@ -22,7 +25,7 @@ use task_meta::{TaskMeta, TaskStatus};
 
 use crate::{
     error::AlienResult,
-    task::{processor::current_task, resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},
+    task::{resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},
 };
 
 // Architecture-specific task switch assembly
@@ -47,23 +50,20 @@ pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
 #[cfg(target_arch = "x86_64")]
 pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
     unsafe {
-        const IA32_FS_BASE: u32 = 0xC000_0100;
-        const IA32_KERNEL_GS_BASE: u32 = 0xC000_0102;
-
         // FP/SIMD 状态在 Rust 路径保存恢复，汇编只处理通用寄存器。
         (*now).save_fp_simd();
         (*next).restore_fp_simd();
 
         // 任务切换前保存当前任务的 TLS 相关基址。
-        (*now).set_fs_base(Msr::new(IA32_FS_BASE).read() as usize);
-        (*now).set_gs_base(Msr::new(IA32_KERNEL_GS_BASE).read() as usize);
+        (*now).set_fs_base(FsBase::read().as_u64() as usize);
+        (*now).set_gs_base(KernelGsBase::read().as_u64() as usize);
 
         // 在任务切换处统一更新 rsp0，避免分散到 trap 返回路径。
         crate::trap::write_tss_rsp0((*next).kstack_top());
 
         // 切到下一个任务前恢复其 TLS 相关基址。
-        Msr::new(IA32_FS_BASE).write((*next).fs_base() as u64);
-        Msr::new(IA32_KERNEL_GS_BASE).write((*next).gs_base() as u64);
+        FsBase::write(VirtAddr::new((*next).fs_base() as u64));
+        KernelGsBase::write(VirtAddr::new((*next).gs_base() as u64));
 
         __switch(now, next);
     }

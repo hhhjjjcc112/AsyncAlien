@@ -48,7 +48,7 @@ static CPUS: [CpuLocal<Cpu>; CPU_NUM] = [CPU_ONE; CPU_NUM];
 
 #[cfg(target_arch = "x86_64")]
 #[percpu::def_percpu]
-static CURRENT_TID: usize = 0;
+static CURRENT_TID: usize = usize::MAX;
 
 pub fn current_cpu() -> &'static mut Cpu {
     CPUS[cpu_id()].as_mut()
@@ -82,7 +82,7 @@ fn current_tid_impl() -> Option<usize> {
 #[cfg(target_arch = "x86_64")]
 fn current_tid_impl() -> Option<usize> {
     let tid = CURRENT_TID.read_current();
-    if tid == 0 {
+    if tid == usize::MAX {
         None
     } else {
         Some(tid)
@@ -164,11 +164,6 @@ pub fn cpu_loop() {
             next_task.lock().set_status(TaskStatus::Running);
             let next_task_ctx_ptr = next_task.lock().get_context_raw_mut_ptr();
             let next_tid = next_task.lock().tid();
-            if next_tid <= 1 {
-                log::warn!("switch to task {}, cx={:?}", next_tid, next_task.lock().basic_info.context);
-            } else {
-                log::warn!("switch to task {}", next_tid);
-            }
             cpu.set_current(next_task);
             set_tp(tp_from_tid(next_tid));
             let cpu_context = cpu.get_idle_task_cx_ptr();

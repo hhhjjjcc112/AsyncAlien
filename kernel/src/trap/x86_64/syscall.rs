@@ -1,6 +1,7 @@
 use core::arch::global_asm;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
+use pconst::syscall_with_linux_x86_64_abi;
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::{
     VirtAddr,
@@ -34,17 +35,22 @@ static SYSCALL_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     let frame = current_trap_frame();
 
-    let parameters = frame.parameters();
+    let mut parameters = frame.parameters();
+    let orig_syscall_id = parameters[0];
+    let syscall_id = syscall_with_linux_x86_64_abi(orig_syscall_id);
+    parameters[0] = syscall_id;
+
     let trace_idx = SYSCALL_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 32 {
-        log::warn!(
-            "[x86 syscall] id={}, args={:#x?}",
-            parameters[0],
+    if trace_idx < 64 {
+        log::debug!(
+            "[x86 syscall] orig={:#x}, id={:#x}, args={:#x?}",
+            orig_syscall_id,
+            syscall_id,
             &parameters[1..]
         );
     }
     let result = crate::syscall_domain!().call(
-        parameters[0],
+        syscall_id,
         [
             parameters[1],
             parameters[2],

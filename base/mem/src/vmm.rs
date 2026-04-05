@@ -352,7 +352,7 @@ pub fn map_domain_region(size: usize) -> VirtDomainArea {
     }
     KERNEL_MAP_MAX.store(virt_start + size, core::sync::atomic::Ordering::Relaxed);
     // 分配物理页并映射到内核虚拟地址。
-    log::error!(
+    log::debug!(
         "[alloc_free_module_region] virt_start: {:#x}, size: {:#x}",
         virt_start,
         size

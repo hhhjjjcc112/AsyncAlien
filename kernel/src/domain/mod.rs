@@ -1,4 +1,6 @@
 mod init;
+#[cfg(all(target_arch = "x86_64", feature = "domain_self_test"))]
+mod self_test;
 
 extern crate alloc;
 use alloc::{boxed::Box, string::ToString};
@@ -332,38 +334,11 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
         let irq = device.irq();
 
         match device.name() {
-            "local_apic" => {
-                let (local_apic, domain_file_info) = create_domain!(
-                    EmptyDeviceDomainProxy,
-                    DomainTypeRaw::EmptyDeviceDomain,
-                    "local_apic"
-                )?;
-                local_apic.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "local_apic",
-                    domain_file_info,
-                    DomainType::EmptyDeviceDomain(local_apic),
-                    true
-                );
-            }
-            "io_apic" => {
-                let (io_apic, domain_file_info) = create_domain!(
-                    EmptyDeviceDomainProxy,
-                    DomainTypeRaw::EmptyDeviceDomain,
-                    "io_apic"
-                )?;
-                io_apic.init_by_box(Box::new(address..address + size))?;
-                register_domain!(
-                    "io_apic",
-                    domain_file_info,
-                    DomainType::EmptyDeviceDomain(io_apic),
-                    true
-                );
-            }
             "uart" => {
-                let compatible = device
-                    .compatible()
-                    .expect("uart device must have compatible property");
+                let compatible = device.compatible().ok_or_else(|| {
+                    log::error!("uart device missing compatible property");
+                    crate::error::AlienError::EINVAL
+                })?;
                 let (uart, domain_file_info) = match compatible {
                     "ns16550a" => {
                         create_domain!(UartDomainProxy, DomainTypeRaw::UartDomain, "uart16550")?
@@ -371,7 +346,10 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     "snps,dw-apb-uart" => {
                         create_domain!(UartDomainProxy, DomainTypeRaw::UartDomain, "uart8250")?
                     }
-                    _ => panic!("unknown uart device: {}", compatible),
+                    _ => {
+                        log::error!("unknown uart device: {}", compatible);
+                        return Err(crate::error::AlienError::EINVAL);
+                    }
                 };
 
                 uart.init_by_box(Box::new(address..address + size))?;
@@ -424,6 +402,12 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
             "pci_ecam" => {
                 // x86_64 的 virtio PCI 统一在平台设备遍历后处理，这里保留分支用于兼容旧日志路径。
             }
+            "local_apic" | "io_apic" => {
+                log::debug!(
+                    "x86_64 device {} detected, interrupt routing handled by apic domain",
+                    device.name()
+                );
+            }
             _ => {
                 warn!("unknown device: {}", device.name());
             }
@@ -461,29 +445,62 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
 
         if let Some(ep) = blk_ep {
             let bdf = ep.address();
+            let pci_irq = ep.interrupt_line().map(|irq| irq as u32);
             let legacy_io = ep.legacy_io_range();
             let modern = ep.virtio_modern_info();
-            if let Some(modern_info) = modern.as_ref() {
-                mem::map_device_phys_range(modern_info.common.clone());
-                mem::map_device_phys_range(modern_info.notify.clone());
-                mem::map_device_phys_range(modern_info.isr.clone());
-                mem::map_device_phys_range(modern_info.device.clone());
+            let use_modern = !ep.is_transitional_virtio();
+            if !use_modern && modern.is_some() {
+                log::debug!(
+                    "virtio-blk @ {:04x}:{:02x}:{:02x}.{} is transitional, prefer legacy transport",
+                    bdf.segment(),
+                    bdf.bus(),
+                    bdf.device(),
+                    bdf.function()
+                );
             }
-            if legacy_io.is_some() || modern.is_some() {
+            if use_modern {
+                if let Some(modern_info) = modern.as_ref() {
+                    mem::map_device_phys_range(modern_info.common.clone());
+                    mem::map_device_phys_range(modern_info.notify.clone());
+                    mem::map_device_phys_range(modern_info.isr.clone());
+                    mem::map_device_phys_range(modern_info.device.clone());
+                }
+            }
+            if legacy_io.is_some() || (use_modern && modern.is_some()) {
                 let init_info = VirtioInitInfo::pci(
                     bdf.segment(),
                     bdf.bus(),
                     bdf.device(),
                     bdf.function(),
-                    None,
+                    pci_irq,
                     legacy_io,
                 )
                 .with_modern_pci(
-                    modern.as_ref().map(|x| x.common.clone()),
-                    modern.as_ref().map(|x| x.notify.clone()),
-                    modern.as_ref().map(|x| x.notify_off_multiplier),
-                    modern.as_ref().map(|x| x.isr.clone()),
-                    modern.as_ref().map(|x| x.device.clone()),
+                    if use_modern {
+                        modern.as_ref().map(|x| x.common.clone())
+                    } else {
+                        None
+                    },
+                    if use_modern {
+                        modern.as_ref().map(|x| x.notify.clone())
+                    } else {
+                        None
+                    },
+                    if use_modern {
+                        modern.as_ref().map(|x| x.notify_off_multiplier)
+                    } else {
+                        None
+                    },
+                    if use_modern {
+                        modern.as_ref().map(|x| x.isr.clone())
+                    } else {
+                        None
+                    },
+                    if use_modern {
+                        modern.as_ref().map(|x| x.device.clone())
+                    } else {
+                        None
+                    },
                 );
                 let (blk_driver, domain_file_info) = create_domain!(
                     BlkDomainProxy,
@@ -499,7 +516,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     bdf.function()
                 );
                 let blk_domain = DomainType::BlkDeviceDomain(blk_driver.clone());
-                register_domain!(
+                let virtio_blk_name = register_domain!(
                     "virtio_block",
                     domain_file_info.clone(),
                     blk_domain.clone(),
@@ -511,6 +528,23 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     blk_domain,
                     false
                 );
+
+                if let Some(irq) = pci_irq {
+                    log::debug!(
+                        "virtio-blk irq {} detected, defer APIC route until trap domain is ready (domain={})",
+                        irq,
+                        virtio_blk_name
+                    );
+                } else {
+                    warn!(
+                        "virtio-blk @ {:04x}:{:02x}:{:02x}.{} has no irq line",
+                        bdf.segment(),
+                        bdf.bus(),
+                        bdf.device(),
+                        bdf.function()
+                    );
+                }
+
                 has_block = true;
             } else {
                 warn!(
@@ -895,7 +929,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
 }
 
 pub fn load_domains() -> AlienResult<()> {
-    init_domains();
+    init_domains()?;
     init_kernel_domain();
     domain_helper::init_domain_create(Box::new(DomainCreateImpl));
 
@@ -1003,12 +1037,25 @@ pub fn load_domains() -> AlienResult<()> {
         true
     );
 
+    let (syscall, domain_file_info) =
+        create_domain!(SysCallDomainProxy, DomainTypeRaw::SysCallDomain, "syscall")?;
+    syscall.init_by_box(Box::new(()))?;
+    register_domain!(
+        "syscall",
+        domain_file_info,
+        DomainType::SysCallDomain(syscall.clone()),
+        true
+    );
+
     // we need to register vfs and task domain before init device, because we need to use vfs and task domain in some
     // device init function
     #[cfg(target_arch = "riscv64")]
     let plic = init_device()?;
     #[cfg(target_arch = "x86_64")]
     let apic = init_device()?;
+
+    #[cfg(all(target_arch = "x86_64", feature = "domain_self_test"))]
+    self_test::run()?;
 
     devfs.init_by_box(Box::new(()))?;
     fatfs.init_by_box(Box::new(()))?;
@@ -1021,9 +1068,16 @@ pub fn load_domains() -> AlienResult<()> {
     // also it may use the task domain.
     {
         let mut initrd = mem::INITRD_DATA.lock();
-        let data = initrd.as_ref().unwrap();
+        let data = initrd
+            .as_ref()
+            .ok_or_else(|| {
+                log::error!("load_domains: initrd data missing before vfs init");
+                crate::error::AlienError::EINVAL
+            })?
+            .as_slice()
+            .to_vec();
         platform::println!("load_domains: before vfs init");
-        vfs.init_by_box(Box::new(data.as_slice().to_vec()))?;
+        vfs.init_by_box(Box::new(data))?;
         platform::println!("load_domains: after vfs init");
         initrd.take(); // release the initrd data
     }
@@ -1031,16 +1085,6 @@ pub fn load_domains() -> AlienResult<()> {
     platform::println!("load_domains: before task init");
     task.init_by_box(Box::new(()))?;
     platform::println!("load_domains: after task init");
-
-    let (syscall, domain_file_info) =
-        create_domain!(SysCallDomainProxy, DomainTypeRaw::SysCallDomain, "syscall")?;
-    syscall.init_by_box(Box::new(()))?;
-    register_domain!(
-        "syscall",
-        domain_file_info,
-        DomainType::SysCallDomain(syscall.clone()),
-        true
-    );
 
     platform::println!("Load domains done");
 
