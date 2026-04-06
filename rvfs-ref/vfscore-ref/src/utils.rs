@@ -436,6 +436,31 @@ pub struct VfsFileStat {
 #[cfg(feature = "linux_error")]
 impl From<VfsFileStat> for FileStat {
     fn from(value: VfsFileStat) -> Self {
+        #[cfg(target_arch = "x86_64")]
+        {
+            return Self {
+                st_dev: value.st_dev,
+                st_ino: value.st_ino,
+                st_nlink: value.st_nlink as u64,
+                st_mode: value.st_mode,
+                st_uid: value.st_uid,
+                st_gid: value.st_gid,
+                __pad0: 0,
+                st_rdev: value.st_rdev,
+                st_size: value.st_size,
+                st_blksize: value.st_blksize as u64,
+                st_blocks: value.st_blocks,
+                st_atime_sec: value.st_atime.sec,
+                st_atime_nsec: value.st_atime.nsec,
+                st_mtime_sec: value.st_mtime.sec,
+                st_mtime_nsec: value.st_mtime.nsec,
+                st_ctime_sec: value.st_ctime.sec,
+                st_ctime_nsec: value.st_ctime.nsec,
+                __unused: [0; 3],
+            };
+        }
+
+        #[cfg(not(target_arch = "x86_64"))]
         Self {
             st_dev: value.st_dev,
             st_ino: value.st_ino,

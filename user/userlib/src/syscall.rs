@@ -1,97 +1,194 @@
-use crate::{arch, syscall, syscall_id};
-use pconst::*;
+use crate::{arch, syscall};
 
-// pconst 暂未覆盖的 Linux 号或兼容名，先在 userlib 保持。
-syscall_id!(SYSCALL_SETXATTR, 5);
-syscall_id!(SYSCALL_LSETXATTR, 6);
-syscall_id!(SYSCALL_FSETXATTR, 7);
-syscall_id!(SYSCALL_GETXATTR, 8);
-syscall_id!(SYSCALL_LGETXATTR, 9);
-syscall_id!(SYSCALL_FGETXATTR, 10);
-syscall_id!(SYSCALL_LISTXATTR, 11);
-syscall_id!(SYSCALL_LLISTXATTR, 12);
-syscall_id!(SYSCALL_FLISTXATTR, 13);
-syscall_id!(SYSCALL_REMOVEXATTR, 14);
-syscall_id!(SYSCALL_LREMOVEXATTR, 15);
-syscall_id!(SYSCALL_FREMOVEXATTR, 16);
-syscall_id!(SYSCALL_SYMLINKAT, 36);
-syscall_id!(SYSCALL_FSTATFS, 44);
-syscall_id!(SYSCALL_TRUNCATE, 45);
-syscall_id!(SYSCALL_WAITID, 95);
-syscall_id!(SYSCALL_SOCKET_PAIR, 199);
-syscall_id!(SYSCALL_MKDIR, 83);
-syscall_id!(SYSCALL_RMDIR, 84);
-syscall_id!(SYSCALL_UNLINK, 87);
-syscall_id!(SYSCALL_RENAMEAT, 38);
+#[cfg(target_arch = "x86_64")]
+mod nr {
+    pub const SYSCALL_READ: usize = 0;
+    pub const SYSCALL_WRITE: usize = 1;
+    pub const SYSCALL_OPENAT: usize = 257;
+    pub const SYSCALL_CLOSE: usize = 3;
+    pub const SYSCALL_GETCWD: usize = 79;
+    pub const SYSCALL_CHDIR: usize = 80;
+    pub const SYSCALL_MKDIR: usize = 83;
+    pub const SYSCALL_LINKAT: usize = 265;
+    pub const SYSCALL_UNLINKAT: usize = 263;
+    pub const SYSCALL_SYMLINKAT: usize = 266;
+    pub const SYSCALL_READLINKAT: usize = 267;
+    pub const SYSCALL_FSTATAT: usize = 262;
+    pub const SYSCALL_FSTATFS: usize = 138;
+    pub const SYSCALL_STATFS: usize = 137;
+    pub const SYSCALL_MKDIRAT: usize = 258;
+    pub const SYSCALL_RENAMEAT: usize = 264;
+    pub const SYSCALL_LSEEK: usize = 8;
+    pub const SYSCALL_FSTAT: usize = 5;
+    pub const SYSCALL_GETDENTS: usize = 217;
+    pub const SYSCALL_SETXATTR: usize = 188;
+    pub const SYSCALL_LSETXATTR: usize = 189;
+    pub const SYSCALL_FSETXATTR: usize = 190;
+    pub const SYSCALL_GETXATTR: usize = 191;
+    pub const SYSCALL_LGETXATTR: usize = 192;
+    pub const SYSCALL_FGETXATTR: usize = 193;
+    pub const SYSCALL_LISTXATTR: usize = 194;
+    pub const SYSCALL_LLISTXATTR: usize = 195;
+    pub const SYSCALL_FLISTXATTR: usize = 196;
+    pub const SYSCALL_REMOVEXATTR: usize = 197;
+    pub const SYSCALL_LREMOVEXATTR: usize = 198;
+    pub const SYSCALL_FREMOVEXATTR: usize = 199;
+    pub const SYSCALL_TRUNCATE: usize = 76;
+    pub const SYSCALL_FTRUNCATE: usize = 77;
+    pub const SYSCALL_PIPE: usize = 293;
+    pub const SYSCALL_DUP: usize = 32;
+    pub const SYSCALL_DUP3: usize = 292;
+    pub const SYSCALL_BRK: usize = 12;
+    pub const SYSCALL_MMAP: usize = 9;
+    pub const SYSCALL_MUNMAP: usize = 11;
+    pub const SYSCALL_EXIT: usize = 60;
+    pub const SYSCALL_YIELD: usize = 24;
+    pub const SYSCALL_GET_TIME: usize = 96;
+    pub const SYSCALL_GETPID: usize = 39;
+    pub const SYSCALL_GETTID: usize = 186;
+    pub const SYSCALL_FORK: usize = 57;
+    pub const SYSCALL_EXEC: usize = 59;
+    pub const SYSCALL_WAITPID: usize = 61;
+    pub const SYSCALL_WAITID: usize = 247;
+    pub const SYSCALL_SOCKET: usize = 41;
+    pub const SYSCALL_SOCKET_PAIR: usize = 53;
+    pub const SYSCALL_BIND: usize = 49;
+    pub const SYSCALL_LISTEN: usize = 50;
+    pub const SYSCALL_ACCEPT: usize = 43;
+    pub const SYSCALL_CONNECT: usize = 42;
+    pub const SYSCALL_GET_SOCKNAME: usize = 51;
+    pub const SYSCALL_GET_PEERNAME: usize = 52;
+    pub const SYSCALL_SENDTO: usize = 44;
+    pub const SYSCALL_RECVFROM: usize = 45;
+    pub const SYSCALL_SET_SOCKOPT: usize = 54;
+    pub const SYSCALL_GET_SOCKOPT: usize = 55;
+    pub const SYSCALL_SHUTDOWN: usize = 48;
+    pub const SYSCALL_MOUNT: usize = 165;
+    pub const SYSCALL_NANO_SLEEP: usize = 35;
+}
 
-// 与历史命名保持兼容，避免改动上层接口。
-const SYSCALL_PIPE: usize = SYSCALL_PIPE2;
-const SYSCALL_GETDENTS: usize = SYSCALL_GETDENTS64;
-const SYSCALL_GET_TIME: usize = SYSCALL_GET_TIME_OF_DAY;
-const SYSCALL_FORK: usize = SYSCALL_CLONE;
-const SYSCALL_EXEC: usize = SYSCALL_EXECVE;
-const SYSCALL_WAITPID: usize = SYSCALL_WAIT4;
-const SYSCALL_GET_SOCKNAME: usize = SYSCALL_GETSOCKNAME;
-const SYSCALL_GET_PEERNAME: usize = SYSCALL_GETPEERNAME;
-const SYSCALL_SET_SOCKOPT: usize = SYSCALL_SETSOCKOPT;
-const SYSCALL_GET_SOCKOPT: usize = SYSCALL_GETSOCKOPT;
-const SYSCALL_NANO_SLEEP: usize = SYSCALL_NANOSLEEP;
+#[cfg(not(target_arch = "x86_64"))]
+mod nr {
+    pub const SYSCALL_READ: usize = pconst::SYSCALL_READ;
+    pub const SYSCALL_WRITE: usize = pconst::SYSCALL_WRITE;
+    pub const SYSCALL_OPENAT: usize = pconst::SYSCALL_OPENAT;
+    pub const SYSCALL_CLOSE: usize = pconst::SYSCALL_CLOSE;
+    pub const SYSCALL_GETCWD: usize = pconst::SYSCALL_GETCWD;
+    pub const SYSCALL_CHDIR: usize = pconst::SYSCALL_CHDIR;
+    pub const SYSCALL_MKDIR: usize = 83;
+    pub const SYSCALL_LINKAT: usize = pconst::SYSCALL_LINKAT;
+    pub const SYSCALL_UNLINKAT: usize = pconst::SYSCALL_UNLINKAT;
+    pub const SYSCALL_SYMLINKAT: usize = 36;
+    pub const SYSCALL_READLINKAT: usize = pconst::SYSCALL_READLINKAT;
+    pub const SYSCALL_FSTATAT: usize = pconst::SYSCALL_FSTATAT;
+    pub const SYSCALL_FSTATFS: usize = 44;
+    pub const SYSCALL_STATFS: usize = pconst::SYSCALL_STATFS;
+    pub const SYSCALL_MKDIRAT: usize = pconst::SYSCALL_MKDIRAT;
+    pub const SYSCALL_RENAMEAT: usize = 38;
+    pub const SYSCALL_LSEEK: usize = pconst::SYSCALL_LSEEK;
+    pub const SYSCALL_FSTAT: usize = pconst::SYSCALL_FSTAT;
+    pub const SYSCALL_GETDENTS: usize = pconst::SYSCALL_GETDENTS64;
+    pub const SYSCALL_SETXATTR: usize = 5;
+    pub const SYSCALL_LSETXATTR: usize = 6;
+    pub const SYSCALL_FSETXATTR: usize = 7;
+    pub const SYSCALL_GETXATTR: usize = 8;
+    pub const SYSCALL_LGETXATTR: usize = 9;
+    pub const SYSCALL_FGETXATTR: usize = 10;
+    pub const SYSCALL_LISTXATTR: usize = 11;
+    pub const SYSCALL_LLISTXATTR: usize = 12;
+    pub const SYSCALL_FLISTXATTR: usize = 13;
+    pub const SYSCALL_REMOVEXATTR: usize = 14;
+    pub const SYSCALL_LREMOVEXATTR: usize = 15;
+    pub const SYSCALL_FREMOVEXATTR: usize = 16;
+    pub const SYSCALL_TRUNCATE: usize = 45;
+    pub const SYSCALL_FTRUNCATE: usize = pconst::SYSCALL_FTRUNCATE;
+    pub const SYSCALL_PIPE: usize = pconst::SYSCALL_PIPE2;
+    pub const SYSCALL_DUP: usize = pconst::SYSCALL_DUP;
+    pub const SYSCALL_DUP3: usize = pconst::SYSCALL_DUP3;
+    pub const SYSCALL_BRK: usize = pconst::SYSCALL_BRK;
+    pub const SYSCALL_MMAP: usize = pconst::SYSCALL_MMAP;
+    pub const SYSCALL_MUNMAP: usize = pconst::SYSCALL_MUNMAP;
+    pub const SYSCALL_EXIT: usize = pconst::SYSCALL_EXIT;
+    pub const SYSCALL_YIELD: usize = pconst::SYSCALL_YIELD;
+    pub const SYSCALL_GET_TIME: usize = pconst::SYSCALL_GET_TIME_OF_DAY;
+    pub const SYSCALL_GETPID: usize = pconst::SYSCALL_GETPID;
+    pub const SYSCALL_GETTID: usize = pconst::SYSCALL_GETTID;
+    pub const SYSCALL_FORK: usize = pconst::SYSCALL_CLONE;
+    pub const SYSCALL_EXEC: usize = pconst::SYSCALL_EXECVE;
+    pub const SYSCALL_WAITPID: usize = pconst::SYSCALL_WAIT4;
+    pub const SYSCALL_WAITID: usize = 95;
+    pub const SYSCALL_SOCKET: usize = pconst::SYSCALL_SOCKET;
+    pub const SYSCALL_SOCKET_PAIR: usize = pconst::SYSCALL_SOCKETPAIR;
+    pub const SYSCALL_BIND: usize = pconst::SYSCALL_BIND;
+    pub const SYSCALL_LISTEN: usize = pconst::SYSCALL_LISTEN;
+    pub const SYSCALL_ACCEPT: usize = pconst::SYSCALL_ACCEPT;
+    pub const SYSCALL_CONNECT: usize = pconst::SYSCALL_CONNECT;
+    pub const SYSCALL_GET_SOCKNAME: usize = pconst::SYSCALL_GETSOCKNAME;
+    pub const SYSCALL_GET_PEERNAME: usize = pconst::SYSCALL_GETPEERNAME;
+    pub const SYSCALL_SENDTO: usize = pconst::SYSCALL_SENDTO;
+    pub const SYSCALL_RECVFROM: usize = pconst::SYSCALL_RECVFROM;
+    pub const SYSCALL_SET_SOCKOPT: usize = pconst::SYSCALL_SETSOCKOPT;
+    pub const SYSCALL_GET_SOCKOPT: usize = pconst::SYSCALL_GETSOCKOPT;
+    pub const SYSCALL_SHUTDOWN: usize = pconst::SYSCALL_SHUTDOWN;
+    pub const SYSCALL_MOUNT: usize = pconst::SYSCALL_MOUNT;
+    pub const SYSCALL_NANO_SLEEP: usize = pconst::SYSCALL_NANOSLEEP;
+}
 
 // Alien 私有扩展号段。
-syscall_id!(SYSCALL_LIST, 1000);
-syscall_id!(SYSCALL_CREATE_GLOBAL_BUCKET, 1001);
-syscall_id!(SYSCALL_EXECUTE_USER_FUNC, 1002);
-syscall_id!(SYSCALL_SHOW_DBFS, 1003);
-syscall_id!(SYSCALL_EXECUTE_OPERATE, 1004);
-syscall_id!(SYSCALL_FRAME_BUFFER, 2000);
-syscall_id!(SYSCALL_FRAME_FLUSH, 2001);
-syscall_id!(SYSCALL_EVENT, 2002);
-syscall_id!(SYSCALL_SYSTEMSHUTDOWN, 2003);
+const SYSCALL_LIST: usize = 1000;
+const SYSCALL_CREATE_GLOBAL_BUCKET: usize = 1001;
+const SYSCALL_EXECUTE_USER_FUNC: usize = 1002;
+const SYSCALL_SHOW_DBFS: usize = 1003;
+const SYSCALL_EXECUTE_OPERATE: usize = 1004;
+const SYSCALL_FRAME_BUFFER: usize = 2000;
+const SYSCALL_FRAME_FLUSH: usize = 2001;
+const SYSCALL_EVENT: usize = 2002;
+const SYSCALL_SYSTEMSHUTDOWN: usize = 2003;
 fn syscall(id: usize, args: [usize; 6]) -> isize {
     arch::syscall(id, args)
 }
 
-syscall!(sys_read, SYSCALL_READ, usize, *mut u8, usize);
-syscall!(sys_write, SYSCALL_WRITE, usize, *const u8, usize);
-syscall!(sys_exit, SYSCALL_EXIT, i32);
-syscall!(sys_yield, SYSCALL_YIELD);
-syscall!(sys_getpid, SYSCALL_GETPID);
-syscall!(sys_gettid, SYSCALL_GETTID);
-syscall!(sys_get_time, SYSCALL_GET_TIME, *mut u8);
-syscall!(sys_fork, SYSCALL_FORK);
+syscall!(sys_read, nr::SYSCALL_READ, usize, *mut u8, usize);
+syscall!(sys_write, nr::SYSCALL_WRITE, usize, *const u8, usize);
+syscall!(sys_exit, nr::SYSCALL_EXIT, i32);
+syscall!(sys_yield, nr::SYSCALL_YIELD);
+syscall!(sys_getpid, nr::SYSCALL_GETPID);
+syscall!(sys_gettid, nr::SYSCALL_GETTID);
+syscall!(sys_get_time, nr::SYSCALL_GET_TIME, *mut u8);
+syscall!(sys_fork, nr::SYSCALL_FORK);
 syscall!(
     sys_execve,
-    SYSCALL_EXEC,
+    nr::SYSCALL_EXEC,
     *const u8,
     *const usize,
     *const usize
 );
-syscall!(sys_waitpid, SYSCALL_WAITPID, isize, *mut i32, u32);
+syscall!(sys_waitpid, nr::SYSCALL_WAITPID, isize, *mut i32, u32);
 
 // virtio-mmio-net
-syscall!(sys_socket, SYSCALL_SOCKET, usize, usize, usize);
+syscall!(sys_socket, nr::SYSCALL_SOCKET, usize, usize, usize);
 syscall!(
     sys_socket_pair,
-    SYSCALL_SOCKET_PAIR,
+    nr::SYSCALL_SOCKET_PAIR,
     usize,
     usize,
     usize,
     *const usize
 );
-syscall!(sys_bind, SYSCALL_BIND, usize, *const usize, usize);
-syscall!(sys_listen, SYSCALL_LISTEN, usize, usize);
-syscall!(sys_accept, SYSCALL_ACCEPT, usize, *const usize, *mut usize);
-syscall!(sys_connect, SYSCALL_CONNECT, usize, *const usize, usize);
+syscall!(sys_bind, nr::SYSCALL_BIND, usize, *const usize, usize);
+syscall!(sys_listen, nr::SYSCALL_LISTEN, usize, usize);
+syscall!(sys_accept, nr::SYSCALL_ACCEPT, usize, *const usize, *mut usize);
+syscall!(sys_connect, nr::SYSCALL_CONNECT, usize, *const usize, usize);
 syscall!(
     sys_getsockname,
-    SYSCALL_GET_SOCKNAME,
+    nr::SYSCALL_GET_SOCKNAME,
     usize,
     *mut usize,
     *mut usize
 );
 syscall!(
     sys_getpeername,
-    SYSCALL_GET_PEERNAME,
+    nr::SYSCALL_GET_PEERNAME,
     usize,
     *mut usize,
     *mut usize
@@ -99,7 +196,7 @@ syscall!(
 
 syscall!(
     sys_sendto,
-    SYSCALL_SENDTO,
+    nr::SYSCALL_SENDTO,
     usize,
     *const u8,
     usize,
@@ -109,7 +206,7 @@ syscall!(
 );
 syscall!(
     sys_recvfrom,
-    SYSCALL_RECVFROM,
+    nr::SYSCALL_RECVFROM,
     usize,
     *mut u8,
     usize,
@@ -117,17 +214,17 @@ syscall!(
     *mut usize,
     *mut usize
 );
-syscall!(sys_setsockopt, SYSCALL_SET_SOCKOPT);
-syscall!(sys_getsockopt, SYSCALL_GET_SOCKOPT);
-syscall!(sys_shutdown, SYSCALL_SHUTDOWN, usize, usize);
+syscall!(sys_setsockopt, nr::SYSCALL_SET_SOCKOPT);
+syscall!(sys_getsockopt, nr::SYSCALL_GET_SOCKOPT);
+syscall!(sys_shutdown, nr::SYSCALL_SHUTDOWN, usize, usize);
 
 syscall!(sys_list, SYSCALL_LIST, *const u8);
-syscall!(sys_openat, SYSCALL_OPENAT, isize, *const u8, usize, usize);
-syscall!(sys_close, SYSCALL_CLOSE, usize);
-syscall!(sys_get_cwd, SYSCALL_GETCWD, *mut u8, usize);
-syscall!(sys_chdir, SYSCALL_CHDIR, *const u8);
-syscall!(sys_mkdir, SYSCALL_MKDIR, *const u8);
-syscall!(sys_nanosleep, SYSCALL_NANO_SLEEP, *mut u8, *mut u8);
+syscall!(sys_openat, nr::SYSCALL_OPENAT, isize, *const u8, usize, usize);
+syscall!(sys_close, nr::SYSCALL_CLOSE, usize);
+syscall!(sys_get_cwd, nr::SYSCALL_GETCWD, *mut u8, usize);
+syscall!(sys_chdir, nr::SYSCALL_CHDIR, *const u8);
+syscall!(sys_mkdir, nr::SYSCALL_MKDIR, *const u8);
+syscall!(sys_nanosleep, nr::SYSCALL_NANO_SLEEP, *mut u8, *mut u8);
 
 syscall!(
     sys_create_global_bucket,
@@ -151,35 +248,35 @@ syscall!(
 );
 syscall!(
     sys_mount,
-    SYSCALL_MOUNT,
+    nr::SYSCALL_MOUNT,
     *const u8,
     *const u8,
     *const u8,
     usize,
     *const u8
 );
-syscall!(sys_lseek, SYSCALL_LSEEK, usize, isize, usize);
-syscall!(sys_fstat, SYSCALL_FSTAT, usize, *mut u8);
+syscall!(sys_lseek, nr::SYSCALL_LSEEK, usize, isize, usize);
+syscall!(sys_fstat, nr::SYSCALL_FSTAT, usize, *mut u8);
 syscall!(
     sys_linkat,
-    SYSCALL_LINKAT,
+    nr::SYSCALL_LINKAT,
     isize,
     *const u8,
     usize,
     *const u8,
     usize
 );
-syscall!(sys_unlinkat, SYSCALL_UNLINKAT, isize, *const u8, usize);
+syscall!(sys_unlinkat, nr::SYSCALL_UNLINKAT, isize, *const u8, usize);
 syscall!(
     sys_symlinkat,
-    SYSCALL_SYMLINKAT,
+    nr::SYSCALL_SYMLINKAT,
     *const u8,
     isize,
     *const u8
 );
 syscall!(
     sys_readlinkat,
-    SYSCALL_READLINKAT,
+    nr::SYSCALL_READLINKAT,
     isize,
     *const u8,
     *mut u8,
@@ -187,18 +284,18 @@ syscall!(
 );
 syscall!(
     sys_fstatat,
-    SYSCALL_FSTATAT,
+    nr::SYSCALL_FSTATAT,
     isize,
     *const u8,
     *mut u8,
     usize
 );
-syscall!(sys_fstatfs, SYSCALL_FSTATFS, usize, *mut u8);
-syscall!(sys_statfs, SYSCALL_STATFS, *const u8, *mut u8);
-syscall!(sys_mkdirat, SYSCALL_MKDIRAT, isize, *const u8, usize);
+syscall!(sys_fstatfs, nr::SYSCALL_FSTATFS, usize, *mut u8);
+syscall!(sys_statfs, nr::SYSCALL_STATFS, *const u8, *mut u8);
+syscall!(sys_mkdirat, nr::SYSCALL_MKDIRAT, isize, *const u8, usize);
 syscall!(
     sys_renameat,
-    SYSCALL_RENAMEAT,
+    nr::SYSCALL_RENAMEAT,
     isize,
     *const u8,
     isize,
@@ -207,7 +304,7 @@ syscall!(
 
 syscall!(
     sys_setxattr,
-    SYSCALL_SETXATTR,
+    nr::SYSCALL_SETXATTR,
     *const u8,
     *const u8,
     *const u8,
@@ -216,7 +313,7 @@ syscall!(
 );
 syscall!(
     sys_lsetxattr,
-    SYSCALL_LSETXATTR,
+    nr::SYSCALL_LSETXATTR,
     *const u8,
     *const u8,
     *const u8,
@@ -225,7 +322,7 @@ syscall!(
 );
 syscall!(
     sys_fsetxattr,
-    SYSCALL_FSETXATTR,
+    nr::SYSCALL_FSETXATTR,
     usize,
     *const u8,
     *const u8,
@@ -235,7 +332,7 @@ syscall!(
 
 syscall!(
     sys_getxattr,
-    SYSCALL_GETXATTR,
+    nr::SYSCALL_GETXATTR,
     *const u8,
     *const u8,
     *mut u8,
@@ -243,7 +340,7 @@ syscall!(
 );
 syscall!(
     sys_lgetxattr,
-    SYSCALL_LGETXATTR,
+    nr::SYSCALL_LGETXATTR,
     *const u8,
     *const u8,
     *mut u8,
@@ -251,43 +348,43 @@ syscall!(
 );
 syscall!(
     sys_fgetxattr,
-    SYSCALL_FGETXATTR,
+    nr::SYSCALL_FGETXATTR,
     usize,
     *const u8,
     *mut u8,
     usize
 );
 
-syscall!(sys_listxattr, SYSCALL_LISTXATTR, *const u8, *mut u8, usize);
+syscall!(sys_listxattr, nr::SYSCALL_LISTXATTR, *const u8, *mut u8, usize);
 syscall!(
     sys_llistxattr,
-    SYSCALL_LLISTXATTR,
+    nr::SYSCALL_LLISTXATTR,
     *const u8,
     *mut u8,
     usize
 );
-syscall!(sys_flistxattr, SYSCALL_FLISTXATTR, usize, *mut u8, usize);
+syscall!(sys_flistxattr, nr::SYSCALL_FLISTXATTR, usize, *mut u8, usize);
 
-syscall!(sys_removexattr, SYSCALL_REMOVEXATTR, *const u8, *const u8);
-syscall!(sys_lremovexattr, SYSCALL_LREMOVEXATTR, *const u8, *const u8);
-syscall!(sys_fremovexattr, SYSCALL_FREMOVEXATTR, usize, *const u8);
-syscall!(sys_getdents, SYSCALL_GETDENTS, usize, *mut u8, usize);
+syscall!(sys_removexattr, nr::SYSCALL_REMOVEXATTR, *const u8, *const u8);
+syscall!(sys_lremovexattr, nr::SYSCALL_LREMOVEXATTR, *const u8, *const u8);
+syscall!(sys_fremovexattr, nr::SYSCALL_FREMOVEXATTR, usize, *const u8);
+syscall!(sys_getdents, nr::SYSCALL_GETDENTS, usize, *mut u8, usize);
 
-syscall!(sys_truncate, SYSCALL_TRUNCATE, *const u8, usize);
-syscall!(sys_ftruncate, SYSCALL_FTRUNCATE, usize, usize);
+syscall!(sys_truncate, nr::SYSCALL_TRUNCATE, *const u8, usize);
+syscall!(sys_ftruncate, nr::SYSCALL_FTRUNCATE, usize, usize);
 
 // ipc
-syscall!(sys_pipe, SYSCALL_PIPE, *mut u32, usize);
-syscall!(sys_dup, SYSCALL_DUP, usize);
-syscall!(sys_dup3, SYSCALL_DUP3, usize, usize, usize);
+syscall!(sys_pipe, nr::SYSCALL_PIPE, *mut u32, usize);
+syscall!(sys_dup, nr::SYSCALL_DUP, usize);
+syscall!(sys_dup3, nr::SYSCALL_DUP3, usize, usize, usize);
 
 // alloc
-syscall!(sys_brk, SYSCALL_BRK, usize);
+syscall!(sys_brk, nr::SYSCALL_BRK, usize);
 
 // memory
 syscall!(
     sys_mmap,
-    SYSCALL_MMAP,
+    nr::SYSCALL_MMAP,
     usize,
     usize,
     usize,
@@ -295,7 +392,7 @@ syscall!(
     usize,
     usize
 );
-syscall!(sys_munmap, SYSCALL_MUNMAP, usize, usize);
+syscall!(sys_munmap, nr::SYSCALL_MUNMAP, usize, usize);
 syscall!(sys_setpriority, 140, i32, u32, i32);
 syscall!(sys_getpriority, 141, i32, u32);
 
@@ -317,16 +414,3 @@ syscall!(
 );
 
 syscall!(sys_out_mask, 2003);
-
-// 编译期断言：兼容别名必须与 pconst 一致。
-const _: [(); SYSCALL_PIPE] = [(); pconst::SYSCALL_PIPE2];
-const _: [(); SYSCALL_GETDENTS] = [(); pconst::SYSCALL_GETDENTS64];
-const _: [(); SYSCALL_GET_TIME] = [(); pconst::SYSCALL_GET_TIME_OF_DAY];
-const _: [(); SYSCALL_FORK] = [(); pconst::SYSCALL_CLONE];
-const _: [(); SYSCALL_EXEC] = [(); pconst::SYSCALL_EXECVE];
-const _: [(); SYSCALL_WAITPID] = [(); pconst::SYSCALL_WAIT4];
-const _: [(); SYSCALL_GET_SOCKNAME] = [(); pconst::SYSCALL_GETSOCKNAME];
-const _: [(); SYSCALL_GET_PEERNAME] = [(); pconst::SYSCALL_GETPEERNAME];
-const _: [(); SYSCALL_SET_SOCKOPT] = [(); pconst::SYSCALL_SETSOCKOPT];
-const _: [(); SYSCALL_GET_SOCKOPT] = [(); pconst::SYSCALL_GETSOCKOPT];
-const _: [(); SYSCALL_NANO_SLEEP] = [(); pconst::SYSCALL_NANOSLEEP];

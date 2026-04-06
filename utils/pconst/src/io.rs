@@ -111,6 +111,31 @@ impl Default for FsStat {
     }
 }
 
+#[cfg(target_arch = "x86_64")]
+#[derive(Debug, Clone, Copy, Default, Pod)]
+#[repr(C)]
+pub struct FileStat {
+    pub st_dev: u64,
+    pub st_ino: u64,
+    pub st_nlink: u64,
+    pub st_mode: u32,
+    pub st_uid: u32,
+    pub st_gid: u32,
+    pub __pad0: u32,
+    pub st_rdev: u64,
+    pub st_size: u64,
+    pub st_blksize: u64,
+    pub st_blocks: u64,
+    pub st_atime_sec: u64,
+    pub st_atime_nsec: u64,
+    pub st_mtime_sec: u64,
+    pub st_mtime_nsec: u64,
+    pub st_ctime_sec: u64,
+    pub st_ctime_nsec: u64,
+    pub __unused: [u64; 3],
+} //144
+
+#[cfg(not(target_arch = "x86_64"))]
 #[derive(Debug, Clone, Copy, Default, Pod)]
 #[repr(C)]
 pub struct FileStat {

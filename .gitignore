@@ -27,3 +27,5 @@ reference
 diskfs
 AGENTS.md
 task_list.md
+迁移文档.md
+syscall_abi_x86_64_vs_riscv64.md

@@ -298,9 +298,21 @@ pub const SYSCALL_MEMBARRIER: usize = 283;
 pub const SYSCALL_FACCESSAT2: usize = 439;
 pub const SYSCALL_SHUTDOWN: usize = 210;
 pub const SYSCALL_COPY_FILE_RANGE: usize = 285;
+pub const SYSCALL_LOAD_DOMAIN: usize = 888;
+pub const SYSCALL_REPLACE_DOMAIN: usize = 889;
+pub const SYSCALL_FRAMEBUFFER: usize = 2000;
+pub const SYSCALL_FRAMEBUFFER_FLUSH: usize = 2001;
+pub const SYSCALL_EVENT_GET: usize = 2002;
+pub const SYSCALL_DOMAIN_TEST: usize = 2003;
 
 pub fn syscall_name(id: usize) -> &'static str {
     match id {
+        SYSCALL_DOMAIN_TEST => "domain_test",
+        SYSCALL_EVENT_GET => "event_get",
+        SYSCALL_FRAMEBUFFER_FLUSH => "framebuffer_flush",
+        SYSCALL_FRAMEBUFFER => "framebuffer",
+        SYSCALL_REPLACE_DOMAIN => "replace_domain",
+        SYSCALL_LOAD_DOMAIN => "load_domain",
         SYSCALL_COPY_FILE_RANGE => "copy_file_range",
         SYSCALL_GETRANDOM => "getrandom",
         SYSCALL_SOCKETPAIR => "socketpair",
