@@ -206,6 +206,7 @@ impl<R: VfsRawMutex + 'static> VfsInode for FatFsDirInode<R> {
             })
             .ok_or(VfsError::NoEntry)?;
         let entry = find.map_err(|_| VfsError::IoError)?;
+        let perm_attr = entry.attributes();
 
         if entry.is_dir() {
             let new_dir = dir
@@ -218,7 +219,7 @@ impl<R: VfsRawMutex + 'static> VfsInode for FatFsDirInode<R> {
                     &self.dir,
                     new_dir,
                     &self.attr.sb.upgrade().unwrap(),
-                    VfsNodePerm::default_dir(),
+                    super::fat_dir_perm(perm_attr),
                 );
                 let inode = Arc::new(inode);
                 inode_cache.insert(name.to_string(), inode.clone());
@@ -237,7 +238,7 @@ impl<R: VfsRawMutex + 'static> VfsInode for FatFsDirInode<R> {
                 file,
                 &self.attr.sb.upgrade().unwrap(),
                 name.to_string(),
-                VfsNodePerm::default_file(),
+                super::fat_file_perm(perm_attr),
             );
             let inode = Arc::new(inode);
             inode_cache.insert(name.to_string(), inode.clone());

@@ -18,7 +18,10 @@ use vfscore::{
 };
 
 use super::*;
-use crate::{device::FatDevice, inode::FatFsDirInode};
+use crate::{
+    device::FatDevice,
+    inode::{fat_root_dir_perm, FatFsDirInode},
+};
 
 pub struct FatFs<T: Send + Sync, R: VfsRawMutex> {
     #[allow(unused)]
@@ -125,7 +128,7 @@ impl<R: VfsRawMutex + 'static> FatFsSuperBlock<R> {
             &root_disk_dir.clone(),
             root_disk_dir,
             &sb,
-            "rwxrwxrwx".into(),
+            fat_root_dir_perm(),
         ));
         sb.root.lock().replace(root_inode.clone());
         let parent = Weak::<UniFsDentry<R>>::new();
