@@ -36,7 +36,7 @@
 //! table.do_call(1, &[0, 8 * 8, data.as_ptr() as usize, 0, 0, 0]);
 //!```
 
-#![cfg_attr(not(feature = "test"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(non_snake_case)]
 #![deny(missing_docs)]
 extern crate alloc;

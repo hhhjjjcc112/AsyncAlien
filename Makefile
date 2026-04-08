@@ -86,7 +86,18 @@ MTOOLS_MMD ?= mmd
 MTOOLS_MDIR ?= mdir
 IMG := build/sdcard.img
 FSMOUNT := ./diskfs
-FEATURES := default
+BASE_FEATURES ?= default
+EXTRA_FEATURES ?=
+APIC_TIMER_TEST ?= n
+UNWIND_TEST ?= n
+MEMORY_TEST ?= n
+TRAP_TEST ?= n
+DOMAIN_TEST ?= n
+DOMAIN_SYSCALL_TEST ?= n
+DOMAIN_TASK_TEST ?= n
+DOMAIN_APIC_TEST ?= n
+DOMAIN_UART_TEST ?= n
+DOMAIN_BLOCK_TEST ?= n
 DOMAIN_PROFILE ?=
 name ?=
 VF2 ?= n
@@ -160,9 +171,51 @@ QEMU_ARGS += -initrd ./build/initramfs.cpio.gz
 QEMU_ARGS += -append "rdinit=/init"
 
 ifeq ($(BENCH),y)
-FEATURES += bench
+EXTRA_FEATURES += bench
 endif
 
+FEATURE_TEST_FLAGS :=
+ifeq ($(APIC_TIMER_TEST),y)
+FEATURE_TEST_FLAGS += apic_timer_test
+endif
+
+ifeq ($(UNWIND_TEST),y)
+FEATURE_TEST_FLAGS += unwind_test
+endif
+
+ifeq ($(MEMORY_TEST),y)
+FEATURE_TEST_FLAGS += memory_test
+endif
+
+ifeq ($(TRAP_TEST),y)
+FEATURE_TEST_FLAGS += trap_test
+endif
+
+ifeq ($(DOMAIN_TEST),y)
+FEATURE_TEST_FLAGS += domain_test
+endif
+
+ifeq ($(DOMAIN_SYSCALL_TEST),y)
+FEATURE_TEST_FLAGS += domain_syscall_test
+endif
+
+ifeq ($(DOMAIN_TASK_TEST),y)
+FEATURE_TEST_FLAGS += domain_task_test
+endif
+
+ifeq ($(DOMAIN_APIC_TEST),y)
+FEATURE_TEST_FLAGS += domain_apic_test
+endif
+
+ifeq ($(DOMAIN_UART_TEST),y)
+FEATURE_TEST_FLAGS += domain_uart_test
+endif
+
+ifeq ($(DOMAIN_BLOCK_TEST),y)
+FEATURE_TEST_FLAGS += domain_block_test
+endif
+
+FEATURES := $(strip $(BASE_FEATURES) $(EXTRA_FEATURES) $(FEATURE_TEST_FLAGS))
 FEATURES := $(subst $(space),$(comma),$(FEATURES))
 
 export ARCH
@@ -206,6 +259,18 @@ help:
 	@echo "  X86_CPU=...             x86 CPU model/features (default: max@tcg, host,+x2apic@kvm)"
 	@echo "  GUI=y/n                 Enable GUI (default: n)"
 	@echo "  LOG=level               Log level"
+	@echo "  BASE_FEATURES=...       Base cargo features (default: default)"
+	@echo "  EXTRA_FEATURES=...      Extra cargo features, space separated"
+	@echo "  APIC_TIMER_TEST=y/n     Enable apic_timer_test feature"
+	@echo "  UNWIND_TEST=y/n         Enable unwind_test feature"
+	@echo "  MEMORY_TEST=y/n         Enable memory_test feature"
+	@echo "  TRAP_TEST=y/n           Enable trap_test feature"
+	@echo "  DOMAIN_TEST=y/n         Enable domain_test umbrella feature"
+	@echo "  DOMAIN_SYSCALL_TEST=y/n Enable domain_syscall_test feature"
+	@echo "  DOMAIN_TASK_TEST=y/n    Enable domain_task_test feature"
+	@echo "  DOMAIN_APIC_TEST=y/n    Enable domain_apic_test feature"
+	@echo "  DOMAIN_UART_TEST=y/n    Enable domain_uart_test feature"
+	@echo "  DOMAIN_BLOCK_TEST=y/n   Enable domain_block_test feature"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
 	@echo ""
 	@echo "Examples:"
@@ -223,6 +288,7 @@ build:
 	@echo "ARCH: $(ARCH)"
 	@echo "PLATFORM: $(PLATFORM)"
 	@echo "TARGET: $(TARGET)"
+	@echo "FEATURES: $(FEATURES)"
 	@echo "SMP: $(SMP)"
 	@echo "VF2_SD: $(VF2_SD)"
 	@#LOG=$(LOG) cargo build --release -p kernel --target $(TARGET) --features $(FEATURES)
@@ -288,6 +354,7 @@ check_mtools:
 user: check_mtools
 	@echo "Building user apps"
 	@make all -C ./user/apps ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
+	@make all -C ./user/tests ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
 	@make all -C ./user/musl ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
 	@echo "Building user apps done"
 

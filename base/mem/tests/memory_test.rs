@@ -6,7 +6,7 @@ use platform::MemIf;
 
 #[inline]
 fn mark_pass(stage: &str) {
-    super::println!("[memory_self_test] pass: {}", stage);
+    super::println!("[memory_test] pass: {}", stage);
 }
 
 #[inline]
@@ -57,14 +57,14 @@ pub fn verify_kernel_page_table_mappings() {
         assert_range_mapped(start, start + size, "alloc_range");
         alloc_range_count += 1;
     }
-    super::println!("[memory_self_test] pass: alloc_ranges mapped, count={}", alloc_range_count);
+    super::println!("[memory_test] pass: alloc_ranges mapped, count={}", alloc_range_count);
 
     let mut device_count = 0usize;
     for &(_, start, size) in super::DEVICE_SPACE {
         assert_range_mapped(start, start + size, "device");
         device_count += 1;
     }
-    super::println!("[memory_self_test] pass: device ranges mapped, count={}", device_count);
+    super::println!("[memory_test] pass: device ranges mapped, count={}", device_count);
 
     let root = kernel_page_table_root_paddr();
     assert_eq!(root & (super::FRAME_SIZE - 1), 0, "root page table not aligned");

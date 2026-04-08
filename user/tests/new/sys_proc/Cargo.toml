@@ -1,0 +1,8 @@
+[package]
+name = "sys_proc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+Mstd = { path = "../../../userlib" }
+pconst = { path = "../../../../utils/pconst" }

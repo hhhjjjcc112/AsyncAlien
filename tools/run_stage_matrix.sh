@@ -5,7 +5,7 @@ set -euo pipefail
 # 用法:
 #   tools/run_stage_matrix.sh stage0
 #   tools/run_stage_matrix.sh all
-#   DOMAIN_SELF_TEST=y tools/run_stage_matrix.sh task6
+#   DOMAIN_TEST=y tools/run_stage_matrix.sh task6
 #   tools/run_stage_matrix.sh riscv-min
 #   tools/run_stage_matrix.sh ab-stage4
 
@@ -121,29 +121,48 @@ check_keywords() {
     grep -q "<attach domain>: nic" "$stage_log" || ok=0
   fi
 
-  if [[ "${DOMAIN_SELF_TEST:-n}" == "y" ]]; then
+  if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_SYSCALL_TEST:-n}" == "y" || "${DOMAIN_TASK_TEST:-n}" == "y" || "${DOMAIN_APIC_TEST:-n}" == "y" || "${DOMAIN_UART_TEST:-n}" == "y" || "${DOMAIN_BLOCK_TEST:-n}" == "y" ]]; then
     local l_syscall l_task l_apic l_uart l_block
-    l_syscall="$(grep -n "\[domain_self_test\] pass: syscall" "$stage_log" | head -n1 | cut -d: -f1)"
-    l_task="$(grep -n "\[domain_self_test\] pass: task" "$stage_log" | head -n1 | cut -d: -f1)"
-    l_apic="$(grep -n "\[domain_self_test\] pass: apic" "$stage_log" | head -n1 | cut -d: -f1)"
-    l_uart="$(grep -n "\[domain_self_test\] pass: uart" "$stage_log" | head -n1 | cut -d: -f1)"
 
-    [[ -n "$l_syscall" && -n "$l_task" && -n "$l_apic" && -n "$l_uart" ]] || ok=0
+    if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_SYSCALL_TEST:-n}" == "y" ]]; then
+      l_syscall="$(grep -n "\[domain_syscall_test\] pass: syscall" "$stage_log" | head -n1 | cut -d: -f1)"
+      [[ -n "$l_syscall" ]] || ok=0
+    fi
+
+    if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_TASK_TEST:-n}" == "y" ]]; then
+      l_task="$(grep -n "\[domain_task_test\] pass: task" "$stage_log" | head -n1 | cut -d: -f1)"
+      [[ -n "$l_task" ]] || ok=0
+    fi
+
+    if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_APIC_TEST:-n}" == "y" ]]; then
+      l_apic="$(grep -n "\[domain_apic_test\] pass: apic" "$stage_log" | head -n1 | cut -d: -f1)"
+      [[ -n "$l_apic" ]] || ok=0
+    fi
+
+    if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_UART_TEST:-n}" == "y" ]]; then
+      l_uart="$(grep -n "\[domain_uart_test\] pass: uart" "$stage_log" | head -n1 | cut -d: -f1)"
+      [[ -n "$l_uart" ]] || ok=0
+    fi
+
     if [[ -n "$l_syscall" && -n "$l_task" && -n "$l_apic" && -n "$l_uart" ]]; then
       [[ "$l_syscall" -lt "$l_task" && "$l_task" -lt "$l_apic" && "$l_apic" -lt "$l_uart" ]] || ok=0
     fi
 
     if [[ "$stage" == "stage0" ]]; then
-      grep -q "\[domain_self_test\] skip: block" "$stage_log" || ok=0
+      if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_BLOCK_TEST:-n}" == "y" ]]; then
+        grep -q "\[domain_block_test\] skip: block" "$stage_log" || ok=0
+      fi
     else
-      l_block="$(grep -n "\[domain_self_test\] pass: block" "$stage_log" | head -n1 | cut -d: -f1)"
-      [[ -n "$l_block" ]] || ok=0
-      if [[ -n "$l_block" && -n "$l_uart" ]]; then
-        [[ "$l_uart" -lt "$l_block" ]] || ok=0
+      if [[ "${DOMAIN_TEST:-n}" == "y" || "${DOMAIN_BLOCK_TEST:-n}" == "y" ]]; then
+        l_block="$(grep -n "\[domain_block_test\] pass: block" "$stage_log" | head -n1 | cut -d: -f1)"
+        [[ -n "$l_block" ]] || ok=0
+        if [[ -n "$l_block" && -n "$l_uart" ]]; then
+          [[ "$l_uart" -lt "$l_block" ]] || ok=0
+        fi
       fi
     fi
 
-    grep -q "\[domain_self_test\] done" "$stage_log" || ok=0
+    grep -q "\[domain_test\] done" "$stage_log" || ok=0
   fi
 
   return $((1 - ok))

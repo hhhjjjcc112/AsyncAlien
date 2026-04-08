@@ -64,8 +64,8 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     mem::init_memory_system(true);
     trap::init_trap_subsystem();
 
-    #[cfg(all(target_arch = "x86_64", feature = "trap_self_test"))]
-    trap::run_trap_self_test();
+    #[cfg(all(target_arch = "x86_64", feature = "trap_test"))]
+    trap::run_trap_test();
 
     println!("Boot CPU {}", boot_cpu_id);
     let machine_info = platform::platform_machine_info();
@@ -85,7 +85,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 
     SECONDARY_RUN_RELEASED.store(true, Ordering::Release);
 
-    #[cfg(feature = "test")]
+    #[cfg(feature = "unwind_test")]
     panic::test_unwind();
     timer::set_next_trigger();
     println!("Begin run task...");

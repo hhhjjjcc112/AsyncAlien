@@ -61,11 +61,25 @@ x86-pci = { path = "../utils/x86-pci" }
 default = ["rust-unwind", "time-tick"]
 rust-unwind = ["dep:unwinding"]
 bench = []
-test = []
+apic_timer_test = ["platform/apic_timer_test"]
+unwind_test = []
 time-tick = []
-memory_self_test = ["mem/memory_self_test"]
-trap_self_test = []
-domain_self_test = []
+memory_test = ["mem/memory_test"]
+trap_test = []
+domain_test = [
+    "domain_syscall_test",
+    "domain_task_test",
+    "domain_apic_test",
+    "domain_uart_test",
+    "domain_block_test",
+    "domain_net_test",
+]
+domain_syscall_test = []
+domain_task_test = []
+domain_apic_test = []
+domain_uart_test = []
+domain_block_test = []
+domain_net_test = []
 
 
 [lints.rust]

@@ -16,6 +16,9 @@ lazyinit = "0.2"
 memory_addr = "0.4"
 bitflags = "2"
 
+[features]
+apic_timer_test = []
+
 # x86-64 specific dependencies
 [target.'cfg(target_arch = "x86_64")'.dependencies]
 x86_64 = "0.15.4"
@@ -38,4 +41,5 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 	'cfg(plat_vf2)',
 	'cfg(plat_qemu_riscv)',
 	'cfg(plat_qemu_x86_64)',
+	'cfg(plat_vf2_sd)',
 ] }

@@ -1,8 +1,9 @@
 use bitflags::bitflags;
-use pconst::task::WaitOptions;
+use pconst::{signal::SigInfo, task::WaitOptions};
 
 use crate::syscall::{
-    sys_execve, sys_exit, sys_fork, sys_getpid, sys_getpriority, sys_setpriority, sys_waitpid,
+    sys_execve, sys_exit, sys_fork, sys_getpid, sys_getpriority, sys_setpriority, sys_waitid,
+    sys_waitpid,
 };
 
 pub fn exit(exit_code: i32) -> ! {
@@ -32,6 +33,10 @@ pub fn wait(exit_code: &mut i32, option: WaitOptions) -> isize {
 
 pub fn waitpid(pid: usize, exit_code: &mut i32) -> isize {
     sys_waitpid(pid as isize, exit_code as *mut _, 0)
+}
+
+pub fn waitid(which: usize, pid: usize, info: &mut SigInfo, option: WaitOptions) -> isize {
+    sys_waitid(which, pid, info as *mut SigInfo as *mut u8, option.bits() as usize, 0)
 }
 
 pub fn set_priority(which: i32, who: u32, prio: i32) -> isize {

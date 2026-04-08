@@ -4,7 +4,7 @@ PLATFORM: plat_qemu_x86_64
 TARGET: x86_64-unknown-none
 SMP: 2
 VF2_SD: n
-PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG=info cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default,memory_self_test
+PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG=info cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default,memory_test
 warning: function `cpu_num` is never used
   --> base/platform/src/common_x86_64/ap.rs:61:8
    |

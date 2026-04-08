@@ -153,12 +153,12 @@ pub fn kernel_info() -> usize {
 
 static KERNEL_MAP_MAX: AtomicUsize = AtomicUsize::new(0);
 
-#[cfg(feature = "memory_self_test")]
-#[path = "../tests/memory_self_test.rs"]
-mod memory_self_test;
+#[cfg(feature = "memory_test")]
+#[path = "../tests/memory_test.rs"]
+mod memory_test;
 
-#[cfg(feature = "memory_self_test")]
-pub use memory_self_test::{verify_kernel_page_table_activated, verify_kernel_page_table_mappings};
+#[cfg(feature = "memory_test")]
+pub use memory_test::{verify_kernel_page_table_activated, verify_kernel_page_table_mappings};
 
 pub fn build_kernel_address_space() {
     kernel_info();

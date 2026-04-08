@@ -1,6 +1,17 @@
 mod init;
-#[cfg(all(target_arch = "x86_64", feature = "domain_self_test"))]
-mod self_test;
+#[cfg(all(
+    target_arch = "x86_64",
+    any(
+        feature = "domain_test",
+        feature = "domain_syscall_test",
+        feature = "domain_task_test",
+        feature = "domain_apic_test",
+        feature = "domain_uart_test",
+        feature = "domain_block_test",
+        feature = "domain_net_test",
+    )
+))]
+mod test;
 
 extern crate alloc;
 use alloc::{boxed::Box, string::ToString};
@@ -1054,8 +1065,19 @@ pub fn load_domains() -> AlienResult<()> {
     #[cfg(target_arch = "x86_64")]
     let apic = init_device()?;
 
-    #[cfg(all(target_arch = "x86_64", feature = "domain_self_test"))]
-    self_test::run()?;
+    #[cfg(all(
+        target_arch = "x86_64",
+        any(
+            feature = "domain_test",
+            feature = "domain_syscall_test",
+            feature = "domain_task_test",
+            feature = "domain_apic_test",
+            feature = "domain_uart_test",
+            feature = "domain_block_test",
+            feature = "domain_net_test",
+        )
+    ))]
+    test::run()?;
 
     devfs.init_by_box(Box::new(()))?;
     fatfs.init_by_box(Box::new(()))?;

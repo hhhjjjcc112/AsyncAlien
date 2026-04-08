@@ -5063,12 +5063,49 @@ dependencies = [
 ]
 
 [[package]]
+name = "sys_fs"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+]
+
+[[package]]
+name = "sys_link"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+]
+
+[[package]]
+name = "sys_proc"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+ "pconst",
+]
+
+[[package]]
+name = "sys_time"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+ "pconst",
+]
+
+[[package]]
 name = "syscall-table"
 version = "0.1.0"
 dependencies = [
  "inventory",
  "paste",
  "systable-macro-derive",
+]
+
+[[package]]
+name = "syscall_all"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
 ]
 
 [[package]]

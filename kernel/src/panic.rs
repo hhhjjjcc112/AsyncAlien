@@ -18,7 +18,7 @@ fn panic(info: &PanicInfo) -> ! {
     system_shutdown();
 }
 
-#[cfg(feature = "test")]
+#[cfg(feature = "unwind_test")]
 pub fn test_unwind() {
     struct UnwindTest;
     impl Drop for UnwindTest {

@@ -64,7 +64,7 @@ pub enum Fcntl64Cmd {
 }
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Pod)]
 pub struct FsStat {
     /// 是个 magic number，每个知名的 fs 都各有定义，但显然我们没有
     pub f_type: i64,

@@ -164,6 +164,7 @@ syscall!(
     *const usize
 );
 syscall!(sys_waitpid, nr::SYSCALL_WAITPID, isize, *mut i32, u32);
+syscall!(sys_waitid, nr::SYSCALL_WAITID, usize, usize, *mut u8, usize, usize);
 
 // virtio-mmio-net
 syscall!(sys_socket, nr::SYSCALL_SOCKET, usize, usize, usize);

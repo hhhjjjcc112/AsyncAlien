@@ -8,8 +8,8 @@ use crate::{task_domain, timer};
 #[cfg(target_arch = "riscv64")]
 use crate::plic_domain;
 
-#[cfg(feature = "trap_self_test")]
-use super::self_test;
+#[cfg(feature = "trap_test")]
+use super::test;
 use super::{
     context::{fault_address, X86TrapFrame, X86TrapFrameExt}, syscall,
     user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult}, vectors,
@@ -22,6 +22,12 @@ unsafe extern "C" {
 
 static USER_TRAP_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 static USER_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+/// 统计用户态APIC timer中断触发次数
+#[cfg(feature = "apic_timer_test")]
+static APIC_TIMER_USER_TRAP_COUNT: AtomicUsize = AtomicUsize::new(0);
+/// 统计内核态APIC timer中断触发次数
+#[cfg(feature = "apic_timer_test")]
+static APIC_TIMER_KERNEL_TRAP_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// 内核态 trap 处理函数
 /// 由 trampoline.asm 中的 .Ltrap_common 直接调用
@@ -66,10 +72,10 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
         vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
         vectors::BREAKPOINT => {
-            #[cfg(feature = "trap_self_test")]
-            self_test::record_breakpoint(frame.rip);
-            #[cfg(feature = "trap_self_test")]
-            println!("[trap_self_test] breakpoint entered at RIP={:#x}", frame.rip);
+            #[cfg(feature = "trap_test")]
+            test::record_breakpoint(frame.rip);
+            #[cfg(feature = "trap_test")]
+            println!("[trap_test] breakpoint entered at RIP={:#x}", frame.rip);
             log::info!("Breakpoint at RIP={:#x}", frame.rip);
         }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
@@ -104,8 +110,16 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         vectors::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
 
         vectors::APIC_TIMER => {
-            trace!("APIC timer interrupt");
-            timer::set_next_trigger();
+            #[cfg(feature = "apic_timer_test")]
+            {
+                let count = APIC_TIMER_USER_TRAP_COUNT.fetch_add(1, Ordering::Relaxed);
+                if count % 10 == 0 {
+                    println!("[apic_timer_test] 用户态中断触发 count={}", count);
+                }
+            }
+            if platform::config::APIC_TIMER_ONESHOT {
+                timer::set_next_trigger();
+            }
             crate::task::yield_now();
             send_apic_eoi();
         }
@@ -151,10 +165,10 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
         vectors::DEBUG => log::debug!("Debug exception at RIP={:#x}", frame.rip),
         vectors::BREAKPOINT => {
-            #[cfg(feature = "trap_self_test")]
-            self_test::record_breakpoint(frame.rip);
-            #[cfg(feature = "trap_self_test")]
-            println!("[trap_self_test] breakpoint entered at RIP={:#x}", frame.rip);
+            #[cfg(feature = "trap_test")]
+            test::record_breakpoint(frame.rip);
+            #[cfg(feature = "trap_test")]
+            println!("[trap_test] breakpoint entered at RIP={:#x}", frame.rip);
             log::info!("Breakpoint at RIP={:#x}", frame.rip);
         }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
@@ -174,8 +188,16 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::DOUBLE_FAULT => panic!("Double fault! RIP={:#x}", frame.rip),
 
         vectors::APIC_TIMER => {
-            trace!("APIC timer interrupt");
-            timer::set_next_trigger();
+            #[cfg(feature = "apic_timer_test")]
+            {
+                let count = APIC_TIMER_KERNEL_TRAP_COUNT.fetch_add(1, Ordering::Relaxed);
+                if count % 10 == 0 {
+                    println!("[apic_timer_test] 内核态中断触发 count={}", count);
+                }
+            }
+            if platform::config::APIC_TIMER_ONESHOT {
+                timer::set_next_trigger();
+            }
             send_apic_eoi();
         }
 

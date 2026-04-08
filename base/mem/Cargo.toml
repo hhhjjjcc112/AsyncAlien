@@ -24,4 +24,4 @@ heapless = "0.8"
 default = ["pager_bitmap",]
 pager_buddy = ["pager/buddy"]
 pager_bitmap = ["pager/bitmap"]
-memory_self_test = []
+memory_test = []

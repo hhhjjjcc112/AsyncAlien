@@ -43,16 +43,16 @@ pub fn init_memory_system(is_first_cpu: bool) {
         println!("Frame allocator init success");
         println!("Talloc allocator init success");
         vmm::build_kernel_address_space();
-        #[cfg(feature = "memory_self_test")]
+        #[cfg(feature = "memory_test")]
         vmm::verify_kernel_page_table_mappings();
         println!("Build kernel address space success");
         activate_paging_mode(vmm::kernel_page_table_token());
-        #[cfg(feature = "memory_self_test")]
+        #[cfg(feature = "memory_test")]
         vmm::verify_kernel_page_table_activated();
         println!("Activate paging mode success");
     } else {
         activate_paging_mode(vmm::kernel_page_table_token());
-        #[cfg(feature = "memory_self_test")]
+        #[cfg(feature = "memory_test")]
         vmm::verify_kernel_page_table_activated();
     }
 }
