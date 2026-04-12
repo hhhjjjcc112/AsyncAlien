@@ -24,58 +24,88 @@ pub enum CommonDeviceType {
     Virtio(String),
 }
 
-fn info_locator(info: &CommonDeviceInfo) -> DeviceLocator {
-    let start = info.address_range.start.as_usize();
-    let end = info.address_range.end.as_usize();
-    if end <= 0x1_0000 && start < end {
-        DeviceLocator::Pio((start as u16)..(end as u16))
-    } else {
-        DeviceLocator::Mmio(info.address_range.clone())
-    }
-}
-
 fn from_common_device(ty: CommonDeviceType) -> DiscoveredDevice {
     match ty {
-        CommonDeviceType::LocalApic(info) => DiscoveredDevice {
-            class: DeviceClass::LocalApic,
-            locator: info_locator(&info),
-            transport: DeviceTransport::Platform,
-            irq: info.irq,
-            compatible: info.compatible,
-            fw_source: FirmwareSource::Acpi,
-        },
-        CommonDeviceType::IoApic(info) => DiscoveredDevice {
-            class: DeviceClass::IoApic,
-            locator: info_locator(&info),
-            transport: DeviceTransport::Platform,
-            irq: info.irq,
-            compatible: info.compatible,
-            fw_source: FirmwareSource::Acpi,
-        },
-        CommonDeviceType::Uart(info) => DiscoveredDevice {
-            class: DeviceClass::Uart,
-            locator: info_locator(&info),
-            transport: DeviceTransport::Platform,
-            irq: info.irq,
-            compatible: info.compatible,
-            fw_source: FirmwareSource::Acpi,
-        },
-        CommonDeviceType::Rtc(info) => DiscoveredDevice {
-            class: DeviceClass::Rtc,
-            locator: info_locator(&info),
-            transport: DeviceTransport::Platform,
-            irq: info.irq,
-            compatible: info.compatible,
-            fw_source: FirmwareSource::Acpi,
-        },
-        CommonDeviceType::Pci(info) => DiscoveredDevice {
-            class: DeviceClass::PciHost,
-            locator: DeviceLocator::Mmio(info.address_range),
-            transport: DeviceTransport::Pci,
-            irq: info.irq,
-            compatible: info.compatible,
-            fw_source: FirmwareSource::Acpi,
-        },
+        CommonDeviceType::LocalApic(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::LocalApic,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
+        CommonDeviceType::IoApic(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::IoApic,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
+        CommonDeviceType::Uart(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::Uart,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
+        CommonDeviceType::Rtc(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::Rtc,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
+        CommonDeviceType::Pci(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::PciHost,
+                locator,
+                transport: DeviceTransport::Pci,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
         CommonDeviceType::Virtio(bdf) => {
             let locator = x86_pci::parse_bdf(&bdf)
                 .map(|(segment, bus, device, function)| DeviceLocator::PciBdf {
@@ -101,12 +131,14 @@ fn locator_to_info(locator: &DeviceLocator, irq: Option<u32>, compatible: Option
     match locator {
         DeviceLocator::Mmio(range) => Some(CommonDeviceInfo {
             address_range: range.clone(),
+            locator: DeviceLocator::Mmio(range.clone()),
             irq,
             compatible,
         }),
         DeviceLocator::Pio(range) => Some(CommonDeviceInfo {
             address_range: mem::PhysAddr::from(range.start as usize)
                 ..mem::PhysAddr::from(range.end as usize),
+            locator: DeviceLocator::Pio(range.clone()),
             irq,
             compatible,
         }),
@@ -183,6 +215,7 @@ fn fallback_with_aml(base_devices: &mut alloc::vec::Vec<CommonDeviceType>) {
     warn!("[bus][x86_64][fallback] UART missing in ACPI/AML, fallback COM1");
     base_devices.push(CommonDeviceType::Uart(CommonDeviceInfo {
         address_range: mem::PhysAddr::from(0x3f8usize)..mem::PhysAddr::from(0x400usize),
+        locator: DeviceLocator::Pio(0x3f8u16..0x400u16),
         irq: Some(4),
         compatible: Some("ns16550a".into()),
     }));

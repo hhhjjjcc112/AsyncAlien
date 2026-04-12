@@ -23,6 +23,9 @@ pub fn ecam_device(pci_info: CommonDeviceInfo) -> CommonDeviceType {
 /// 把一个 ECAM 区域挂到 PCI 总线对象里。
 /// `pci_init` 的职责只有两步：先把内存映射包成安全访问区，再交给总线统一管理。
 pub fn pci_init(pci_info: CommonDeviceInfo) {
+    if !pci_info.validate_locator_or_warn("x86_64.pci_host") {
+        return;
+    }
     // 步骤1：创建受边界保护的 IO 区域。
     let io_region = SafeIORegion::new(pci_info.address_range.clone());
     // 步骤2：注册到 PCI 总线统一管理。

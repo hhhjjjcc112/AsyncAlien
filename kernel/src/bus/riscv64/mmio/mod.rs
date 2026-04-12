@@ -12,6 +12,9 @@ pub static MMIO_BUS: Mutex<MmioBus> = Mutex::new(MmioBus::new());
 const VIRTIO_MMIO_MAGIC: u32 = 0x74726976;
 
 pub fn register_mmio_device(info: CommonDeviceInfo) {
+    if !info.validate_locator_or_warn("riscv64.mmio") {
+        return;
+    }
     let io_region = SafeIORegion::new(info.address_range.clone());
     let magic = io_region.read_at::<u32>(0).unwrap();
     let device_id = io_region.read_at::<u32>(8).unwrap();

@@ -11,6 +11,9 @@ mod device;
 pub static PLATFORM_BUS: Mutex<PlatformBus> = Mutex::new(PlatformBus::new());
 
 pub fn register_platform_device(info: CommonDeviceInfo, name: &str) {
+    if !info.validate_locator_or_warn(name) {
+        return;
+    }
     let io_region = SafeIORegion::new(info.address_range.clone());
     let platform_device = PlatformCommonDevice::new(io_region, info, name.to_string());
 

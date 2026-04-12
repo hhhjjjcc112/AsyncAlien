@@ -1388,8 +1388,8 @@ version = "0.1.0"
 dependencies = [
  "basic",
  "interface",
+ "safe_uart_16550",
  "shared_heap",
- "uart16550",
 ]
 
 [[package]]
@@ -5586,6 +5586,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "safe_uart_16550"
+version = "0.1.0"
+dependencies = [
+ "io",
+ "uart_16550",
+]
+
+[[package]]
 name = "same-file"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6638,10 +6646,6 @@ dependencies = [
  "bincode",
  "serde",
 ]
-
-[[package]]
-name = "uart16550"
-version = "0.0.1"
 
 [[package]]
 name = "uart8250"

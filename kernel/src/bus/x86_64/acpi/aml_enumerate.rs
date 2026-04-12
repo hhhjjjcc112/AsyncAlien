@@ -8,7 +8,7 @@ use aml::{
 use mem::PhysAddr;
 use spin::Lazy;
 
-use crate::bus::{CommonDeviceInfo, CommonDeviceType};
+use crate::bus::{CommonDeviceInfo, CommonDeviceType, DeviceLocator};
 
 use super::{BusAcpiTables, aml_handler, descriptor_parser};
 
@@ -199,8 +199,25 @@ fn classify_uart_device(
         irq
     );
 
+    let end = address.saturating_add(size);
+    let Ok(start_port) = u16::try_from(address) else {
+        warn!(
+            "[bus][x86_64][acpi][aml] UART io base out of range, skip: {:#x}",
+            address
+        );
+        return None;
+    };
+    let Ok(end_port) = u16::try_from(end) else {
+        warn!(
+            "[bus][x86_64][acpi][aml] UART io end out of range, skip: {:#x}",
+            end
+        );
+        return None;
+    };
+
     Some(CommonDeviceType::Uart(CommonDeviceInfo {
-        address_range: PhysAddr::from(address)..PhysAddr::from(address.saturating_add(size)),
+        address_range: PhysAddr::from(address)..PhysAddr::from(end),
+        locator: DeviceLocator::Pio(start_port..end_port),
         irq,
         compatible: Some("ns16550a".into()),
     }))

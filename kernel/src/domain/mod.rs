@@ -18,6 +18,7 @@ use alloc::{boxed::Box, string::ToString};
 use alloc::sync::Arc;
 
 use basic::bus::mmio::VirtioMmioDeviceType;
+use core::ops::Range;
 use corelib::AlienResult;
 use domain_helper::alloc_domain_id;
 use interface::*;
@@ -25,19 +26,74 @@ use log::warn;
 use shared_heap::DVec;
 
 use crate::{
+    bus::DeviceLocator,
     create_domain,
     domain::init::init_domains,
     domain_helper,
     domain_helper::{DOMAIN_DATA_ALLOCATOR, SHARED_HEAP_ALLOCATOR},
     domain_loader::creator::*,
     domain_proxy::*,
-    mmio_bus, pci_bus, platform_bus, register_domain,
+    mmio_bus, platform_bus, register_domain,
 };
+#[cfg(target_arch = "x86_64")]
+use crate::pci_bus;
 
 /// set the kernel to the specific domain
 fn init_kernel_domain() {
     shared_heap::init(SHARED_HEAP_ALLOCATOR, alloc_domain_id());
     storage::init_data_allocator(DOMAIN_DATA_ALLOCATOR);
+}
+
+fn require_mmio_range_or_einval(
+    arch: &str,
+    device_tag: &str,
+    locator: &DeviceLocator,
+) -> AlienResult<Range<usize>> {
+    match locator {
+        DeviceLocator::Mmio(range) => Ok(range.start.as_usize()..range.end.as_usize()),
+        other => {
+            log::error!(
+                "[locator][{}][{}] expected MMIO locator, got {:?}, reject with EINVAL",
+                arch,
+                device_tag,
+                other
+            );
+            Err(crate::error::AlienError::EINVAL)
+        }
+    }
+}
+
+fn try_virtio_mmio_range_or_skip(
+    arch: &str,
+    device_type: VirtioMmioDeviceType,
+    mmio_range: Option<Range<mem::PhysAddr>>,
+    locator: &DeviceLocator,
+) -> AlienResult<Option<Range<usize>>> {
+    if let Some(range) = mmio_range {
+        return Ok(Some(range.start.as_usize()..range.end.as_usize()));
+    }
+
+    #[cfg(feature = "strict_locator")]
+    {
+        log::error!(
+            "[locator][{}][virtio-mmio:{:?}] expected MMIO locator, got {:?}, strict mode reject with EINVAL",
+            arch,
+            device_type,
+            locator
+        );
+        return Err(crate::error::AlienError::EINVAL);
+    }
+
+    #[cfg(not(feature = "strict_locator"))]
+    {
+        warn!(
+            "[locator][{}][virtio-mmio:{:?}] expected MMIO locator, got {:?}, skip",
+            arch,
+            device_type,
+            locator
+        );
+        Ok(None)
+    }
 }
 
 #[cfg(target_arch = "riscv64")]
@@ -54,9 +110,9 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
 
     let (plic, domain_file_info) =
         create_domain!(PLICDomainProxy, DomainTypeRaw::PLICDomain, "plic")?;
-    let plic_address = plic_device.address_range();
+    let plic_address = require_mmio_range_or_einval("riscv64", "plic", plic_device.locator())?;
     let plic_info = PlicInfo {
-        device_info: plic_address.start.as_usize()..plic_address.end.as_usize(),
+        device_info: plic_address,
         #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
         ty: PlicType::Qemu,
         #[cfg(all(target_arch = "riscv64", plat_vf2))]
@@ -73,8 +129,6 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     let mut nic_irq = 0;
 
     for device in platform_bus.common_devices().iter() {
-        let address = device.address().as_usize();
-        let size = device.io_region().size();
         let irq = device.irq();
         match device.name() {
             "rtc" => {
@@ -84,9 +138,10 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                         continue;
                     }
                 }
+                let rtc_range = require_mmio_range_or_einval("riscv64", "rtc", device.locator())?;
                 let (rtc, domain_file_info) =
                     create_domain!(RtcDomainProxy, DomainTypeRaw::RtcDomain, "goldfish")?;
-                rtc.init_by_box(Box::new(address..address + size))?;
+                rtc.init_by_box(Box::new(rtc_range))?;
                 register_domain!("rtc", domain_file_info, DomainType::RtcDomain(rtc), true);
                 plic.register_irq(irq.unwrap() as _, &DVec::from_slice("rtc".as_bytes()))?;
             }
@@ -104,7 +159,10 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     _ => panic!("unknown uart device: {}", compatible),
                 };
 
-                uart.init_by_box(Box::new(address..address + size))?;
+                let uart_range =
+                    require_mmio_range_or_einval("riscv64", "uart", device.locator())?;
+
+                uart.init_by_box(Box::new(uart_range))?;
                 register_domain!("uart", domain_file_info, DomainType::UartDomain(uart), true);
 
                 let (buf_uart, domain_file_info) =
@@ -120,12 +178,11 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                 plic.register_irq(irq.unwrap() as _, &DVec::from_slice("buf_uart".as_bytes()))?;
             }
             "sdcard" => {
+                let sdcard_range =
+                    require_mmio_range_or_einval("riscv64", "sdcard", device.locator())?;
                 let (sdcard, domain_file_info) =
                     create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "vf2_sd")?;
-                sdcard.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    irq,
-                )))?;
+                sdcard.init_by_box(Box::new(VirtioInitInfo::mmio(sdcard_range, irq)))?;
                 register_domain!(
                     "block",
                     domain_file_info,
@@ -140,8 +197,15 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     }
 
     for device in mmio_bus!().lock().common_devices().iter() {
-        let address = device.address().as_usize();
-        let size = device.io_region().size();
+        let Some(mmio_range) = try_virtio_mmio_range_or_skip(
+            "riscv64",
+            device.device_type(),
+            device.mmio_range(),
+            device.locator(),
+        )?
+        else {
+            continue;
+        };
         match device.device_type() {
             VirtioMmioDeviceType::Network => {
                 let (net_driver, domain_file_info) = create_domain!(
@@ -149,10 +213,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     DomainTypeRaw::NetDeviceDomain,
                     "virtio_net"
                 )?;
-                net_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                net_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let net_domain = DomainType::NetDeviceDomain(net_driver.clone());
                 register_domain!(
                     "virtio_net",
@@ -173,10 +234,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     DomainTypeRaw::BlkDeviceDomain,
                     "virtio_blk"
                 )?;
-                blk_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                blk_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let blk_domain = DomainType::BlkDeviceDomain(blk_driver.clone());
                 register_domain!(
                     "virtio_block",
@@ -197,10 +255,8 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
                     DomainTypeRaw::InputDomain,
                     "virtio_input"
                 )?;
-                input_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                input_driver
+                    .init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let input_name = register_domain!(
                     "virtio_input",
                     domain_file_info,
@@ -237,10 +293,7 @@ fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
             VirtioMmioDeviceType::GPU => {
                 let (gpu_driver, domain_file_info) =
                     create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
-                gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
                 register_domain!(
                     "virtio_gpu",
@@ -340,8 +393,6 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
     );
 
     for device in platform_bus.common_devices().iter() {
-        let address = device.address().as_usize();
-        let size = device.io_region().size();
         let irq = device.irq();
 
         match device.name() {
@@ -363,7 +414,15 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     }
                 };
 
-                uart.init_by_box(Box::new(address..address + size))?;
+                let uart_range = match device.locator() {
+                    DeviceLocator::Pio(range) => usize::from(range.start)..usize::from(range.end),
+                    other => {
+                        log::error!("x86_64 uart locator must be PIO, got {:?}", other);
+                        return Err(crate::error::AlienError::EINVAL);
+                    }
+                };
+
+                uart.init_by_box(Box::new(uart_range))?;
                 register_domain!("uart", domain_file_info, DomainType::UartDomain(uart), true);
 
                 let (buf_uart, domain_file_info) =
@@ -388,10 +447,12 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                 warn!("rtc device detected, rtc domain is not wired yet");
             }
             "ramdisk" => {
+                let ramdisk_range =
+                    require_mmio_range_or_einval("x86_64", "ramdisk", device.locator())?;
                 let (ramdisk, domain_file_info) =
                     create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "mem_block")?;
                 ramdisk.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
+                    ramdisk_range,
                     irq,
                 )))?;
                 #[cfg(not(feature = "bench"))]
@@ -751,8 +812,15 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
     }
 
     for device in mmio_bus!().lock().common_devices().iter() {
-        let address = device.address().as_usize();
-        let size = device.io_region().size();
+        let Some(mmio_range) = try_virtio_mmio_range_or_skip(
+            "x86_64",
+            device.device_type(),
+            device.mmio_range(),
+            device.locator(),
+        )?
+        else {
+            continue;
+        };
         match device.device_type() {
             VirtioMmioDeviceType::Network => {
                 let (net_driver, domain_file_info) = create_domain!(
@@ -760,10 +828,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     DomainTypeRaw::NetDeviceDomain,
                     "virtio_net"
                 )?;
-                net_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                net_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let net_domain = DomainType::NetDeviceDomain(net_driver.clone());
                 register_domain!(
                     "virtio_net",
@@ -785,10 +850,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     DomainTypeRaw::BlkDeviceDomain,
                     "virtio_blk"
                 )?;
-                blk_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                blk_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let blk_domain = DomainType::BlkDeviceDomain(blk_driver.clone());
                 register_domain!(
                     "virtio_block",
@@ -810,10 +872,8 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                     DomainTypeRaw::InputDomain,
                     "virtio_input"
                 )?;
-                input_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                input_driver
+                    .init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let input_name = register_domain!(
                     "virtio_input",
                     domain_file_info,
@@ -850,10 +910,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
             VirtioMmioDeviceType::GPU => {
                 let (gpu_driver, domain_file_info) =
                     create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
-                gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(
-                    address..address + size,
-                    device.irq(),
-                )))?;
+                gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
                 register_domain!(
                     "virtio_gpu",

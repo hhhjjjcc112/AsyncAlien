@@ -5,7 +5,7 @@ use alloc::{string::String, vec::Vec, vec};
 use acpi::AcpiTables;
 use mem::PhysAddr;
 
-use crate::bus::{CommonDeviceInfo, CommonDeviceType, pci::ecam_device};
+use crate::bus::{CommonDeviceInfo, CommonDeviceType, DeviceLocator, pci::ecam_device};
 use self::{
     acpi_enumerate::{acpi_tables, enumerate_apic, enumerate_rtc, enumerate_uart},
     aml_enumerate::enumerate_aml_devices,
@@ -70,6 +70,7 @@ pub fn enumerate_pci_devices() -> Vec<CommonDeviceType> {
     );
     vec![ecam_device(CommonDeviceInfo {
         address_range: PhysAddr::from(base)..PhysAddr::from(base + size),
+        locator: DeviceLocator::Mmio(PhysAddr::from(base)..PhysAddr::from(base + size)),
         irq: None,
         compatible: Some("pci_ecam".into()),
     })]
@@ -79,6 +80,7 @@ pub fn enumerate_pci_devices() -> Vec<CommonDeviceType> {
 fn make_common_device(
     base: usize,
     size: usize,
+    locator: DeviceLocator,
     irq: Option<u32>,
     compatible: Option<&str>,
 ) -> CommonDeviceInfo {
@@ -92,6 +94,7 @@ fn make_common_device(
     );
     CommonDeviceInfo {
         address_range: PhysAddr::from(base)..PhysAddr::from(base + size),
+        locator,
         irq,
         compatible: compatible.map(String::from),
     }

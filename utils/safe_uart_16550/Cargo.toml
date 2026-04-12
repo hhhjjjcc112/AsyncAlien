@@ -1,0 +1,8 @@
+[package]
+name = "safe_uart_16550"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+io = { path = "../../domain-lib/io" }
+uart_16550 = "0.4.0"

@@ -4,7 +4,7 @@ use core::ops::Range;
 use fdt::{standard_nodes::Compatible, Fdt};
 use mem::PhysAddr;
 
-use crate::bus::CommonDeviceInfo;
+use crate::bus::{CommonDeviceInfo, DeviceLocator};
 
 use super::CommonDeviceType;
 
@@ -53,7 +53,8 @@ impl Probe for Fdt<'_> {
                 let irq = u32::from_be_bytes(irq[0..4].try_into().ok().unwrap());
                 let compatible = node.compatible().map(Compatible::first).unwrap();
                 let device_info = CommonDeviceInfo {
-                    address_range: range,
+                    address_range: range.clone(),
+                    locator: DeviceLocator::Mmio(range),
                     irq: Some(irq),
                     compatible: Some(compatible.to_string()),
                 };
@@ -82,7 +83,8 @@ impl Probe for Fdt<'_> {
         let compatible = node.compatible().map(Compatible::first).unwrap();
 
         let device_info = CommonDeviceInfo {
-            address_range: range,
+            address_range: range.clone(),
+            locator: DeviceLocator::Mmio(range),
             irq,
             compatible: Some(compatible.to_string()),
         };

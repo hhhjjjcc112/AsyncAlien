@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 
 use mem::PhysAddr;
 
-use crate::bus::{pci::ecam_device, CommonDeviceInfo, CommonDeviceType};
+use crate::bus::{pci::ecam_device, CommonDeviceInfo, CommonDeviceType, DeviceLocator};
 
 /// 函数说明：执行对应的总线处理步骤。
 pub fn enumerate_pci_devices<H: ::acpi::Handler>(tables: &::acpi::AcpiTables<H>) -> Vec<CommonDeviceType> {
@@ -31,9 +31,11 @@ pub fn enumerate_pci_devices<H: ::acpi::Handler>(tables: &::acpi::AcpiTables<H>)
             }
             let bus_count = (bus_end - bus_start) as usize + 1;
             let size = bus_count << 20;
+            let address_range =
+                PhysAddr::from(base as usize)..PhysAddr::from(base as usize + size);
             devices.push(ecam_device(CommonDeviceInfo {
-                address_range: PhysAddr::from(base as usize)
-                    ..PhysAddr::from(base as usize + size),
+                address_range: address_range.clone(),
+                locator: DeviceLocator::Mmio(address_range),
                 irq: None,
                 compatible: Some("pci_ecam".into()),
             }));
@@ -49,8 +51,10 @@ pub fn enumerate_pci_devices<H: ::acpi::Handler>(tables: &::acpi::AcpiTables<H>)
         base,
         base + size
     );
+    let address_range = PhysAddr::from(base)..PhysAddr::from(base + size);
     devices.push(ecam_device(CommonDeviceInfo {
-        address_range: PhysAddr::from(base)..PhysAddr::from(base + size),
+        address_range: address_range.clone(),
+        locator: DeviceLocator::Mmio(address_range),
         irq: None,
         compatible: Some("pci_ecam".into()),
     }));

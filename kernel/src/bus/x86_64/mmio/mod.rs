@@ -13,6 +13,9 @@ const VIRTIO_MMIO_MAGIC: u32 = 0x74726976;
 
 /// 函数说明：执行对应的总线处理步骤。
 pub fn register_mmio_device(info: CommonDeviceInfo) {
+    if !info.validate_locator_or_warn("x86_64.mmio") {
+        return;
+    }
     // 步骤1：读取 virtio-mmio 标识并判断设备是否有效。
     let io_region = SafeIORegion::new(info.address_range.clone());
     let magic = io_region.read_at::<u32>(0).unwrap();

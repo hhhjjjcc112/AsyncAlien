@@ -9,9 +9,10 @@ use acpi::{
     },
 };
 use alloc::vec::Vec;
+use mem::PhysAddr;
 use spin::Once;
 
-use crate::bus::CommonDeviceType;
+use crate::bus::{CommonDeviceType, DeviceLocator};
 
 use super::{BusAcpiTables, acpi_hander, make_common_device};
 
@@ -111,6 +112,9 @@ pub fn enumerate_apic(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
     devices.push(CommonDeviceType::LocalApic(make_common_device(
         lapic_base,
         APIC_MMIO_SIZE,
+        DeviceLocator::Mmio(
+            PhysAddr::from(lapic_base)..PhysAddr::from(lapic_base + APIC_MMIO_SIZE),
+        ),
         None,
         Some("local_apic"),
     )));
@@ -119,6 +123,7 @@ pub fn enumerate_apic(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
         devices.push(CommonDeviceType::IoApic(make_common_device(
             base,
             APIC_MMIO_SIZE,
+            DeviceLocator::Mmio(PhysAddr::from(base)..PhysAddr::from(base + APIC_MMIO_SIZE)),
             None,
             Some("io_apic"),
         )));
@@ -137,14 +142,35 @@ pub fn enumerate_uart(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
         let interface = spcr.interface_type();
         let irq = spcr.irq().map(u32::from).or_else(|| spcr.global_system_interrupt());
 
-        let (base, size) = match spcr.base_address() {
+        let (base, size, locator) = match spcr.base_address() {
             Some(Ok(address)) => {
                 let base = address.address as usize;
                 match address.address_space {
                     // x86 常见 UART 是系统 I/O 端口，按 16550 8 字节窗口处理。
-                    AddressSpace::SystemIo => (base, 8),
-                    // 对 MMIO UART 保守给 8 字节，避免误扫过大范围。
-                    AddressSpace::SystemMemory => (base, 8),
+                    AddressSpace::SystemIo => {
+                        let end = base.saturating_add(8);
+                        let Ok(start_port) = u16::try_from(base) else {
+                            warn!(
+                                "[bus][x86_64][acpi] SPCR UART port base out of range: {:#x}",
+                                base
+                            );
+                            return devices;
+                        };
+                        let Ok(end_port) = u16::try_from(end) else {
+                            warn!(
+                                "[bus][x86_64][acpi] SPCR UART port end out of range: {:#x}",
+                                end
+                            );
+                            return devices;
+                        };
+                        (base, 8, DeviceLocator::Pio(start_port..end_port))
+                    }
+                    AddressSpace::SystemMemory => {
+                        warn!(
+                            "[bus][x86_64][acpi] SPCR UART in SystemMemory, skip by x86_64 PIO-only policy"
+                        );
+                        return devices;
+                    }
                     other => {
                         warn!(
                             "[bus][x86_64][acpi] SPCR unsupported address space: {:?}",
@@ -178,6 +204,7 @@ pub fn enumerate_uart(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
         devices.push(CommonDeviceType::Uart(make_common_device(
             base,
             size,
+            locator,
             irq,
             Some(compatible),
         )));
@@ -208,6 +235,9 @@ pub fn enumerate_rtc(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
     devices.push(CommonDeviceType::Rtc(make_common_device(
         DEFAULT_RTC_IO_BASE,
         DEFAULT_RTC_IO_SIZE,
+        DeviceLocator::Pio(
+            DEFAULT_RTC_IO_BASE as u16..(DEFAULT_RTC_IO_BASE + DEFAULT_RTC_IO_SIZE) as u16,
+        ),
         Some(DEFAULT_RTC_IRQ),
         Some("cmos_rtc"),
     )));

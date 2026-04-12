@@ -1,9 +1,10 @@
 use alloc::collections::VecDeque;
+use core::ops::Range;
 
 use basic::{bus::mmio::*, io::SafeIORegion};
 use mem::PhysAddr;
 
-use crate::bus::CommonDeviceInfo;
+use crate::bus::{CommonDeviceInfo, DeviceLocator};
 pub struct MmioBus {
     common_devices: VecDeque<MmioCommonDevice>,
     // devices: Vec<Arc<dyn MmioDevice>>,
@@ -69,5 +70,16 @@ impl MmioCommonDevice {
 
     pub fn irq(&self) -> Option<u32> {
         self.info.irq
+    }
+
+    pub fn locator(&self) -> &DeviceLocator {
+        &self.info.locator
+    }
+
+    pub fn mmio_range(&self) -> Option<Range<PhysAddr>> {
+        match self.locator() {
+            DeviceLocator::Mmio(range) => Some(range.clone()),
+            _ => None,
+        }
     }
 }

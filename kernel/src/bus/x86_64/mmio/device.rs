@@ -1,9 +1,10 @@
 use alloc::collections::VecDeque;
+use core::ops::Range;
 
 use basic::{bus::mmio::*, io::SafeIORegion};
 use mem::PhysAddr;
 
-use crate::bus::CommonDeviceInfo;
+use crate::bus::{CommonDeviceInfo, DeviceLocator};
 pub struct MmioBus {
     common_devices: VecDeque<MmioCommonDevice>,
     // devices: Vec<Arc<dyn MmioDevice>>,
@@ -77,5 +78,18 @@ impl MmioCommonDevice {
 /// 函数说明：执行对应的总线处理步骤。
     pub fn irq(&self) -> Option<u32> {
         self.info.irq
+    }
+
+/// 函数说明：返回设备的 I/O 语义定位信息。
+    pub fn locator(&self) -> &DeviceLocator {
+        &self.info.locator
+    }
+
+/// 函数说明：返回 MMIO 物理地址范围。
+    pub fn mmio_range(&self) -> Option<Range<PhysAddr>> {
+        match self.locator() {
+            DeviceLocator::Mmio(range) => Some(range.clone()),
+            _ => None,
+        }
     }
 }

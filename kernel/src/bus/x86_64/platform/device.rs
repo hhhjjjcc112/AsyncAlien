@@ -4,7 +4,7 @@ use core::ops::Range;
 use basic::io::SafeIORegion;
 use mem::PhysAddr;
 
-use crate::bus::CommonDeviceInfo;
+use crate::bus::{CommonDeviceInfo, DeviceLocator};
 
 pub struct PlatformBus {
     common_devices: VecDeque<PlatformCommonDevice>,
@@ -77,8 +77,13 @@ impl PlatformCommonDevice {
         self.info.irq
     }
 
-/// 函数说明：执行对应的总线处理步骤。
+    /// 函数说明：执行对应的总线处理步骤。
     pub fn compatible(&self) -> Option<&str> {
         self.info.compatible.as_deref()
+    }
+
+    /// 函数说明：返回设备的显式 I/O 语义定位信息。
+    pub fn locator(&self) -> &DeviceLocator {
+        &self.info.locator
     }
 }

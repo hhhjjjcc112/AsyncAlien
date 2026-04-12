@@ -80,6 +80,7 @@ domain_apic_test = []
 domain_uart_test = []
 domain_block_test = []
 domain_net_test = []
+strict_locator = []
 
 
 [lints.rust]
