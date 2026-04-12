@@ -73,7 +73,7 @@ fn run_case() -> bool {
         return false;
     }
 
-    if fs.block_size == 0 || fs.total_blocks == 0 {
+    if fs.f_bsize == 0 || fs.f_blocks == 0 {
         println!("[sys_fs] statfs invalid fields");
         let _ = close(fd as usize);
         return false;
@@ -86,7 +86,7 @@ fn run_case() -> bool {
         return false;
     }
 
-    if fs2.block_size == 0 || fs2.total_blocks == 0 {
+    if fs2.f_bsize == 0 || fs2.f_blocks == 0 {
         println!("[sys_fs] statfs on file invalid fields");
         let _ = close(fd as usize);
         return false;

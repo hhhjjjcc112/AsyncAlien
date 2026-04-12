@@ -16,7 +16,7 @@ pub fn socket_pair(
     domain: Domain,
     socket_type: SocketType,
     protocol: usize,
-    sv: *const usize,
+    sv: *mut usize,
 ) -> isize {
     sys_socket_pair(domain as usize, socket_type as usize, protocol, sv)
 }
@@ -96,12 +96,24 @@ pub fn recv(socket: usize, buffer: *mut u8, length: usize, flags: usize) -> isiz
     )
 }
 
-pub fn setsockopt(socket: usize) -> isize {
-    sys_setsockopt()
+pub fn setsockopt(
+    socket: usize,
+    level: usize,
+    opt_name: usize,
+    opt_value: *const u8,
+    opt_len: usize,
+) -> isize {
+    sys_setsockopt(socket, level, opt_name, opt_value, opt_len)
 }
 
-pub fn getsockopt(socket: usize) -> isize {
-    sys_getsockopt()
+pub fn getsockopt(
+    socket: usize,
+    level: usize,
+    opt_name: usize,
+    opt_value: *mut u8,
+    opt_len: *mut usize,
+) -> isize {
+    sys_getsockopt(socket, level, opt_name, opt_value, opt_len)
 }
 
 pub fn shutdown(socket: usize, how: ShutdownFlag) -> isize {

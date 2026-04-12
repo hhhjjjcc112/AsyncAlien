@@ -14,16 +14,17 @@ use Mstd::{
 fn main() -> isize {
     println!("Init process is running");
     if fork() == 0 {
-        let sh = "sh\0";
-        // let bash = "bash\0";
-        exec("/bin/sh\0", &[sh.as_ptr(), 0 as *const u8], BASH_ENV);
-        // exec("/bin/bash\0", &[bash.as_ptr(),0 as *const u8], BASH_ENV);
-        // exec("/tests/shell\0", &[0 as *const u8], BASH_ENV);
+        let launcher = "syscall_all\0";
+        exec("/tests/new/syscall_all\0", &[launcher.as_ptr(), 0 as *const u8], TEST_ENV);
     } else {
         loop {
             let mut exit_code: i32 = 0;
             let tid = wait(&mut exit_code, WaitOptions::WNOHANG);
-            if tid == -1 || tid == 0 || tid == isize::from(ECHILD) {
+                if tid == isize::from(ECHILD) {
+                    println!("[Init] no child left, exit");
+                    break;
+                }
+                if tid == -1 || tid == 0 {
                 m_yield();
                 continue;
             }
@@ -37,8 +38,8 @@ fn main() -> isize {
     0
 }
 
-const BASH_ENV: &[*const u8] = &[
-    "SHELL=/bash\0".as_ptr(),
+const TEST_ENV: &[*const u8] = &[
+    "SHELL=/tests/new/syscall_all\0".as_ptr(),
     "PWD=/\0".as_ptr(),
     "LOGNAME=root\0".as_ptr(),
     "MOTD_SHOWN=pam\0".as_ptr(),
@@ -49,8 +50,8 @@ const BASH_ENV: &[*const u8] = &[
     "SHLVL=0\0".as_ptr(),
     "OLDPWD=/root\0".as_ptr(),
     "PS1=\x1b[1m\x1b[32mAlien\x1b[0m:\x1b[1m\x1b[34m\\w\x1b[0m\\$ \0".as_ptr(),
-    "_=/bin/bash\0".as_ptr(),
-    "PATH=/:/bin:/sbin:/tests:/tests/new\0".as_ptr(),
+    "_=/tests/new/syscall_all\0".as_ptr(),
+    "PATH=/tests/new:/tests:/bin:/sbin:/\0".as_ptr(),
     "LD_LIBRARY_PATH=/tests:/bin\0".as_ptr(),
     core::ptr::null(),
 ];
@@ -81,7 +82,7 @@ fn run_test() {
         let args = [app.as_ptr()];
         let pid = fork();
         if pid == 0 {
-            exec(app, &args, BASH_ENV);
+            exec(app, &args, TEST_ENV);
             exit(0);
         } else {
             m_yield();

@@ -4,6 +4,7 @@
 extern crate alloc;
 
 pub use consts::*;
+pub use syscall_id::*;
 
 pub mod aux;
 mod consts;
@@ -13,5 +14,6 @@ pub mod ipc;
 pub mod net;
 pub mod signal;
 pub mod sys;
+pub mod syscall_id;
 pub mod task;
 pub mod time;

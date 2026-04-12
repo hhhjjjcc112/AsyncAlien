@@ -17,13 +17,12 @@ all: build install
 install:
 	@command -v $(MTOOLS_MCOPY) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MCOPY)，请安装 mtools"; exit 1; }
 	@[ -f "$(IMG)" ] || { echo "[ERR] 镜像 $(IMG) 不存在，请先执行顶层 make fat/sdcard"; exit 1; }
-	@$(MTOOLS_MMD) -i $(IMG) ::/tests >/dev/null 2>&1 || true
 	@echo "Moving apps to $(IMG)"
 	@for dir in $(BUILD_CRATES); do \
 		if [ "$$dir" = "init" ]; then \
-			$(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$$dir ::/tests/init; \
+			$(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$$dir ::/init; \
 		elif [ "$$dir" = "tests" ]; then \
-			$(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$$dir ::/tests/tests; \
+			$(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$$dir ::/tests; \
 		else \
 			$(MTOOLS_MCOPY) -D o -i $(IMG) $(target)$$dir ::/$$dir; \
 		fi; \

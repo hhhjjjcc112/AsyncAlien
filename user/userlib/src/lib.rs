@@ -21,6 +21,7 @@ pub mod ipc;
 mod macros;
 pub mod memory;
 mod panic;
+pub mod random;
 pub mod process;
 pub mod pthread;
 pub mod socket;

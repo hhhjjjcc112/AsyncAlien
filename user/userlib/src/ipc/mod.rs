@@ -1,9 +1,24 @@
 use bitflags::bitflags;
 
-use crate::syscall::{sys_dup, sys_dup3, sys_mmap, sys_munmap, sys_pipe};
+#[cfg(target_arch = "riscv64")]
+use crate::syscall::sys_pipe2;
+#[cfg(target_arch = "x86_64")]
+use crate::syscall::sys_pipe;
+use crate::syscall::{sys_dup, sys_dup3, sys_mmap, sys_munmap};
 
 pub fn pipe(fd: &mut [u32; 2]) -> isize {
-    sys_pipe(fd.as_mut_ptr(), 0)
+    // x86_64 直接走 pipe，riscv64 则回退到 pipe2(flags=0)。
+    #[cfg(target_arch = "x86_64")]
+    {
+        return sys_pipe(fd.as_mut_ptr());
+    }
+
+    #[cfg(target_arch = "riscv64")]
+    {
+        return sys_pipe2(fd.as_mut_ptr(), 0);
+    }
+
+    0
 }
 
 pub fn dup(old_fd: usize) -> isize {

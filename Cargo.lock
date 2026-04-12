@@ -155,16 +155,69 @@ dependencies = [
 ]
 
 [[package]]
+name = "anstream"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "824a212faf96e9acacdbd09febd34438f8f711fb84e09a8916013cd7815ca28d"
+dependencies = [
+ "anstyle",
+ "anstyle-parse",
+ "anstyle-query",
+ "anstyle-wincon",
+ "colorchoice",
+ "is_terminal_polyfill",
+ "utf8parse",
+]
+
+[[package]]
 name = "anstyle"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
 
 [[package]]
+name = "anstyle-parse"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52ce7f38b242319f7cabaa6813055467063ecdc9d355bbb4ce0c68908cd8130e"
+dependencies = [
+ "utf8parse",
+]
+
+[[package]]
+name = "anstyle-query"
+version = "1.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
+dependencies = [
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "anstyle-wincon"
+version = "3.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
+dependencies = [
+ "anstyle",
+ "once_cell_polyfill",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.102"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
+
+[[package]]
+name = "apic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
 
 [[package]]
 name = "arbitrary"
@@ -510,6 +563,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e4b40c7323adcfc0a41c4b88143ed58346ff65a288fc144329c5c45e05d70c6"
 
 [[package]]
+name = "bitfield-struct"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de05f8756f1c68937349406d4632ae96ae35901019b5e59c508d9c38c64715fb"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -586,6 +650,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "buddy_system_allocator"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d44d578cadd17312c75e7d0ef489361f160ace58f7139aa32001fee1a51b89b5"
+dependencies = [
+ "spin 0.9.8",
+]
+
+[[package]]
+name = "buf_input"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
+name = "buf_uart"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
 name = "built"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -640,6 +731,17 @@ name = "bytes"
 version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e748733b7cbc798e1434b6ac524f0c1ff2ab456fe201501e6497c8417a4fc33"
+
+[[package]]
+name = "cache_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "lru",
+ "shared_heap",
+]
 
 [[package]]
 name = "calloop"
@@ -741,6 +843,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap"
+version = "4.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b193af5b67834b676abd72466a96c1024e6a6ad978a1f484bd90b85c94041351"
+dependencies = [
+ "clap_builder",
+ "clap_derive",
+]
+
+[[package]]
+name = "clap_builder"
+version = "4.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "714a53001bf66416adb0e2ef5ac857140e7dc3a0c48fb28b2f10762fc4b5069f"
+dependencies = [
+ "anstream",
+ "anstyle",
+ "clap_lex",
+ "strsim",
+]
+
+[[package]]
+name = "clap_derive"
+version = "4.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1110bd8a634a1ab8cb04345d8d878267d57c3cf1b38d91b71af6686408bbca6a"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "clap_lex"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
+
+[[package]]
 name = "client"
 version = "0.1.0"
 dependencies = [
@@ -773,6 +915,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 
 [[package]]
+name = "colorchoice"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -780,6 +928,18 @@ checksum = "ba5a308b75df32fe02788e748662718f03fde005016435c444eea572398219fd"
 dependencies = [
  "bytes",
  "memchr",
+]
+
+[[package]]
+name = "common_scheduler"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "spin 0.10.0",
+ "task_meta",
 ]
 
 [[package]]
@@ -1065,6 +1225,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "devfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "devfs-ref",
+ "generic",
+ "interface",
+ "log",
+ "pod",
+ "shared_heap",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "devfs-ref"
 version = "0.1.0"
 dependencies = [
@@ -1153,6 +1327,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "domain"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "fs_extra",
+ "serde",
+ "toml 0.8.23",
+]
+
+[[package]]
 name = "domain-helper"
 version = "0.1.0"
 dependencies = [
@@ -1166,6 +1350,18 @@ version = "0.1.0"
 [[package]]
 name = "domain-server"
 version = "0.1.0"
+
+[[package]]
+name = "domain_fatfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "fat-vfs-ref",
+ "generic",
+ "interface",
+ "log",
+ "vfscore-ref",
+]
 
 [[package]]
 name = "domain_main"
@@ -1184,6 +1380,113 @@ dependencies = [
  "shared_heap",
  "spin 0.9.8",
  "storage",
+]
+
+[[package]]
+name = "domain_uart16550"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+ "uart16550",
+]
+
+[[package]]
+name = "domainfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "custom_fs-ref",
+ "generic",
+ "interface",
+ "shared_heap",
+ "vfscore-ref",
+]
+
+[[package]]
+name = "domains"
+version = "0.1.0"
+dependencies = [
+ "apic",
+ "buf_input",
+ "buf_uart",
+ "cache_blk",
+ "common_scheduler",
+ "devfs",
+ "domain",
+ "domain_fatfs",
+ "domain_uart16550",
+ "domainfs",
+ "fifo_scheduler",
+ "gapic",
+ "gbuf_input",
+ "gbuf_uart",
+ "gdevfs",
+ "gdomainfs",
+ "generic",
+ "gfatfs",
+ "gfifo_scheduler",
+ "ggoldfish",
+ "ghpet",
+ "gio_apic",
+ "glocal_apic",
+ "glogger",
+ "gloopback",
+ "gmem_block",
+ "gnet_stack",
+ "gnull",
+ "goldfish",
+ "gpipefs",
+ "gplic",
+ "gprocfs",
+ "gramfs",
+ "grandom",
+ "grandom_scheduler",
+ "gshadow_blk",
+ "gsshadow_blk",
+ "gsyscall",
+ "gsysfs",
+ "gtask",
+ "guart16550",
+ "guart8250",
+ "gvf2_sd",
+ "gvfs",
+ "gvfs2",
+ "gvirtio_gpu",
+ "gvirtio_input",
+ "gvirtio_net",
+ "gxlogger",
+ "hpet",
+ "io_apic",
+ "local_apic",
+ "logger",
+ "loopback",
+ "mem_block",
+ "net_stack",
+ "null",
+ "pipefs",
+ "plic",
+ "procfs",
+ "ramfs",
+ "random",
+ "random_scheduler",
+ "shadow_blk",
+ "sshadow_blk",
+ "syscall",
+ "sysfs",
+ "task",
+ "uart8250",
+ "vf2_sd",
+ "vfs",
+ "vfs2",
+ "vfs_common",
+ "virtio_blk",
+ "virtio_gpu",
+ "virtio_input",
+ "virtio_mmio_common",
+ "virtio_net",
+ "xlogger",
 ]
 
 [[package]]
@@ -1556,6 +1859,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "fifo_scheduler"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "common_scheduler",
+ "interface",
+ "log",
+ "shared_heap",
+ "storage",
+ "task_meta",
+]
+
+[[package]]
 name = "filetime"
 version = "0.2.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1695,6 +2011,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs_extra"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42703706b716c37f96a77aea830392ad231f44c9e9a67872fa5548707e11b11c"
+
+[[package]]
 name = "fs_update"
 version = "0.1.0"
 dependencies = [
@@ -1823,6 +2145,84 @@ dependencies = [
 ]
 
 [[package]]
+name = "gapic"
+version = "0.1.0"
+dependencies = [
+ "apic",
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gbuf_input"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "buf_input",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gbuf_uart"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "buf_uart",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gdevfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "devfs",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gdomainfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "domainfs",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "generic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "spin 0.10.0",
+ "vfs_common",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "getopts"
 version = "0.2.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1868,6 +2268,58 @@ dependencies = [
 ]
 
 [[package]]
+name = "gfatfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "domain_fatfs",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gfifo_scheduler"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "fifo_scheduler",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "ggoldfish"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "goldfish",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "ghpet"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "hpet",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
 name = "gif"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1882,6 +2334,19 @@ name = "gimli"
 version = "0.32.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
+
+[[package]]
+name = "gio_apic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "io_apic",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
 
 [[package]]
 name = "gl_generator"
@@ -1899,6 +2364,45 @@ name = "glob"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
+
+[[package]]
+name = "glocal_apic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "local_apic",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "glogger"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "logger",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gloopback"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "loopback",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
 
 [[package]]
 name = "glow"
@@ -1954,6 +2458,95 @@ dependencies = [
 ]
 
 [[package]]
+name = "gmem_block"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "mem_block",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gnet_stack"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "net_stack",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gnull"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "null",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "goldfish"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "rtc",
+ "shared_heap",
+ "timestamp",
+]
+
+[[package]]
+name = "gpipefs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "pipefs",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gplic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "plic",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gprocfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "procfs",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
 name = "gproxy"
 version = "0.1.0"
 dependencies = [
@@ -1961,6 +2554,227 @@ dependencies = [
  "quote",
  "spin 0.10.0",
  "syn 2.0.117",
+]
+
+[[package]]
+name = "gramfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "ramfs",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "grandom"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "random",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "grandom_scheduler"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "random_scheduler",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gshadow_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shadow_blk",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gsshadow_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "sshadow_blk",
+ "storage",
+]
+
+[[package]]
+name = "gsyscall"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "syscall",
+]
+
+[[package]]
+name = "gsysfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "sysfs",
+]
+
+[[package]]
+name = "gtask"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "task",
+]
+
+[[package]]
+name = "guart16550"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "domain_uart16550",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "guart8250"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "uart8250",
+]
+
+[[package]]
+name = "gvf2_sd"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "vf2_sd",
+]
+
+[[package]]
+name = "gvfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "vfs",
+]
+
+[[package]]
+name = "gvfs2"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "vfs2",
+]
+
+[[package]]
+name = "gvirtio_gpu"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "virtio_gpu",
+]
+
+[[package]]
+name = "gvirtio_input"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "virtio_input",
+]
+
+[[package]]
+name = "gvirtio_net"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "virtio_net",
+]
+
+[[package]]
+name = "gxlogger"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+ "xlogger",
 ]
 
 [[package]]
@@ -2075,6 +2889,15 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
+name = "hpet"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
 
 [[package]]
 name = "htmlparser"
@@ -2613,6 +3436,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "io_apic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
 name = "is-terminal"
 version = "0.4.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2622,6 +3454,12 @@ dependencies = [
  "libc",
  "windows-sys 0.61.2",
 ]
+
+[[package]]
+name = "is_terminal_polyfill"
+version = "1.70.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
 name = "itertools"
@@ -2963,6 +3801,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "local_apic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
 name = "lock_api"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2978,12 +3825,54 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
+name = "logger"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+]
+
+[[package]]
 name = "loop9"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fae87c125b03c1d2c0150c90365d7d6bcc53fb73a9acaef207d2d065860f062"
 dependencies = [
  "imgref",
+]
+
+[[package]]
+name = "loopback"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
+name = "lose-net-stack"
+version = "0.1.0"
+dependencies = [
+ "bitflags 2.11.0",
+ "log",
+ "low_level_op",
+ "spin 0.9.8",
+]
+
+[[package]]
+name = "low_level_op"
+version = "0.1.0"
+
+[[package]]
+name = "lru"
+version = "0.16.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1dc47f592c06f33f8e3aea9591776ec7c9f9e4124778ff8a3c3b87159f7e593"
+dependencies = [
+ "hashbrown 0.16.1",
 ]
 
 [[package]]
@@ -3028,6 +3917,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "malloc"
+version = "0.1.0"
+dependencies = [
+ "buddy_system_allocator",
+ "shared_heap",
+]
+
+[[package]]
 name = "maybe-rayon"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3054,6 +3951,16 @@ dependencies = [
  "spin 0.10.0",
  "talc",
  "vmspace",
+]
+
+[[package]]
+name = "mem_block"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
 ]
 
 [[package]]
@@ -3214,6 +4121,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "net_stack"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "downcast-rs",
+ "interface",
+ "log",
+ "lose-net-stack",
+ "shared_heap",
+ "spin 0.10.0",
+]
+
+[[package]]
 name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3263,6 +4183,15 @@ name = "noop_proc_macro"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0676bb32a98c1a483ce53e500a81ad9c3d5b3f7c920c28c24e9cb0980d0b5bc8"
+
+[[package]]
+name = "null"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
 
 [[package]]
 name = "num-bigint"
@@ -3723,6 +4652,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "once_cell_polyfill"
+version = "1.70.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
+
+[[package]]
+name = "oorandom"
+version = "11.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
+
+[[package]]
 name = "orbclient"
 version = "0.3.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3908,6 +4849,19 @@ name = "pingpong"
 version = "0.1.0"
 
 [[package]]
+name = "pipefs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "dynfs-ref",
+ "generic",
+ "interface",
+ "log",
+ "shared_heap",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "piper"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3954,6 +4908,17 @@ dependencies = [
  "x86-pci",
  "x86_64 0.15.4",
  "x86_rtc",
+]
+
+[[package]]
+name = "plic"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "raw-plic",
+ "shared_heap",
+ "spin 0.9.8",
 ]
 
 [[package]]
@@ -4088,6 +5053,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "procfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "dynfs-ref",
+ "generic",
+ "interface",
+ "log",
+ "shared_heap",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "profiling"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4174,6 +5152,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
+name = "ramfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "generic",
+ "interface",
+ "log",
+ "ramfs-ref",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "ramfs-ref"
 version = "0.1.0"
 dependencies = [
@@ -4247,6 +5237,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "random"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+]
+
+[[package]]
+name = "random_scheduler"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "common_scheduler",
+ "interface",
+ "shared_heap",
+ "storage",
+ "task_meta",
+]
+
+[[package]]
 name = "rav1e"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4313,6 +5324,10 @@ checksum = "498cd0dc59d73224351ee52a95fee0f1a617a2eae0e7d9d720cc622c73a54186"
 dependencies = [
  "bitflags 2.11.0",
 ]
+
+[[package]]
+name = "raw-plic"
+version = "0.1.0"
 
 [[package]]
 name = "raw-window-handle"
@@ -4496,6 +5511,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "rtc"
+version = "0.1.0"
+
+[[package]]
 name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4649,11 +5668,30 @@ dependencies = [
 
 [[package]]
 name = "serde_spanned"
+version = "0.6.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "serde_spanned"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8bbf91e5a4d6315eee45e704372590b30e260ee83af6639d64557f51b067776"
 dependencies = [
  "serde_core",
+]
+
+[[package]]
+name = "shadow_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
 ]
 
 [[package]]
@@ -4828,6 +5866,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "small-index"
+version = "0.1.0"
+
+[[package]]
 name = "smallvec"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4951,6 +5993,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sshadow_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4974,6 +6026,12 @@ checksum = "6637bab7722d379c8b41ba849228d680cc12d0a45ba1fa2b48f2a30577a06731"
 dependencies = [
  "float-cmp",
 ]
+
+[[package]]
+name = "strsim"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "strum"
@@ -5077,7 +6135,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "sys_poll"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+ "pconst",
+]
+
+[[package]]
 name = "sys_proc"
+version = "0.1.0"
+dependencies = [
+ "Mstd",
+ "pconst",
+]
+
+[[package]]
+name = "sys_random"
 version = "0.1.0"
 dependencies = [
  "Mstd",
@@ -5090,6 +6164,21 @@ version = "0.1.0"
 dependencies = [
  "Mstd",
  "pconst",
+]
+
+[[package]]
+name = "syscall"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "bit_field",
+ "interface",
+ "log",
+ "oorandom",
+ "pconst",
+ "pod",
+ "shared_heap",
+ "vfscore-ref",
 ]
 
 [[package]]
@@ -5106,6 +6195,18 @@ name = "syscall_all"
 version = "0.1.0"
 dependencies = [
  "Mstd",
+]
+
+[[package]]
+name = "sysfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "dynfs-ref",
+ "generic",
+ "interface",
+ "shared_heap",
+ "vfscore-ref",
 ]
 
 [[package]]
@@ -5147,6 +6248,25 @@ name = "target-triple"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "591ef38edfb78ca4771ee32cf494cb8771944bee237a9b91fc9c1424ac4b777b"
+
+[[package]]
+name = "task"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "memory_addr 0.1.0",
+ "page-table",
+ "pod",
+ "shared_heap",
+ "small-index",
+ "spin 0.10.0",
+ "task_meta",
+ "vfscore-ref",
+ "vmspace",
+ "xmas-elf",
+]
 
 [[package]]
 name = "task_meta"
@@ -5235,6 +6355,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "timestamp"
+version = "0.1.0"
+source = "git+https://github.com/Byte-OS/timestamp#0394ccfa14db1912047a0a3e7e1c38b027856165"
+
+[[package]]
 name = "tiny-skia"
 version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5314,13 +6439,25 @@ dependencies = [
 
 [[package]]
 name = "toml"
+version = "0.8.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362"
+dependencies = [
+ "serde",
+ "serde_spanned 0.6.9",
+ "toml_datetime 0.6.11",
+ "toml_edit 0.22.27",
+]
+
+[[package]]
+name = "toml"
 version = "0.9.12+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf92845e79fc2e2def6a5d828f0801e29a2f8acc037becc5ab08595c7d5e9863"
 dependencies = [
  "indexmap",
  "serde_core",
- "serde_spanned",
+ "serde_spanned 1.0.4",
  "toml_datetime 0.7.5+spec-1.1.0",
  "toml_parser",
  "toml_writer",
@@ -5335,11 +6472,20 @@ checksum = "399b1124a3c9e16766831c6bba21e50192572cdd98706ea114f9502509686ffc"
 dependencies = [
  "indexmap",
  "serde_core",
- "serde_spanned",
+ "serde_spanned 1.0.4",
  "toml_datetime 1.0.0+spec-1.1.0",
  "toml_parser",
  "toml_writer",
  "winnow",
+]
+
+[[package]]
+name = "toml_datetime"
+version = "0.6.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -5358,6 +6504,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32c2555c699578a4f59f0cc68e5116c8d7cabbd45e1409b989d4be085b53f13e"
 dependencies = [
  "serde_core",
+]
+
+[[package]]
+name = "toml_edit"
+version = "0.22.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_spanned 0.6.9",
+ "toml_datetime 0.6.11",
+ "toml_write",
+ "winnow",
 ]
 
 [[package]]
@@ -5393,6 +6553,12 @@ checksum = "702d4415e08923e7e1ef96cd5727c0dfed80b4d2fa25db9647fe5eb6f7c5a4c4"
 dependencies = [
  "winnow",
 ]
+
+[[package]]
+name = "toml_write"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
 name = "toml_writer"
@@ -5471,6 +6637,19 @@ checksum = "898160f1dfd383b4e92e17f0512a7d62f3c51c44937b23b6ffc3a1614a8eaccd"
 dependencies = [
  "bincode",
  "serde",
+]
+
+[[package]]
+name = "uart16550"
+version = "0.0.1"
+
+[[package]]
+name = "uart8250"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
 ]
 
 [[package]]
@@ -5652,6 +6831,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
 
 [[package]]
+name = "utf8parse"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
+
+[[package]]
 name = "uuid"
 version = "1.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5681,6 +6866,68 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "vf2_sd"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "fatfs",
+ "interface",
+ "shared_heap",
+ "visionfive2-sd",
+]
+
+[[package]]
+name = "vfs"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "core2",
+ "cpio_reader",
+ "downcast-rs",
+ "interface",
+ "libflate",
+ "log",
+ "shared_heap",
+ "spin 0.10.0",
+ "storage",
+ "unifs-ref",
+ "vfs_common",
+ "vfscore-ref",
+]
+
+[[package]]
+name = "vfs2"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "core2",
+ "cpio_reader",
+ "downcast-rs",
+ "interface",
+ "libflate",
+ "log",
+ "shared_heap",
+ "spin 0.10.0",
+ "storage",
+ "unifs-ref",
+ "vfs_common",
+ "vfscore-ref",
+]
+
+[[package]]
+name = "vfs_common"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "storage",
+ "unifs-ref",
+ "vfscore-ref",
+]
+
+[[package]]
 name = "vfscore-ref"
 version = "0.1.0"
 dependencies = [
@@ -5702,9 +6949,83 @@ dependencies = [
 ]
 
 [[package]]
+name = "virtio-drivers"
+version = "0.1.0"
+dependencies = [
+ "bitflags 2.11.0",
+ "log",
+]
+
+[[package]]
 name = "virtio-input-decoder"
 version = "0.1.3"
 source = "git+https://github.com/os-module/virtio-input-decoder.git#d57c42651aca4a588e527c178409a90a0036aea6"
+
+[[package]]
+name = "virtio_blk"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "virtio-drivers",
+ "virtio_mmio_common",
+]
+
+[[package]]
+name = "virtio_gpu"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "virtio-drivers",
+ "virtio_mmio_common",
+]
+
+[[package]]
+name = "virtio_input"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+ "virtio-drivers",
+ "virtio_mmio_common",
+]
+
+[[package]]
+name = "virtio_mmio_common"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "log",
+ "shared_heap",
+ "virtio-drivers",
+]
+
+[[package]]
+name = "virtio_net"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "virtio-drivers",
+ "virtio_mmio_common",
+]
+
+[[package]]
+name = "visionfive2-sd"
+version = "0.1.0"
+dependencies = [
+ "bitfield-struct",
+ "log",
+ "preprint",
+]
 
 [[package]]
 name = "vmspace"
@@ -6669,6 +7990,16 @@ name = "xkeysym"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9cc00251562a284751c9973bace760d86c0276c471b4be569fe6b068ee97a56"
+
+[[package]]
+name = "xlogger"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+]
 
 [[package]]
 name = "xmas-elf"

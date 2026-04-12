@@ -5,6 +5,15 @@ use bitflags::bitflags;
 use int_enum::IntEnum;
 use pod::Pod;
 
+bitflags! {
+    pub struct FileMode: u32 {
+        const FMODE_READ = 0x0;
+        const FMODE_WRITE = 0x1;
+        const FMODE_RDWR = 0x2;
+        const FMODE_EXEC = 0x5; // read and execute
+    }
+}
+
 #[derive(Debug, Clone, Copy, Pod)]
 #[repr(C)]
 pub struct IoVec {
@@ -200,6 +209,14 @@ bitflags! {
 bitflags! {
     pub struct UnlinkatFlags: u32 {
         const AT_REMOVEDIR = 0x200;
+    }
+}
+
+bitflags! {
+    pub struct StatFlags: u32 {
+        const AT_EMPTY_PATH = 0x1000;
+        const AT_NO_AUTOMOUNT = 0x800;
+        const AT_SYMLINK_NOFOLLOW = 0x100;
     }
 }
 
@@ -613,14 +630,6 @@ bitflags! {
 }
 
 bitflags! {
-    pub struct StatFlags:u32{
-        const AT_EMPTY_PATH = 0x1000;
-        const AT_NO_AUTOMOUNT = 0x800;
-        const AT_SYMLINK_NOFOLLOW = 0x100;
-    }
-}
-
-bitflags! {
      /// renameat flag
     pub struct Renameat2Flags: u32 {
         /// Go back to renameat
@@ -633,14 +642,6 @@ bitflags! {
         const RENAME_WHITEOUT = 1 << 2;
     }
 }
-bitflags! {
-    pub struct ProtFlags: u32 {
-        const PROT_NONE = 0x0;
-        const PROT_READ = 0x1;
-        const PROT_WRITE = 0x2;
-        const PROT_EXEC = 0x4;
-    }
-}
 
 #[derive(Copy, Clone, PartialEq, Debug, IntEnum)]
 #[repr(u8)]
@@ -651,6 +652,15 @@ pub enum MMapType {
     SharedValidate = 0x3,
 }
 pub const MMAP_TYPE_MASK: u32 = 0xf;
+
+bitflags! {
+    pub struct ProtFlags: u32 {
+        const PROT_NONE = 0x0;
+        const PROT_READ = 0x1;
+        const PROT_WRITE = 0x2;
+        const PROT_EXEC = 0x4;
+    }
+}
 
 bitflags! {
     pub struct MMapFlags : u32 {

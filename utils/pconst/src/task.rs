@@ -98,3 +98,12 @@ bitflags! {
         const WNOWAIT = 0x01000000;
     }
 }
+
+/// waitid 的 idtype：等待任意子进程。
+pub const P_ALL: usize = 0;
+/// waitid 的 idtype：等待指定进程。
+pub const P_PID: usize = 1;
+/// waitid 的 idtype：等待指定进程组。
+pub const P_PGID: usize = 2;
+/// waitid 的 idtype：等待 pidfd。
+pub const P_PIDFD: usize = 3;

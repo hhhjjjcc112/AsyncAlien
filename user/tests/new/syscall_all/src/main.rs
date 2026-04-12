@@ -13,15 +13,17 @@ const ENV: &[*const u8] = &[
     "PWD=/\0".as_ptr(),
     "HOME=/root\0".as_ptr(),
     "TERM=vt220\0".as_ptr(),
-    "PATH=/:/bin:/sbin:/tests:/tests/new\0".as_ptr(),
+    "PATH=/tests/new:/tests:/bin:/sbin:/\0".as_ptr(),
     core::ptr::null(),
 ];
 
 const TESTS: &[&str] = &[
-    "/sys_time\0",
-    "/sys_fs\0",
-    "/sys_link\0",
-    "/sys_proc\0",
+    "/tests/new/sys_poll\0",
+    "/tests/new/sys_fs\0",
+    "/tests/new/sys_link\0",
+    "/tests/new/sys_proc\0",
+    "/tests/new/sys_random\0",
+    "/tests/new/sys_time\0",
 ];
 
 #[unsafe(no_mangle)]
@@ -34,7 +36,7 @@ fn main() -> i32 {
         }
     }
     println!("[syscall_all] PASS");
-    0
+    return 0;
 }
 
 fn run_one(path: &str) -> bool {

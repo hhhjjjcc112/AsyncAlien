@@ -143,333 +143,22 @@ impl syscall_table::ToIsize for LinuxErrno {
     }
 }
 
-pub const SYSCALL_ABI_TAG_BIT: usize = 1usize << (usize::BITS as usize - 1);
-pub const SYSCALL_ABI_LINUX_X86_64: usize = SYSCALL_ABI_TAG_BIT;
-pub const SYSCALL_ABI_RAW_MASK: usize = !SYSCALL_ABI_TAG_BIT;
-
-#[inline]
-pub const fn syscall_with_linux_x86_64_abi(raw_syscall_id: usize) -> usize {
-    (raw_syscall_id & SYSCALL_ABI_RAW_MASK) | SYSCALL_ABI_LINUX_X86_64
-}
-
-#[inline]
-pub const fn is_linux_x86_64_abi_syscall(syscall_id: usize) -> bool {
-    (syscall_id & SYSCALL_ABI_TAG_BIT) != 0
-}
-
-#[inline]
-pub const fn raw_syscall_id(syscall_id: usize) -> usize {
-    syscall_id & SYSCALL_ABI_RAW_MASK
-}
-
-#[cfg(target_arch = "x86_64")]
-pub const X86_64_RAW_SYSCALL_ARCH_PRCTL: usize = 0x9e;
-#[cfg(target_arch = "x86_64")]
-pub const X86_64_RAW_SYSCALL_SET_TID_ADDRESS: usize = 0xda;
-#[cfg(target_arch = "x86_64")]
-pub const SYSCALL_ARCH_PRCTL: usize = X86_64_RAW_SYSCALL_ARCH_PRCTL;
-
-#[cfg(target_arch = "x86_64")]
-pub const ARCH_SET_GS: usize = 0x1001;
-#[cfg(target_arch = "x86_64")]
-pub const ARCH_SET_FS: usize = 0x1002;
-#[cfg(target_arch = "x86_64")]
-pub const ARCH_GET_FS: usize = 0x1003;
-#[cfg(target_arch = "x86_64")]
-pub const ARCH_GET_GS: usize = 0x1004;
-
-pub const SYSCALL_SETXATTR: usize = 5;
-pub const SYSCALL_LSETXATTR: usize = 6;
-pub const SYSCALL_FSETXATTR: usize = 7;
-pub const SYSCALL_GETXATTR: usize = 8;
-pub const SYSCALL_LGETXATTR: usize = 9;
-pub const SYSCALL_FGETXATTR: usize = 10;
-pub const SYSCALL_LISTXATTR: usize = 11;
-pub const SYSCALL_LLISTXATTR: usize = 12;
-pub const SYSCALL_FLISTXATTR: usize = 13;
-pub const SYSCALL_REMOVEXATTR: usize = 14;
-pub const SYSCALL_LREMOVEXATTR: usize = 15;
-pub const SYSCALL_FREMOVEXATTR: usize = 16;
-pub const SYSCALL_GETCWD: usize = 17;
-pub const SYSCALL_EVENTFD2: usize = 19;
-pub const SYSCALL_EPOLL_CREATE1: usize = 20;
-pub const SYSCALL_EPOLL_CTL: usize = 21;
-pub const SYSCALL_DUP: usize = 23;
-pub const SYSCALL_DUP3: usize = 24;
-pub const SYSCALL_FCNTL: usize = 25;
-pub const SYSCALL_IOCTL: usize = 29;
-pub const SYSCALL_MKNODAT: usize = 33;
-pub const SYSCALL_MKDIRAT: usize = 34;
-pub const SYSCALL_UNLINKAT: usize = 35;
-pub const SYSCALL_SYMLINKAT: usize = 36;
-pub const SYSCALL_LINKAT: usize = 37;
-pub const SYSCALL_UMOUNT2: usize = 39;
-pub const SYSCALL_MOUNT: usize = 40;
-pub const SYSCALL_STATFS: usize = 43;
-pub const SYSCALL_FSTATFS: usize = 44;
-pub const SYSCALL_TRUNCATE: usize = 45;
-pub const SYSCALL_FTRUNCATE: usize = 46;
-pub const SYSCALL_FACCESSAT: usize = 48;
-pub const SYSCALL_CHDIR: usize = 49;
-pub const SYSCALL_FCHMOD: usize = 52;
-pub const SYSCALL_FCHMODAT: usize = 53;
-pub const SYSCALL_FCHOWN: usize = 55;
-pub const SYSCALL_OPENAT: usize = 56;
-pub const SYSCALL_CLOSE: usize = 57;
-pub const SYSCALL_PIPE2: usize = 59;
-pub const SYSCALL_GETDENTS64: usize = 61;
-pub const SYSCALL_LSEEK: usize = 62;
-pub const SYSCALL_READ: usize = 63;
-pub const SYSCALL_WRITE: usize = 64;
-pub const SYSCALL_READV: usize = 65;
-pub const SYSCALL_WRITEV: usize = 66;
-pub const SYSCALL_PREAD: usize = 67;
-pub const SYSCALL_PWRITE: usize = 68;
-pub const SYSCALL_SENDFILE: usize = 71;
-pub const SYSCALL_PSELECT6: usize = 72;
-pub const SYSCALL_PPOLL: usize = 73;
-pub const SYSCALL_READLINKAT: usize = 78;
-pub const SYSCALL_FSTATAT: usize = 79;
-pub const SYSCALL_FSTAT: usize = 80;
-pub const SYSCALL_SYNC: usize = 81;
-pub const SYSCALL_FSYNC: usize = 82;
-pub const SYSCALL_UTIMENSAT: usize = 88;
-pub const SYSCALL_EXIT: usize = 93;
-pub const SYSCALL_EXIT_GROUP: usize = 94;
-pub const SYSCALL_WAITID: usize = 95;
-pub const SYSCALL_SET_TID_ADDRESS: usize = 96;
-pub const SYSCALL_FUTEX: usize = 98;
-pub const SYSCALL_SET_ROBUST_LIST: usize = 99;
-pub const SYSCALL_GET_ROBUST_LIST: usize = 100;
-pub const SYSCALL_NANOSLEEP: usize = 101;
-pub const SYSCALL_GETITIMER: usize = 102;
-pub const SYSCALL_SETITIMER: usize = 103;
-pub const SYSCALL_CLOCK_GETTIME: usize = 113;
-pub const SYSCALL_CLOCK_GETRES: usize = 114;
-pub const SYSCALL_CLOCK_NANOSLEEP: usize = 115;
-pub const SYSCALL_SYSLOG: usize = 116;
-pub const SYSCALL_YIELD: usize = 124;
-pub const SYSCALL_SCHED_SETPARAM: usize = 118;
-pub const SYSCALL_SCHED_GETPARAM: usize = 121;
-pub const SYSCALL_SCHED_SETAFFINITY: usize = 122;
-pub const SYSCALL_SCHED_GETAFFINITY: usize = 123;
-pub const SYSCALL_SCHED_GETSCHEDULER: usize = 120;
-pub const SYSCALL_SCHED_SETSCHEDULER: usize = 119;
-pub const SYSCALL_KILL: usize = 129;
-pub const SYSCALL_TKILL: usize = 130;
-pub const SYSCALL_SIGALTSTACK: usize = 132;
-pub const SYSCALL_SIGSUSPEND: usize = 133;
-pub const SYSCALL_SIGACTION: usize = 134;
-pub const SYSCALL_SIGPROCMASK: usize = 135;
-pub const SYSCALL_SIGTIMEDWAIT: usize = 137;
-pub const SYSCALL_SIGRETURN: usize = 139;
-pub const SYSCALL_SET_PRIORITY: usize = 140;
-pub const SYSCALL_GET_PRIORITY: usize = 141;
-pub const SYSCALL_TIMES: usize = 153;
-pub const SYSCALL_SETPGID: usize = 154;
-pub const SYSCALL_GETPGID: usize = 155;
-pub const SYSCALL_SETSID: usize = 157;
-pub const SYSCALL_UNAME: usize = 160;
-pub const SYSCALL_GETRUSAGE: usize = 165;
-pub const SYSCALL_UMASK: usize = 166;
-pub const SYSCALL_GET_TIME_OF_DAY: usize = 169;
-pub const SYSCALL_GETPID: usize = 172;
-pub const SYSCALL_GETPPID: usize = 173;
-pub const SYSCALL_GETUID: usize = 174;
-pub const SYSCALL_GETEUID: usize = 175;
-pub const SYSCALL_GETGID: usize = 176;
-pub const SYSCALL_GETEGID: usize = 177;
-pub const SYSCALL_GETTID: usize = 178;
-pub const SYSCALL_SYSINFO: usize = 179;
-pub const SYSCALL_SHMGET: usize = 194;
-pub const SYSCALL_SHAMCTL: usize = 195;
-pub const SYSCALL_SHAMAT: usize = 196;
-pub const SYSCALL_SHAMDT: usize = 197;
-pub const SYSCALL_SOCKET: usize = 198;
-pub const SYSCALL_SOCKETPAIR: usize = 199;
-pub const SYSCALL_BIND: usize = 200;
-pub const SYSCALL_LISTEN: usize = 201;
-pub const SYSCALL_ACCEPT: usize = 202;
-pub const SYSCALL_CONNECT: usize = 203;
-pub const SYSCALL_GETSOCKNAME: usize = 204;
-pub const SYSCALL_GETPEERNAME: usize = 205;
-pub const SYSCALL_SENDTO: usize = 206;
-pub const SYSCALL_RECVFROM: usize = 207;
-pub const SYSCALL_SETSOCKOPT: usize = 208;
-pub const SYSCALL_GETSOCKOPT: usize = 209;
-pub const SYSCALL_SBRK: usize = 213;
-pub const SYSCALL_BRK: usize = 214;
-pub const SYSCALL_MUNMAP: usize = 215;
-pub const SYSCALL_CLONE: usize = 220;
-pub const SYSCALL_EXECVE: usize = 221;
-pub const SYSCALL_MMAP: usize = 222;
-pub const SYSCALL_MPROTECT: usize = 226;
-pub const SYSCALL_MSYNC: usize = 227;
-pub const SYSCALL_MADVISE: usize = 233;
-pub const SYSCALL_WAIT4: usize = 260;
-pub const SYSCALL_PRLIMIT: usize = 261;
-pub const SYSCALL_RENAMEAT2: usize = 276;
-pub const SYSCALL_GETRANDOM: usize = 278;
-pub const SYSCALL_MEMBARRIER: usize = 283;
-pub const SYSCALL_FACCESSAT2: usize = 439;
-pub const SYSCALL_SHUTDOWN: usize = 210;
-pub const SYSCALL_COPY_FILE_RANGE: usize = 285;
+pub const GRND_NONBLOCK: usize = 0x0001;
+pub const GRND_RANDOM: usize = 0x0002;
+pub const PPOLL_FROM_POLL_SIGMASK: usize = usize::MAX;
+pub const AT_FDCWD: isize = -100isize;
+pub const SYSCALL_LIST: usize = 1000;
+pub const SYSCALL_CREATE_GLOBAL_BUCKET: usize = 1001;
+pub const SYSCALL_EXECUTE_USER_FUNC: usize = 1002;
+pub const SYSCALL_SHOW_DBFS: usize = 1003;
+pub const SYSCALL_EXECUTE_OPERATE: usize = 1004;
 pub const SYSCALL_LOAD_DOMAIN: usize = 888;
 pub const SYSCALL_REPLACE_DOMAIN: usize = 889;
 pub const SYSCALL_FRAMEBUFFER: usize = 2000;
 pub const SYSCALL_FRAMEBUFFER_FLUSH: usize = 2001;
 pub const SYSCALL_EVENT_GET: usize = 2002;
 pub const SYSCALL_DOMAIN_TEST: usize = 2003;
-
-pub fn syscall_name(id: usize) -> &'static str {
-    match id {
-        SYSCALL_SETXATTR => "setxattr",
-        SYSCALL_LSETXATTR => "lsetxattr",
-        SYSCALL_FSETXATTR => "fsetxattr",
-        SYSCALL_GETXATTR => "getxattr",
-        SYSCALL_LGETXATTR => "lgetxattr",
-        SYSCALL_FGETXATTR => "fgetxattr",
-        SYSCALL_LISTXATTR => "listxattr",
-        SYSCALL_LLISTXATTR => "llistxattr",
-        SYSCALL_FLISTXATTR => "flistxattr",
-        SYSCALL_REMOVEXATTR => "removexattr",
-        SYSCALL_LREMOVEXATTR => "lremovexattr",
-        SYSCALL_FREMOVEXATTR => "fremovexattr",
-        SYSCALL_DOMAIN_TEST => "domain_test",
-        SYSCALL_EVENT_GET => "event_get",
-        SYSCALL_FRAMEBUFFER_FLUSH => "framebuffer_flush",
-        SYSCALL_FRAMEBUFFER => "framebuffer",
-        SYSCALL_REPLACE_DOMAIN => "replace_domain",
-        SYSCALL_LOAD_DOMAIN => "load_domain",
-        SYSCALL_COPY_FILE_RANGE => "copy_file_range",
-        SYSCALL_GETRANDOM => "getrandom",
-        SYSCALL_SOCKETPAIR => "socketpair",
-        SYSCALL_GET_PRIORITY => "getpriority",
-        SYSCALL_SET_PRIORITY => "setpriority",
-        SYSCALL_SIGALTSTACK => "sigaltstack",
-        SYSCALL_EPOLL_CTL => "epoll_ctl",
-        SYSCALL_EPOLL_CREATE1 => "epoll_create1",
-        SYSCALL_EVENTFD2 => "eventfd2",
-        #[cfg(target_arch = "x86_64")]
-        SYSCALL_ARCH_PRCTL => "arch_prctl",
-        SYSCALL_FCHOWN => "fchown",
-        SYSCALL_SETSID => "setsid",
-        SYSCALL_SIGSUSPEND => "sigsuspend",
-        SYSCALL_MADVISE => "madvise",
-        SYSCALL_CLOCK_NANOSLEEP => "clock_nanosleep",
-        SYSCALL_CLOCK_GETRES => "clock_getres",
-        SYSCALL_SCHED_SETPARAM => "sched_setparam",
-        SYSCALL_SCHED_GETPARAM => "sched_getparam",
-        SYSCALL_SCHED_SETAFFINITY => "sched_setaffinity",
-        SYSCALL_SCHED_GETAFFINITY => "sched_getaffinity",
-        SYSCALL_SCHED_GETSCHEDULER => "sched_getscheduler",
-        SYSCALL_SCHED_SETSCHEDULER => "sched_setscheduler",
-        SYSCALL_SHUTDOWN => "shutdown",
-        SYSCALL_FCHMODAT => "fchmodat",
-        SYSCALL_FCHMOD => "fchmod",
-        SYSCALL_GETSOCKOPT => "getsockopt",
-        SYSCALL_MKNODAT => "mknodat",
-        SYSCALL_SHMGET => "shmget",
-        SYSCALL_SHAMCTL => "shamctl",
-        SYSCALL_SHAMAT => "shamat",
-        SYSCALL_SHAMDT => "shamdt",
-        SYSCALL_DUP => "dup",
-        SYSCALL_DUP3 => "dup3",
-        SYSCALL_GETCWD => "getcwd",
-        SYSCALL_FCNTL => "fcntl",
-        SYSCALL_IOCTL => "ioctl",
-        SYSCALL_MKDIRAT => "mkdirat",
-        SYSCALL_UNLINKAT => "unlinkat",
-        SYSCALL_SYMLINKAT => "symlinkat",
-        SYSCALL_LINKAT => "linkat",
-        SYSCALL_UMOUNT2 => "umount2",
-        SYSCALL_MOUNT => "mount",
-        SYSCALL_FACCESSAT => "faccessat",
-        SYSCALL_CHDIR => "chdir",
-        SYSCALL_OPENAT => "openat",
-        SYSCALL_CLOSE => "close",
-        SYSCALL_PIPE2 => "pipe2",
-        SYSCALL_GETDENTS64 => "getdents64",
-        SYSCALL_LSEEK => "lseek",
-        SYSCALL_READ => "read",
-        SYSCALL_WRITE => "write",
-        SYSCALL_READV => "readv",
-        SYSCALL_WRITEV => "writev",
-        SYSCALL_PREAD => "pread",
-        SYSCALL_PWRITE => "pwrite",
-        SYSCALL_SENDFILE => "sendfile",
-        SYSCALL_PSELECT6 => "pselect6",
-        SYSCALL_PPOLL => "ppoll",
-        SYSCALL_READLINKAT => "readlinkat",
-        SYSCALL_FSTATAT => "fstatat",
-        SYSCALL_FSTAT => "fstat",
-        SYSCALL_STATFS => "statfs",
-        SYSCALL_FSTATFS => "fstatfs",
-        SYSCALL_TRUNCATE => "truncate",
-        SYSCALL_FTRUNCATE => "ftruncate",
-        SYSCALL_SYNC => "sync",
-        SYSCALL_FSYNC => "fsync",
-        SYSCALL_UTIMENSAT => "utimensat",
-        SYSCALL_EXIT => "exit",
-        SYSCALL_EXIT_GROUP => "exit_GROUP",
-        SYSCALL_WAITID => "waitid",
-        SYSCALL_SET_TID_ADDRESS => "set_tid_address",
-        SYSCALL_FUTEX => "futex",
-        SYSCALL_SET_ROBUST_LIST => "set_robust_list",
-        SYSCALL_GET_ROBUST_LIST => "get_robust_list",
-        SYSCALL_NANOSLEEP => "nanosleep",
-        SYSCALL_GETITIMER => "getitimer",
-        SYSCALL_SETITIMER => "setitimer",
-        SYSCALL_CLOCK_GETTIME => "clock_gettime",
-        SYSCALL_SYSLOG => "syslog",
-        SYSCALL_YIELD => "yield",
-        SYSCALL_KILL => "kill",
-        SYSCALL_TKILL => "tkill",
-        SYSCALL_SIGACTION => "sigaction",
-        SYSCALL_SIGPROCMASK => "sigprocmask",
-        SYSCALL_SIGTIMEDWAIT => "sigtimedwait",
-        SYSCALL_SIGRETURN => "sigreturn",
-        SYSCALL_TIMES => "times",
-        SYSCALL_SETPGID => "setpgid",
-        SYSCALL_GETPGID => "getpgid",
-        SYSCALL_UNAME => "uname",
-        SYSCALL_GETRUSAGE => "getrusage",
-        SYSCALL_UMASK => "umask",
-        SYSCALL_GET_TIME_OF_DAY => "get_time_of_day",
-        SYSCALL_GETPID => "getpid",
-        SYSCALL_GETPPID => "getppid",
-        SYSCALL_GETUID => "getuid",
-        SYSCALL_GETEUID => "geteuid",
-        SYSCALL_GETGID => "getgid",
-        SYSCALL_GETEGID => "getegid",
-        SYSCALL_GETTID => "gettid",
-        SYSCALL_SYSINFO => "sysinfo",
-        SYSCALL_SOCKET => "socket",
-        SYSCALL_BIND => "bind",
-        SYSCALL_LISTEN => "listen",
-        SYSCALL_ACCEPT => "accept",
-        SYSCALL_CONNECT => "connect",
-        SYSCALL_GETSOCKNAME => "getsockname",
-        SYSCALL_GETPEERNAME => "getpeername",
-        SYSCALL_SENDTO => "sendto",
-        SYSCALL_RECVFROM => "recvfrom",
-        SYSCALL_SETSOCKOPT => "setsockopt",
-        SYSCALL_SBRK => "sbrk",
-        SYSCALL_BRK => "brk",
-        SYSCALL_MUNMAP => "munmap",
-        SYSCALL_CLONE => "clone",
-        SYSCALL_EXECVE => "execve",
-        SYSCALL_MMAP => "mmap",
-        SYSCALL_MPROTECT => "mprotect",
-        SYSCALL_MSYNC => "msync",
-        SYSCALL_WAIT4 => "wait4",
-        SYSCALL_PRLIMIT => "prlimit",
-        SYSCALL_RENAMEAT2 => "renameat2",
-        SYSCALL_FACCESSAT2 => "faccessat2",
-        SYSCALL_MEMBARRIER => "membarrier",
-        _ => "unknown",
-    }
-}
+pub const SYSCALL_SYSTEM_SHUTDOWN: usize = 2004;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Pod)]
@@ -504,4 +193,22 @@ pub enum PrLimitResType {
     RlimitStack = 3,
     RlimitNofile = 7,
     RlimitAs = 9,
+}
+
+pub fn syscall_name(id: usize) -> &'static str {
+    match id {
+        SYSCALL_SYSTEM_SHUTDOWN => "system_shutdown",
+        SYSCALL_DOMAIN_TEST => "domain_test",
+        SYSCALL_EVENT_GET => "event_get",
+        SYSCALL_FRAMEBUFFER_FLUSH => "framebuffer_flush",
+        SYSCALL_FRAMEBUFFER => "framebuffer",
+        SYSCALL_EXECUTE_OPERATE => "execute_operate",
+        SYSCALL_SHOW_DBFS => "show_dbfs",
+        SYSCALL_EXECUTE_USER_FUNC => "execute_user_func",
+        SYSCALL_CREATE_GLOBAL_BUCKET => "create_global_bucket",
+        SYSCALL_LIST => "list",
+        SYSCALL_REPLACE_DOMAIN => "replace_domain",
+        SYSCALL_LOAD_DOMAIN => "load_domain",
+        _ => "unknown",
+    }
 }

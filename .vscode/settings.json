@@ -16,7 +16,6 @@
         "RUSTFLAGS": "--cfg getrandom_backend=\"custom\" --cfg plat_qemu_x86_64",
         "PLATFORM": "plat_qemu_x86_64"
     },
-    
     // 通用配置
     "rust-analyzer.cargo.buildScripts.enable": true,
     "rust-analyzer.cargo.buildScripts.overrideCommand": null,
@@ -27,11 +26,5 @@
     ],
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-proc-macro"
-    ],
-    "chat.tools.terminal.autoApprove": {
-        "make": true,
-        "cargo info": true,
-        "cargo check": true,
-        "timeout": true
-    }
+    ]
 }

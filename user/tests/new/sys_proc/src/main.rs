@@ -7,7 +7,11 @@ use Mstd::{
     println,
     process::{exit, fork, waitid, waitpid},
 };
-use pconst::{signal::{SigInfo, SignalNumber}, task::WaitOptions};
+use pconst::{
+    signal::{SigInfo, SignalNumber},
+    sys::Rusage,
+    task::{P_PID, WaitOptions},
+};
 
 #[unsafe(no_mangle)]
 fn main() -> i32 {
@@ -41,8 +45,8 @@ fn run_waitpid_case() -> bool {
         println!("[sys_proc] waitpid pid mismatch: {} vs {}", waited, pid);
         return false;
     }
-    if exit_code != 7 {
-        println!("[sys_proc] waitpid exit code mismatch: {}", exit_code);
+    if exit_code != (7 << 8) {
+        println!("[sys_proc] waitpid status mismatch: {}", exit_code);
         return false;
     }
     true
@@ -60,7 +64,14 @@ fn run_waitid_case() -> bool {
     }
 
     let mut info = SigInfo::default();
-    let res = waitid(1, pid as usize, &mut info, WaitOptions::WEXITED);
+    let mut rusage = Rusage::default();
+    let res = waitid(
+        P_PID,
+        pid as usize,
+        &mut info,
+        WaitOptions::WEXITED,
+        &mut rusage as *mut Rusage,
+    );
     if res < 0 {
         println!("[sys_proc] waitid failed: {}", res);
         return false;

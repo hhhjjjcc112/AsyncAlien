@@ -28,4 +28,6 @@ diskfs
 AGENTS.md
 task_list.md
 迁移文档.md
-syscall_abi_x86_64_vs_riscv64.md
+agent_next_tasks.md
+test_cfg.md
+x86_64_域加载与关键域测试报告.md

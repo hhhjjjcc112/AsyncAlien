@@ -379,13 +379,15 @@ impl VfsPath {
 
                     let old_fs = old_dt.inode()?.get_super_block()?;
                     let this_fs = parent_inode.get_super_block()?;
-                    if !Arc::ptr_eq(&old_fs, &this_fs) {
+                    if old_fs.magic() != this_fs.magic() {
+                        error!("link: fs mismatch");
                         return Err(VfsError::Invalid);
                     }
                     // todo! access check
                     let name = self.filename();
                     assert!(!name.is_empty());
-                    let inode = parent_inode.link(&name, old_dt.inode()?)?;
+                    let old_inode = old_dt.inode()?;
+                    let inode = parent_inode.link(&name, old_inode)?;
                     let _ = parent.insert(&name, inode)?;
                     Ok(())
                 }

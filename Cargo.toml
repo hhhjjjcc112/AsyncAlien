@@ -3,6 +3,7 @@ members = [
     "kernel",
     "user/userlib",
     "user/apps/init",
+    "domains",
     "base/*",
     "tools/*",
     "rvfs-ref/*",
@@ -22,6 +23,8 @@ members = [
     "user/tests/new/sys_fs",
     "user/tests/new/sys_link",
     "user/tests/new/sys_proc",
+    "user/tests/new/sys_poll",
+    "user/tests/new/sys_random",
     "user/tests/new/syscall_all",
 ]
 resolver = "2"

@@ -1,7 +1,6 @@
 use core::arch::global_asm;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
-use pconst::syscall_with_linux_x86_64_abi;
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::{
     VirtAddr,
@@ -37,7 +36,7 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
 
     let mut parameters = frame.parameters();
     let orig_syscall_id = parameters[0];
-    let syscall_id = syscall_with_linux_x86_64_abi(orig_syscall_id);
+    let syscall_id = orig_syscall_id;
     parameters[0] = syscall_id;
 
     let trace_idx = SYSCALL_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);

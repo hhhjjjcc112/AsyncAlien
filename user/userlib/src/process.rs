@@ -1,9 +1,10 @@
 use bitflags::bitflags;
-use pconst::{signal::SigInfo, task::WaitOptions};
+pub use pconst::task::CloneFlags;
+use pconst::{signal::SigInfo, sys::Rusage, task::WaitOptions};
 
 use crate::syscall::{
-    sys_execve, sys_exit, sys_fork, sys_getpid, sys_getpriority, sys_setpriority, sys_waitid,
-    sys_waitpid,
+    sys_execve, sys_exit, sys_fork, sys_getpid, sys_getpriority, sys_setpriority, sys_vfork,
+    sys_waitid, sys_waitpid,
 };
 
 pub fn exit(exit_code: i32) -> ! {
@@ -13,6 +14,10 @@ pub fn exit(exit_code: i32) -> ! {
 
 pub fn fork() -> isize {
     sys_fork()
+}
+
+pub fn vfork() -> isize {
+    sys_vfork()
 }
 
 pub fn getpid() -> isize {
@@ -35,8 +40,21 @@ pub fn waitpid(pid: usize, exit_code: &mut i32) -> isize {
     sys_waitpid(pid as isize, exit_code as *mut _, 0)
 }
 
-pub fn waitid(which: usize, pid: usize, info: &mut SigInfo, option: WaitOptions) -> isize {
-    sys_waitid(which, pid, info as *mut SigInfo as *mut u8, option.bits() as usize, 0)
+/// 直接透传 rusage，保持 waitid 的 Linux 原型。
+pub fn waitid(
+    which: usize,
+    pid: usize,
+    info: &mut SigInfo,
+    option: WaitOptions,
+    rusage: *mut Rusage,
+) -> isize {
+    sys_waitid(
+        which,
+        pid,
+        info as *mut SigInfo as *mut u8,
+        option.bits() as usize,
+        rusage as usize,
+    )
 }
 
 pub fn set_priority(which: i32, who: u32, prio: i32) -> isize {
@@ -45,34 +63,6 @@ pub fn set_priority(which: i32, who: u32, prio: i32) -> isize {
 
 pub fn get_priority(which: i32, who: u32) -> i32 {
     sys_getpriority(which, who) as i32
-}
-
-bitflags! {
-    pub struct CloneFlags: u32 {
-        const CLONE_VM = 0x00000100;
-        const CLONE_FS = 0x00000200;
-        const CLONE_FILES = 0x00000400;
-        const CLONE_SIGHAND = 0x00000800;
-        const CLONE_PTRACE = 0x00002000;
-        const CLONE_VFORK = 0x00004000;
-        const CLONE_PARENT = 0x00008000;
-        const CLONE_THREAD = 0x00010000;
-        const CLONE_NEWNS = 0x00020000;
-        const CLONE_SYSVSEM = 0x00040000;
-        const CLONE_SETTLS = 0x00080000;
-        const CLONE_PARENT_SETTID = 0x00100000;
-        const CLONE_CHILD_CLEARTID = 0x00200000;
-        const CLONE_DETACHED = 0x00400000;
-        const CLONE_UNTRACED = 0x00800000;
-        const CLONE_CHILD_SETTID = 0x01000000;
-        const CLONE_NEWCGROUP = 0x02000000;
-        const CLONE_NEWUTS = 0x04000000;
-        const CLONE_NEWIPC = 0x08000000;
-        const CLONE_NEWUSER = 0x10000000;
-        const CLONE_NEWPID = 0x20000000;
-        const CLONE_NEWNET = 0x40000000;
-        const CLONE_IO = 0x80000000;
-    }
 }
 
 bitflags! {
