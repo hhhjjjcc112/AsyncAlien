@@ -7,7 +7,7 @@ use mem::PhysAddr;
 
 use crate::bus::{CommonDeviceInfo, CommonDeviceType, DeviceLocator, pci::ecam_device};
 use self::{
-    acpi_enumerate::{acpi_tables, enumerate_apic, enumerate_rtc, enumerate_uart},
+    acpi_enumerate::{acpi_tables, enumerate_apic, enumerate_hpet, enumerate_rtc, enumerate_uart},
     aml_enumerate::enumerate_aml_devices,
 };
 
@@ -27,9 +27,10 @@ pub fn enumerate_static_devices() -> Vec<CommonDeviceType> {
     let mut devices = Vec::new();
 
     if let Some(tables) = tables {
-        // 步骤2：按“静态表优先”顺序枚举 APIC/UART/RTC。
+        // 步骤2：按“静态表优先”顺序枚举 APIC/HPET/UART/RTC。
         debug!("[bus][x86_64] enumerate static ACPI devices");
         devices.extend(enumerate_apic(tables));
+        devices.extend(enumerate_hpet(tables));
         devices.extend(enumerate_uart(tables));
         devices.extend(enumerate_rtc(tables));
     } else {

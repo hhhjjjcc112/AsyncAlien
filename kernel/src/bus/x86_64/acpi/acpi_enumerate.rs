@@ -1,5 +1,6 @@
 use acpi::{
     AcpiTables,
+    HpetInfo,
     address::AddressSpace,
     rsdp::Rsdp,
     sdt::{
@@ -19,6 +20,7 @@ use super::{BusAcpiTables, acpi_hander, make_common_device};
 const DEFAULT_LAPIC_BASE: usize = 0xfee0_0000;
 const DEFAULT_IOAPIC_BASE: usize = 0xfec0_0000;
 const APIC_MMIO_SIZE: usize = 0x1000;
+const HPET_MMIO_SIZE: usize = 0x1000;
 const DEFAULT_RTC_IO_BASE: usize = 0x70;
 const DEFAULT_RTC_IO_SIZE: usize = 0x2;
 const DEFAULT_RTC_IRQ: u32 = 8;
@@ -212,6 +214,39 @@ pub fn enumerate_uart(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
         warn!("[bus][x86_64][acpi] SPCR missing, fallback to AML/COM path");
     }
 
+    devices
+}
+
+/// 函数说明：执行对应的总线处理步骤。
+pub fn enumerate_hpet(tables: &BusAcpiTables) -> Vec<CommonDeviceType> {
+    // 步骤1：优先读取 ACPI HPET 表，缺失时仅告警并跳过。
+    let mut devices = Vec::new();
+    let hpet = match HpetInfo::new(tables) {
+        Ok(info) => info,
+        Err(err) => {
+            warn!("[bus][x86_64][acpi] HPET not available: {:?}, skip", err);
+            return devices;
+        }
+    };
+
+    let base = hpet.base_address;
+    let end = base.saturating_add(HPET_MMIO_SIZE);
+    debug!(
+        "[bus][x86_64][acpi] HPET: base={:#x}, comparators={}, 64bit_counter={}, legacy_irq={}",
+        base,
+        hpet.num_comparators,
+        hpet.main_counter_is_64bits,
+        hpet.legacy_irq_capable
+    );
+
+    // 步骤2：封装为统一设备类型。
+    devices.push(CommonDeviceType::Hpet(make_common_device(
+        base,
+        HPET_MMIO_SIZE,
+        DeviceLocator::Mmio(PhysAddr::from(base)..PhysAddr::from(end)),
+        None,
+        Some("hpet"),
+    )));
     devices
 }
 

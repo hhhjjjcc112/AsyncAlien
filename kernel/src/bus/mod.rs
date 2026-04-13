@@ -80,6 +80,7 @@ pub enum DeviceClass {
     Plic,
     LocalApic,
     IoApic,
+    Hpet,
     Uart,
     Rtc,
     PciHost,

@@ -909,6 +909,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "cmos_rtc"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "shared_heap",
+ "timestamp",
+ "x86_rtc",
+]
+
+[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1412,6 +1423,7 @@ dependencies = [
  "buf_input",
  "buf_uart",
  "cache_blk",
+ "cmos_rtc",
  "common_scheduler",
  "devfs",
  "domain",
@@ -1422,6 +1434,7 @@ dependencies = [
  "gapic",
  "gbuf_input",
  "gbuf_uart",
+ "gcmos_rtc",
  "gdevfs",
  "gdomainfs",
  "generic",
@@ -2176,6 +2189,19 @@ version = "0.1.0"
 dependencies = [
  "basic",
  "buf_uart",
+ "corelib",
+ "interface",
+ "malloc",
+ "shared_heap",
+ "storage",
+]
+
+[[package]]
+name = "gcmos_rtc"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "cmos_rtc",
  "corelib",
  "interface",
  "malloc",

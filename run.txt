@@ -1,16 +1,12 @@
 cd domains && ARCH=x86_64 PLATFORM=plat_qemu_x86_64 DOMAIN_PROFILE= cargo domain build-all -l "" -o /home/hjch/AsyncAlien/build
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.46s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.34s
      Running `/home/hjch/AsyncAlien/target/debug/domain build-all -l '' -o /home/hjch/AsyncAlien/build`
 Building all domain projects, LOG: 
 Start building all domains
 Building domain [syscall] project for target: x86_64
 Start building domain,path: "./common/syscall/gsyscall/Cargo.toml"
    Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
-   Compiling pconst v0.1.0 (/home/hjch/AsyncAlien/utils/pconst)
    Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
-   Compiling vfscore-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/vfscore-ref)
-   Compiling interface v0.1.0 (/home/hjch/AsyncAlien/domain-lib/interface)
-   Compiling corelib v0.1.0 (/home/hjch/AsyncAlien/domain-lib/corelib)
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling syscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/syscall)
 warning: function `sys_dup2` is never used
@@ -23,17 +19,13 @@ warning: function `sys_dup2` is never used
 
 warning: `syscall` (lib) generated 1 warning
    Compiling gsyscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/gsyscall)
-    Finished `release` profile [optimized] target(s) in 6.10s
+    Finished `release` profile [optimized] target(s) in 2.59s
 Build domain [syscall] project success
 Copy domain [syscall] project success
 Building domain [task] project for target: x86_64
 Start building domain,path: "./common/task/gtask/Cargo.toml"
    Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
-   Compiling pconst v0.1.0 (/home/hjch/AsyncAlien/utils/pconst)
    Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
-   Compiling vfscore-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/vfscore-ref)
-   Compiling interface v0.1.0 (/home/hjch/AsyncAlien/domain-lib/interface)
-   Compiling corelib v0.1.0 (/home/hjch/AsyncAlien/domain-lib/corelib)
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling task v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/task)
 warning: function `kthread_init` is never used
@@ -79,13 +71,12 @@ warning: methods `get` and `del` are never used
 
 warning: `task` (lib) generated 5 warnings
    Compiling gtask v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/gtask)
-    Finished `release` profile [optimized] target(s) in 6.66s
+    Finished `release` profile [optimized] target(s) in 4.24s
 Build domain [task] project success
 Copy domain [task] project success
 Building domain [vfs] project for target: x86_64
 Start building domain,path: "./common/vfs/gvfs/Cargo.toml"
    Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
-   Compiling unifs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/unifs-ref)
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling vfs_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/vfs_common)
    Compiling vfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/vfs)
@@ -124,7 +115,7 @@ warning: field `inode` is never read
 
 warning: `vfs` (lib) generated 3 warnings
    Compiling gvfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/gvfs)
-    Finished `release` profile [optimized] target(s) in 5.96s
+    Finished `release` profile [optimized] target(s) in 5.38s
 Build domain [vfs] project success
 Copy domain [vfs] project success
 Building domain [buf_uart] project for target: x86_64
@@ -132,14 +123,14 @@ Start building domain,path: "./drivers/buf_uart/gbuf_uart/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling buf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/buf_uart)
    Compiling gbuf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/gbuf_uart)
-    Finished `release` profile [optimized] target(s) in 1.39s
+    Finished `release` profile [optimized] target(s) in 1.26s
 Build domain [buf_uart] project success
 Copy domain [buf_uart] project success
 Building domain [buf_input] project for target: x86_64
 Start building domain,path: "./drivers/buf_input/gbuf_input/Cargo.toml"
    Compiling buf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/buf_input)
    Compiling gbuf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/gbuf_input)
-    Finished `release` profile [optimized] target(s) in 1.26s
+    Finished `release` profile [optimized] target(s) in 1.10s
 Build domain [buf_input] project success
 Copy domain [buf_input] project success
 Building domain [cache_blk] project for target: x86_64
@@ -184,28 +175,28 @@ warning: function `main` is never used
 
 warning: `cache_blk` (lib) generated 5 warnings
    Compiling gcache_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cache_blk/gcache_blk)
-    Finished `release` profile [optimized] target(s) in 1.63s
+    Finished `release` profile [optimized] target(s) in 1.38s
 Build domain [cache_blk] project success
 Copy domain [cache_blk] project success
 Building domain [null] project for target: x86_64
 Start building domain,path: "./drivers/null/gnull/Cargo.toml"
    Compiling null v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/null)
    Compiling gnull v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/gnull)
-    Finished `release` profile [optimized] target(s) in 1.03s
+    Finished `release` profile [optimized] target(s) in 0.95s
 Build domain [null] project success
 Copy domain [null] project success
 Building domain [random] project for target: x86_64
 Start building domain,path: "./drivers/random/grandom/Cargo.toml"
    Compiling random v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/random)
    Compiling grandom v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/grandom)
-    Finished `release` profile [optimized] target(s) in 1.00s
+    Finished `release` profile [optimized] target(s) in 0.88s
 Build domain [random] project success
 Copy domain [random] project success
 Building domain [shadow_blk] project for target: x86_64
 Start building domain,path: "./drivers/shadow_blk/gshadow_blk/Cargo.toml"
    Compiling shadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/shadow_blk)
    Compiling gshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/gshadow_blk)
-    Finished `release` profile [optimized] target(s) in 1.20s
+    Finished `release` profile [optimized] target(s) in 1.10s
 Build domain [shadow_blk] project success
 Copy domain [shadow_blk] project success
 Building domain [apic] project for target: x86_64
@@ -214,14 +205,42 @@ Start building domain,path: "./common/apic/gapic/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling apic v0.1.0 (/home/hjch/AsyncAlien/domains/common/apic/apic)
    Compiling gapic v0.1.0 (/home/hjch/AsyncAlien/domains/common/apic/gapic)
-    Finished `release` profile [optimized] target(s) in 1.54s
+    Finished `release` profile [optimized] target(s) in 1.37s
 Build domain [apic] project success
 Copy domain [apic] project success
+Building domain [local_apic] project for target: x86_64
+Start building domain,path: "./drivers/local_apic/glocal_apic/Cargo.toml"
+   Compiling glocal_apic v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/local_apic/glocal_apic)
+    Finished `release` profile [optimized] target(s) in 0.77s
+Build domain [local_apic] project success
+Copy domain [local_apic] project success
+Building domain [io_apic] project for target: x86_64
+Start building domain,path: "./drivers/io_apic/gio_apic/Cargo.toml"
+   Compiling gio_apic v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/io_apic/gio_apic)
+    Finished `release` profile [optimized] target(s) in 0.77s
+Build domain [io_apic] project success
+Copy domain [io_apic] project success
+Building domain [hpet] project for target: x86_64
+Start building domain,path: "./drivers/hpet/ghpet/Cargo.toml"
+   Compiling hpet v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/hpet/hpet)
+   Compiling ghpet v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/hpet/ghpet)
+    Finished `release` profile [optimized] target(s) in 0.86s
+Build domain [hpet] project success
+Copy domain [hpet] project success
+Building domain [cmos_rtc] project for target: x86_64
+Start building domain,path: "./drivers/cmos_rtc/gcmos_rtc/Cargo.toml"
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling cmos_rtc v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cmos_rtc/cmos_rtc)
+   Compiling gcmos_rtc v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cmos_rtc/gcmos_rtc)
+    Finished `release` profile [optimized] target(s) in 1.09s
+Build domain [cmos_rtc] project success
+Copy domain [cmos_rtc] project success
 Building domain [uart16550] project for target: x86_64
 Start building domain,path: "./drivers/uart16550/guart16550/Cargo.toml"
    Compiling domain_uart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/uart16550)
    Compiling guart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/guart16550)
-    Finished `release` profile [optimized] target(s) in 1.03s
+    Finished `release` profile [optimized] target(s) in 0.88s
 Build domain [uart16550] project success
 Copy domain [uart16550] project success
 Building domain [virtio_blk] project for target: x86_64
@@ -415,7 +434,7 @@ warning: `virtio-drivers` (lib) generated 16 warnings
    Compiling virtio_mmio_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/virtio_mmio_common)
    Compiling virtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/virtio_blk)
    Compiling gvirtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/gvirtio_blk)
-    Finished `release` profile [optimized] target(s) in 1.67s
+    Finished `release` profile [optimized] target(s) in 1.52s
 Build domain [virtio_blk] project success
 Copy domain [virtio_blk] project success
 Building domain [virtio_net] project for target: x86_64
@@ -608,7 +627,7 @@ warning: field `config_generation` is never read
 warning: `virtio-drivers` (lib) generated 16 warnings
    Compiling virtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/virtio_net)
    Compiling gvirtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/gvirtio_net)
-    Finished `release` profile [optimized] target(s) in 1.59s
+    Finished `release` profile [optimized] target(s) in 1.46s
 Build domain [virtio_net] project success
 Copy domain [virtio_net] project success
 Building domain [virtio_input] project for target: x86_64
@@ -801,7 +820,7 @@ warning: field `config_generation` is never read
 warning: `virtio-drivers` (lib) generated 16 warnings
    Compiling virtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/virtio_input)
    Compiling gvirtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/gvirtio_input)
-    Finished `release` profile [optimized] target(s) in 1.58s
+    Finished `release` profile [optimized] target(s) in 1.35s
 Build domain [virtio_input] project success
 Copy domain [virtio_input] project success
 Building domain [virtio_gpu] project for target: x86_64
@@ -994,55 +1013,51 @@ warning: field `config_generation` is never read
 warning: `virtio-drivers` (lib) generated 16 warnings
    Compiling virtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/virtio_gpu)
    Compiling gvirtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/gvirtio_gpu)
-    Finished `release` profile [optimized] target(s) in 1.58s
+    Finished `release` profile [optimized] target(s) in 1.44s
 Build domain [virtio_gpu] project success
 Copy domain [virtio_gpu] project success
 Building domain [devfs] project for target: x86_64
 Start building domain,path: "./fs/devfs/gdevfs/Cargo.toml"
-   Compiling devfs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/devfs-ref)
    Compiling vfs_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/vfs_common)
    Compiling generic v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/generic)
    Compiling devfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/devfs)
    Compiling gdevfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/gdevfs)
-    Finished `release` profile [optimized] target(s) in 4.40s
+    Finished `release` profile [optimized] target(s) in 4.07s
 Build domain [devfs] project success
 Copy domain [devfs] project success
 Building domain [fatfs] project for target: x86_64
 Start building domain,path: "./fs/fatfs/gfatfs/Cargo.toml"
-   Compiling fat-vfs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/fat-vfs-ref)
    Compiling domain_fatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/fatfs)
    Compiling gfatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/gfatfs)
-    Finished `release` profile [optimized] target(s) in 4.79s
+    Finished `release` profile [optimized] target(s) in 4.07s
 Build domain [fatfs] project success
 Copy domain [fatfs] project success
 Building domain [pipefs] project for target: x86_64
 Start building domain,path: "./fs/pipefs/gpipefs/Cargo.toml"
-   Compiling dynfs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/dynfs-ref)
    Compiling pipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/pipefs)
    Compiling gpipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/gpipefs)
-    Finished `release` profile [optimized] target(s) in 3.12s
+    Finished `release` profile [optimized] target(s) in 2.78s
 Build domain [pipefs] project success
 Copy domain [pipefs] project success
 Building domain [ramfs] project for target: x86_64
 Start building domain,path: "./fs/ramfs/gramfs/Cargo.toml"
-   Compiling ramfs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/ramfs-ref)
    Compiling ramfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/ramfs/ramfs)
    Compiling gramfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/ramfs/gramfs)
-    Finished `release` profile [optimized] target(s) in 3.48s
+    Finished `release` profile [optimized] target(s) in 3.10s
 Build domain [ramfs] project success
 Copy domain [ramfs] project success
 Building domain [sysfs] project for target: x86_64
 Start building domain,path: "./fs/sysfs/gsysfs/Cargo.toml"
    Compiling sysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/sysfs)
    Compiling gsysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/gsysfs)
-    Finished `release` profile [optimized] target(s) in 2.98s
+    Finished `release` profile [optimized] target(s) in 2.78s
 Build domain [sysfs] project success
 Copy domain [sysfs] project success
 Building domain [procfs] project for target: x86_64
 Start building domain,path: "./fs/procfs/gprocfs/Cargo.toml"
    Compiling procfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/procfs)
    Compiling gprocfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/gprocfs)
-    Finished `release` profile [optimized] target(s) in 3.36s
+    Finished `release` profile [optimized] target(s) in 3.01s
 Build domain [procfs] project success
 Copy domain [procfs] project success
 Building domain [fifo_scheduler] project for target: x86_64
@@ -1062,7 +1077,7 @@ warning: field `name` is never read
    Compiling fifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/fifo_scheduler)
 warning: `common_scheduler` (lib) generated 1 warning
    Compiling gfifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/gfifo_scheduler)
-    Finished `release` profile [optimized] target(s) in 1.19s
+    Finished `release` profile [optimized] target(s) in 1.08s
 Build domain [fifo_scheduler] project success
 Copy domain [fifo_scheduler] project success
 Building domain [logger] project for target: x86_64
@@ -1070,7 +1085,7 @@ Start building domain,path: "./common/logger/glogger/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling logger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/logger)
    Compiling glogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/glogger)
-    Finished `release` profile [optimized] target(s) in 1.13s
+    Finished `release` profile [optimized] target(s) in 1.03s
 Build domain [logger] project success
 Copy domain [logger] project success
 Building domain [net_stack] project for target: x86_64
@@ -1091,29 +1106,28 @@ warning: variants `ICMP` and `IGMP` are never constructed
 warning: `lose-net-stack` (lib) generated 1 warning
    Compiling net_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/net_stack)
    Compiling gnet_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/gnet_stack)
-    Finished `release` profile [optimized] target(s) in 2.54s
+    Finished `release` profile [optimized] target(s) in 2.35s
 Build domain [net_stack] project success
 Copy domain [net_stack] project success
 Building domain [domainfs] project for target: x86_64
 Start building domain,path: "./fs/domainfs/gdomainfs/Cargo.toml"
-   Compiling custom_fs-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/customfs-ref)
    Compiling domainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/domainfs)
    Compiling gdomainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/gdomainfs)
-    Finished `release` profile [optimized] target(s) in 3.39s
+    Finished `release` profile [optimized] target(s) in 3.07s
 Build domain [domainfs] project success
 Copy domain [domainfs] project success
 Building domain [mem_block] project for target: x86_64
 Start building domain,path: "./drivers/mem_block/gmem_block/Cargo.toml"
    Compiling mem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/mem_block)
    Compiling gmem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/gmem_block)
-    Finished `release` profile [optimized] target(s) in 1.06s
+    Finished `release` profile [optimized] target(s) in 0.98s
 Build domain [mem_block] project success
 Copy domain [mem_block] project success
 Building domain [sshadow_blk] project for target: x86_64
 Start building domain,path: "./drivers/sshadow_blk/gsshadow_blk/Cargo.toml"
    Compiling sshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/sshadow_blk)
    Compiling gsshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/gsshadow_blk)
-    Finished `release` profile [optimized] target(s) in 1.18s
+    Finished `release` profile [optimized] target(s) in 1.11s
 Build domain [sshadow_blk] project success
 Copy domain [sshadow_blk] project success
 Building domain [random_scheduler] project for target: x86_64
@@ -1132,14 +1146,14 @@ warning: field `name` is never read
 warning: `common_scheduler` (lib) generated 1 warning
    Compiling random_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/random_scheduler)
    Compiling grandom_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/grandom_scheduler)
-    Finished `release` profile [optimized] target(s) in 1.10s
+    Finished `release` profile [optimized] target(s) in 1.02s
 Build domain [random_scheduler] project success
 Copy domain [random_scheduler] project success
 Building domain [xlogger] project for target: x86_64
 Start building domain,path: "./common/xlogger/gxlogger/Cargo.toml"
    Compiling xlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/xlogger)
    Compiling gxlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/gxlogger)
-    Finished `release` profile [optimized] target(s) in 1.01s
+    Finished `release` profile [optimized] target(s) in 0.94s
 Build domain [xlogger] project success
 Copy domain [xlogger] project success
 Building domain [vfs2] project for target: x86_64
@@ -1200,79 +1214,56 @@ warning: struct `VfsOutPut` is never constructed
 
 warning: `vfs2` (lib) generated 6 warnings (run `cargo fix --lib -p vfs2` to apply 2 suggestions)
    Compiling gvfs2 v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs2/gvfs2)
-    Finished `release` profile [optimized] target(s) in 5.19s
+    Finished `release` profile [optimized] target(s) in 4.72s
 Build domain [vfs2] project success
 Copy domain [vfs2] project success
 Building domain [loopback] project for target: x86_64
 Start building domain,path: "./drivers/loopback/gloopback/Cargo.toml"
    Compiling loopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/loopback)
    Compiling gloopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/gloopback)
-    Finished `release` profile [optimized] target(s) in 1.17s
+    Finished `release` profile [optimized] target(s) in 1.06s
 Build domain [loopback] project success
 Copy domain [loopback] project success
 dd if=/dev/zero of=build/sdcard.img bs=1M count=72;
 72+0 records in
 72+0 records out
-75497472 bytes (75 MB, 72 MiB) copied, 0.0670164 s, 1.1 GB/s
+75497472 bytes (75 MB, 72 MiB) copied, 0.0973829 s, 775 MB/s
 mkfs.fat 4.2 (2021-01-31)
 Building user apps
 make[1]: Entering directory '/home/hjch/AsyncAlien/user/apps'
 Building apps
 init dtest dgpu dtask dlog dinput dnet dvfs ping client out nice
-   Compiling pconst v0.1.0 (/home/hjch/AsyncAlien/utils/pconst)
-   Compiling Mstd v0.1.0 (/home/hjch/AsyncAlien/user/userlib)
-   Compiling init v0.1.0 (/home/hjch/AsyncAlien/user/apps/init)
-    Finished `release` profile [optimized] target(s) in 2.36s
-   Compiling domain-helper v0.1.0 (/home/hjch/AsyncAlien/user/apps/domain-helper)
-   Compiling dtest v0.1.0 (/home/hjch/AsyncAlien/user/apps/dtest)
-    Finished `release` profile [optimized] target(s) in 0.65s
-   Compiling dgpu v0.1.0 (/home/hjch/AsyncAlien/user/apps/dgpu)
-    Finished `release` profile [optimized] target(s) in 0.58s
-   Compiling dtask v0.1.0 (/home/hjch/AsyncAlien/user/apps/dtask)
-    Finished `release` profile [optimized] target(s) in 0.57s
-   Compiling downloader v0.1.0 (/home/hjch/AsyncAlien/user/apps/downloader)
-   Compiling dlog v0.1.0 (/home/hjch/AsyncAlien/user/apps/dlog)
-    Finished `release` profile [optimized] target(s) in 0.72s
-   Compiling dinput v0.1.0 (/home/hjch/AsyncAlien/user/apps/dinput)
-    Finished `release` profile [optimized] target(s) in 0.56s
-   Compiling dnet v0.1.0 (/home/hjch/AsyncAlien/user/apps/dnet)
-    Finished `release` profile [optimized] target(s) in 0.54s
-   Compiling dvfs v0.1.0 (/home/hjch/AsyncAlien/user/apps/dvfs)
-    Finished `release` profile [optimized] target(s) in 0.57s
-   Compiling ping v0.1.0 (/home/hjch/AsyncAlien/user/apps/ping)
-    Finished `release` profile [optimized] target(s) in 0.62s
-   Compiling client v0.1.0 (/home/hjch/AsyncAlien/user/apps/client)
-    Finished `release` profile [optimized] target(s) in 0.67s
-   Compiling out v0.1.0 (/home/hjch/AsyncAlien/user/apps/out)
-    Finished `release` profile [optimized] target(s) in 0.56s
-   Compiling nice v0.1.0 (/home/hjch/AsyncAlien/user/apps/nice)
-    Finished `release` profile [optimized] target(s) in 0.59s
+    Finished `release` profile [optimized] target(s) in 0.19s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
 Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
 make[1]: Leaving directory '/home/hjch/AsyncAlien/user/apps'
 make[1]: Entering directory '/home/hjch/AsyncAlien/user/tests'
 Building tests
 new/sys_time new/sys_fs new/sys_link new/sys_proc new/sys_poll new/sys_random new/syscall_all
-   Compiling sys_time v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_time)
-    Finished `release` profile [optimized] target(s) in 0.54s
-   Compiling sys_fs v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_fs)
-    Finished `release` profile [optimized] target(s) in 0.56s
-   Compiling sys_link v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_link)
-    Finished `release` profile [optimized] target(s) in 0.54s
-   Compiling sys_proc v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_proc)
-    Finished `release` profile [optimized] target(s) in 0.64s
-   Compiling sys_poll v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_poll)
-    Finished `release` profile [optimized] target(s) in 0.56s
-   Compiling sys_random v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/sys_random)
-    Finished `release` profile [optimized] target(s) in 0.54s
-   Compiling syscall_all v0.1.0 (/home/hjch/AsyncAlien/user/tests/new/syscall_all)
-    Finished `release` profile [optimized] target(s) in 0.56s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
 Moving tests to /home/hjch/AsyncAlien/build/sdcard.img
 make[1]: Leaving directory '/home/hjch/AsyncAlien/user/tests'
 make[1]: Entering directory '/home/hjch/AsyncAlien/user/musl'
 Building apps
 (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p hello);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p async_test);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p ftest);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p fs_update);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p pingpong);
-    Finished `release` profile [optimized] target(s) in 0.31s
-    Finished `release` profile [optimized] target(s) in 0.28s
+    Finished `release` profile [optimized] target(s) in 0.29s
+    Finished `release` profile [optimized] target(s) in 0.22s
 warning: function `read_once_test` is never used
   --> user/musl/ftest/src/main.rs:41:4
    |
@@ -1282,58 +1273,54 @@ warning: function `read_once_test` is never used
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
 warning: `ftest` (bin "ftest") generated 1 warning
-    Finished `release` profile [optimized] target(s) in 0.23s
-   Compiling pconst v0.1.0 (/home/hjch/AsyncAlien/utils/pconst)
-   Compiling Mstd v0.1.0 (/home/hjch/AsyncAlien/user/userlib)
-   Compiling domain-helper v0.1.0 (/home/hjch/AsyncAlien/user/apps/domain-helper)
-   Compiling fs_update v0.1.0 (/home/hjch/AsyncAlien/user/musl/fs_update)
-    Finished `release` profile [optimized] target(s) in 7.86s
     Finished `release` profile [optimized] target(s) in 0.22s
+    Finished `release` profile [optimized] target(s) in 0.21s
+    Finished `release` profile [optimized] target(s) in 0.20s
 Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
 make[1]: Leaving directory '/home/hjch/AsyncAlien/user/musl'
 Building user apps done
 [sdcard] 使用 mtools 写入 build/sdcard.img
  Volume in drive : has no label
- Volume Serial Number is 68E9-0D46
+ Volume Serial Number is 32EA-0F52
 Directory for ::/
 
-init             30472 2026-04-12  15:15 
-dtest            34608 2026-04-12  15:15 
-dgpu             34608 2026-04-12  15:15 
-dtask            34632 2026-04-12  15:15 
-dlog             38976 2026-04-12  15:15 
-dinput           34632 2026-04-12  15:15 
-dnet             34608 2026-04-12  15:15 
-dvfs             34608 2026-04-12  15:15 
-ping             38976 2026-04-12  15:15 
-client           34776 2026-04-12  15:15 
-out              30352 2026-04-12  15:15 
-nice             34656 2026-04-12  15:15 
-new          <DIR>     2026-04-12  15:15 
-hello           430632 2026-04-12  15:15 
-ASYNC_~1        545384 2026-04-12  15:15  async_test
-ftest           418224 2026-04-12  15:15 
-FS_UPD~1        447016 2026-04-12  15:15  fs_update
-pingpong        467496 2026-04-12  15:15 
-GLOOPB~1         79288 2026-04-12  15:15  gloopback
-GRANDO~1         83528 2026-04-12  15:15  grandom_scheduler
-GSSHAD~1         83352 2026-04-12  15:15  gsshadow_blk
-gvfs2           408112 2026-04-12  15:15 
-GVIRTI~1        123280 2026-04-12  15:15  gvirtio_mmio_gpu
-GVIRTI~2        114384 2026-04-12  15:15  gvirtio_mmio_input
-GVIRTI~3        123200 2026-04-12  15:15  gvirtio_mmio_net
-gxlogger         74280 2026-04-12  15:15 
-bash           5569896 2026-04-12  15:15 
-REDIS-~1        502256 2026-04-12  15:15  redis-benchmark
-REDIS-~2        759640 2026-04-12  15:15  redis-cli
-REDIS-~3       3814760 2026-04-12  15:15  redis-server
-REDIS~1  CON     46695 2026-04-12  15:15  redis.conf
-domains      <DIR>     2026-04-12  15:15 
+init             30472 2026-04-13   1:15 
+dtest            34608 2026-04-13   1:15 
+dgpu             34608 2026-04-13   1:15 
+dtask            34632 2026-04-13   1:15 
+dlog             38976 2026-04-13   1:15 
+dinput           34632 2026-04-13   1:15 
+dnet             34608 2026-04-13   1:15 
+dvfs             34608 2026-04-13   1:15 
+ping             38976 2026-04-13   1:15 
+client           34776 2026-04-13   1:15 
+out              30352 2026-04-13   1:15 
+nice             34656 2026-04-13   1:15 
+new          <DIR>     2026-04-13   1:15 
+hello           430632 2026-04-13   1:15 
+ASYNC_~1        545384 2026-04-13   1:15  async_test
+ftest           418224 2026-04-13   1:15 
+FS_UPD~1        447016 2026-04-13   1:15  fs_update
+pingpong        467496 2026-04-13   1:15 
+GLOOPB~1         79288 2026-04-13   1:15  gloopback
+GRANDO~1         83528 2026-04-13   1:15  grandom_scheduler
+GSSHAD~1         83352 2026-04-13   1:15  gsshadow_blk
+gvfs2           408112 2026-04-13   1:15 
+GVIRTI~1        123280 2026-04-13   1:15  gvirtio_mmio_gpu
+GVIRTI~2        114384 2026-04-13   1:15  gvirtio_mmio_input
+GVIRTI~3        123200 2026-04-13   1:15  gvirtio_mmio_net
+gxlogger         74280 2026-04-13   1:15 
+bash           5569896 2026-04-13   1:15 
+REDIS-~1        502256 2026-04-13   1:15  redis-benchmark
+REDIS-~2        759640 2026-04-13   1:15  redis-cli
+REDIS-~3       3814760 2026-04-13   1:15  redis-server
+REDIS~1  CON     46695 2026-04-13   1:15  redis.conf
+domains      <DIR>     2026-04-13   1:15 
        32 files          14 507 327 bytes
                          59 585 536 bytes free
 
 [initrd] skip user/initrd rebuild (up-to-date)
-11518 blocks
+11781 blocks
 Building...
 ARCH: x86_64
 PLATFORM: plat_qemu_x86_64
@@ -1343,7 +1330,6 @@ SMP: 1
 VF2_SD: n
 PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG= cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default
    Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
-   Compiling pconst v0.1.0 (/home/hjch/AsyncAlien/utils/pconst)
 warning: unused import: `AtomicUsize`
  --> domain-lib/arch/src/x86_64.rs:5:37
   |
@@ -1355,6 +1341,7 @@ warning: unused import: `AtomicUsize`
 warning: `arch` (lib) generated 1 warning (run `cargo fix --lib -p arch` to apply 1 suggestion)
    Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
    Compiling platform v0.1.0 (/home/hjch/AsyncAlien/base/platform)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
 warning: function `cpu_num` is never used
   --> base/platform/src/common_x86_64/ap.rs:61:8
    |
@@ -1393,12 +1380,8 @@ warning: function `ticks_since_init` is never used
 93 | pub fn ticks_since_init() -> u64 {
    |        ^^^^^^^^^^^^^^^^
 
-warning: `platform` (lib) generated 6 warnings
-   Compiling vfscore-ref v0.1.0 (/home/hjch/AsyncAlien/rvfs-ref/vfscore-ref)
    Compiling mem v0.1.0 (/home/hjch/AsyncAlien/base/mem)
-   Compiling interface v0.1.0 (/home/hjch/AsyncAlien/domain-lib/interface)
-   Compiling corelib v0.1.0 (/home/hjch/AsyncAlien/domain-lib/corelib)
-   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+warning: `platform` (lib) generated 6 warnings
    Compiling kernel v0.1.0 (/home/hjch/AsyncAlien/kernel)
 warning: static `PLIC_DOMAIN` is never used
   --> kernel/src/trap/mod.rs:41:12
@@ -1415,7 +1398,7 @@ warning: function `register_plic_domain` is never used
    |        ^^^^^^^^^^^^^^^^^^^^
 
 warning: `kernel` (bin "kernel") generated 2 warnings
-    Finished `release` profile [optimized] target(s) in 15.26s
+    Finished `release` profile [optimized] target(s) in 11.56s
 qemu-system-x86_64 \
             -m 2048M \
             -smp 1 \
@@ -1438,21 +1421,21 @@ Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 
   / ___ \  | | | | |  __/ | | | |
  /_/   \_\ |_| |_|  \___| |_| |_|
 
-[0] Initrd from multiboot: 0xb23000..0xd88a64
+[0] Initrd from multiboot: 0xb24000..0xd93f46
 [0] Init logger Some("")
-[0] Frame range: 0x10b22000..0x7ffdc000, pages=0x6f4ba
-[0] initrd copy: src=0xb23000, size=2513508, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0xcd636a58, dst=0xcd636a58
-[0] Relocate initrd data to 0x10b30000
+[0] Frame range: 0x10b23000..0x7ffdc000, pages=0x6f4b9
+[0] initrd copy: src=0xb24000, size=2555718, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xc0f8ce0, dst=0xc0f8ce0
+[0] Relocate initrd data to 0x10b31000
 [0] Frame allocator init success
 [0] Talloc allocator init success
-[0] kernel text:          0x200000-0x2ae000
-[0] kernel rodata:        0x2ae000-0x2c5000
-[0] kernel init_array:    0x2c5000-0x2c5000
-[0] kernel data:          0x2c5000-0xb0a000
-[0] kernel bss:           0xb0a000-0xb22000
-[0] kernel heap:          0xb22000-0x10b22000
-[0] kernel alloc range:   0x10b22000-0x7ffdc000
+[0] kernel text:          0x200000-0x2af000
+[0] kernel rodata:        0x2af000-0x2c6000
+[0] kernel init_array:    0x2c6000-0x2c6000
+[0] kernel data:          0x2c6000-0xb0b000
+[0] kernel bss:           0xb0b000-0xb23000
+[0] kernel heap:          0xb23000-0x10b23000
+[0] kernel alloc range:   0x10b23000-0x7ffdc000
 [0] map local_apic: 0xfee00000-0xfee01000
 [0] map io_apic: 0xfec00000-0xfec01000
 [0] map hpet: 0xfed00000-0xfed01000
@@ -1466,7 +1449,7 @@ Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 
 SMP:     1 CPUs
 Memory:  0x100000..0x7ffdc000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb23000..0xd88a64
+Initrd:  0xb24000..0xd93f46
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] [bus][x86_64][pci] virtio summary: blk=1, net=1, input=0, gpu=0
@@ -1494,66 +1477,79 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: logger
 [0] <register domain>: domainfs
 [0] <register domain>: apic
+[0] <register domain>: local_apic
+[0] <register domain>: io_apic
+[0] <register domain>: hpet
+[0] <register domain>: cmos_rtc
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 4263 us[0m
+[0] [31m[Load new domain] Time elapsed: 4058 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 755 us[0m
+[0] [31m[Load new domain] Time elapsed: 800 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 2175 us[0m
+[0] [31m[Load new domain] Time elapsed: 1987 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 1174 us[0m
+[0] [31m[Load new domain] Time elapsed: 1073 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 2064 us[0m
+[0] [31m[Load new domain] Time elapsed: 1922 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 1729 us[0m
+[0] [31m[Load new domain] Time elapsed: 1607 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 1738 us[0m
+[0] [31m[Load new domain] Time elapsed: 1647 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 1629 us[0m
+[0] [31m[Load new domain] Time elapsed: 1620 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 2144 us[0m
+[0] [31m[Load new domain] Time elapsed: 1999 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 1369 us[0m
+[0] [31m[Load new domain] Time elapsed: 1392 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 825 us[0m
+[0] [31m[Load new domain] Time elapsed: 813 us[0m
 [0] <attach domain>: task, it's name is task
 [0][Domain:12] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 2481 us[0m
+[0] [31m[Load new domain] Time elapsed: 2452 us[0m
 [0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
 [0][Domain:12] syscall domain init
 [0] <attach domain>: syscall, it's name is syscall
-[0] [31m[Load new domain] Time elapsed: 787 us[0m
+[0] [31m[Load new domain] Time elapsed: 815 us[0m
 [0][Domain:13] APIC domain init
 [0] <attach domain>: apic, it's name is apic
-[0] [31m[Load new domain] Time elapsed: 1044 us[0m
-[0][Domain:14] uart_addr: 0x3f8-0x400
-[0][Domain:14] init uart success
+[0] [31m[Load new domain] Time elapsed: 434 us[0m
+[0] <attach domain>: local_apic, it's name is local_apic
+[0] [31m[Load new domain] Time elapsed: 395 us[0m
+[0] <attach domain>: io_apic, it's name is io_apic
+[0] [31m[Load new domain] Time elapsed: 569 us[0m
+[0] <attach domain>: hpet, it's name is hpet
+[0] [31m[Load new domain] Time elapsed: 463 us[0m
+[0][Domain:17] CmosRtc region: 0x70..0x72
+[0] <attach domain>: rtc, it's name is rtc
+[0] [31m[Load new domain] Time elapsed: 982 us[0m
+[0][Domain:18] uart_addr: 0x3f8-0x400
+[0][Domain:18] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 1012 us[0m
-[0][Domain:15] init buf uart success
+[0] [31m[Load new domain] Time elapsed: 1094 us[0m
+[0][Domain:19] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0][Domain:13] APIC enable irq 4
-[0] [31m[Load new domain] Time elapsed: 832 us[0m
-[0][Domain:16] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
-[0][Domain:16] virtio_blk_pci: create blk driver
-[0][Domain:16] virtio_blk_pci: driver ready
+[0] [31m[Load new domain] Time elapsed: 868 us[0m
+[0][Domain:20] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
+[0][Domain:20] virtio_blk_pci: create blk driver
+[0][Domain:20] virtio_blk_pci: driver ready
 [0] virtio-pci block @ 0000:00:03.0
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
 [0] Create empty domain: virtio_net
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 987 us[0m
-[0][Domain:17] net stack init successes!
+[0] [31m[Load new domain] Time elapsed: 969 us[0m
+[0][Domain:21] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 758 us[0m
+[0] [31m[Load new domain] Time elapsed: 730 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 3188 us[0m
+[0] [31m[Load new domain] Time elapsed: 2364 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 504 us[0m
+[0] [31m[Load new domain] Time elapsed: 431 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 411 us[0m
+[0] [31m[Load new domain] Time elapsed: 569 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -1566,10 +1562,10 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 1350 us[0m
-[0][Domain:22] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 1561 us[0m
+[0][Domain:26] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
-[0][Domain:22] ramfs mount success
+[0][Domain:26] ramfs mount success
 [0][Domain:10] procfs init success
 [0][Domain:5] devfs mount success
 [0][Domain:10] gpu domain not found
@@ -1578,16 +1574,16 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 1826 us[0m
-[0][Domain:23] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 1413 us[0m
+[0][Domain:27] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
-[0][Domain:23] ramfs mount success
+[0][Domain:27] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 1172 us[0m
-[0][Domain:24] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 1261 us[0m
+[0][Domain:28] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
-[0][Domain:24] ramfs mount success
+[0][Domain:28] ramfs mount success
 [0][Domain:9] domainfs mount success
 [0][Domain:10] Initrd populate success
 [0][Domain:10] fatfs mount begin: /tests
@@ -1614,7 +1610,7 @@ drwxr-xr-x      4KB usr
 [0] load_domains: before task init
 [0][Domain:11] x86_64 skip kthread_test for minimal shell bring-up
 [0][Domain:11] task::current_task: tid 0 not found
-[0][Domain:11] Task::from_elf success: name=/tests/init, tid=0, entry=0x4000000, user_sp=0x4059f80, k_sp=0x13a16000, cpu_id=0, cpus_allowed=0x1
+[0][Domain:11] Task::from_elf success: name=/tests/init, tid=0, entry=0x4000000, user_sp=0x4059f80, k_sp=0x13a62000, cpu_id=0, cpus_allowed=0x1
 [0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=0
 [0][Domain:11] init_task enqueue init process tid=0
 [0][Domain:11] Init task domain success

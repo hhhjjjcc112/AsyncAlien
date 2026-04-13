@@ -96,6 +96,17 @@ fn try_virtio_mmio_range_or_skip(
     }
 }
 
+#[cfg(target_arch = "x86_64")]
+fn init_x86_rtc_domain() -> AlienResult<()> {
+    // x86 CMOS RTC 使用固定端口，最小实现只提供读时间能力。
+    let rtc_range = 0x70usize..0x72usize;
+    let (rtc, domain_file_info) =
+        create_domain!(RtcDomainProxy, DomainTypeRaw::RtcDomain, "cmos_rtc")?;
+    rtc.init_by_box(Box::new(rtc_range))?;
+    register_domain!("rtc", domain_file_info, DomainType::RtcDomain(rtc), true);
+    Ok(())
+}
+
 #[cfg(target_arch = "riscv64")]
 fn init_device() -> AlienResult<Arc<dyn PLICDomain>> {
     let platform_bus = platform_bus!();
@@ -443,8 +454,7 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
                 }
             }
             "rtc" => {
-                // 当前 x86_64 RTC 仅完成总线枚举，域驱动后续再接入。
-                warn!("rtc device detected, rtc domain is not wired yet");
+                init_x86_rtc_domain()?;
             }
             "ramdisk" => {
                 let ramdisk_range =
@@ -474,10 +484,19 @@ fn init_device() -> AlienResult<Arc<dyn APICDomain>> {
             "pci_ecam" => {
                 // x86_64 的 virtio PCI 统一在平台设备遍历后处理，这里保留分支用于兼容旧日志路径。
             }
-            "local_apic" | "io_apic" => {
-                log::debug!(
-                    "x86_64 device {} detected, interrupt routing handled by apic domain",
-                    device.name()
+            "local_apic" | "io_apic" | "hpet" => {
+                // 迁移阶段先复用稳定的 null 空设备域占位，避免专用域引入额外不稳定性。
+                let (empty_dev, domain_file_info) = create_domain!(
+                    EmptyDeviceDomainProxy,
+                    DomainTypeRaw::EmptyDeviceDomain,
+                    "null"
+                )?;
+                empty_dev.init_by_box(Box::new(()))?;
+                register_domain!(
+                    device.name(),
+                    domain_file_info,
+                    DomainType::EmptyDeviceDomain(empty_dev),
+                    true
                 );
             }
             _ => {

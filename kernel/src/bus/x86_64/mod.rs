@@ -17,6 +17,7 @@ pub mod platform;
 pub enum CommonDeviceType {
     LocalApic(CommonDeviceInfo),
     IoApic(CommonDeviceInfo),
+    Hpet(CommonDeviceInfo),
     Uart(CommonDeviceInfo),
     Rtc(CommonDeviceInfo),
     Pci(CommonDeviceInfo),
@@ -51,6 +52,22 @@ fn from_common_device(ty: CommonDeviceType) -> DiscoveredDevice {
             } = info;
             DiscoveredDevice {
                 class: DeviceClass::IoApic,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Acpi,
+            }
+        }
+        CommonDeviceType::Hpet(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::Hpet,
                 locator,
                 transport: DeviceTransport::Platform,
                 irq,
@@ -159,6 +176,11 @@ fn register_discovered_devices(devices: alloc::vec::Vec<DiscoveredDevice>) {
                 platform::register_platform_device(info, "io_apic");
             }
         }
+        DeviceClass::Hpet => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "hpet");
+            }
+        }
         DeviceClass::Uart => {
             if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
                 platform::register_platform_device(info, "uart");
@@ -226,6 +248,7 @@ fn log_probe(devices: &[CommonDeviceType]) {
     // 步骤1：统计总线设备数量并输出关键地址信息。
     let mut local_apic = 0usize;
     let mut io_apic = 0usize;
+    let mut hpet = 0usize;
     let mut uart = 0usize;
     let mut rtc = 0usize;
     let mut pci_ecam = 0usize;
@@ -245,6 +268,14 @@ fn log_probe(devices: &[CommonDeviceType]) {
                 io_apic += 1;
                 debug!(
                     "[bus][x86_64][probe] io_apic @ {:#x}..{:#x}",
+                    info.address_range.start.as_usize(),
+                    info.address_range.end.as_usize()
+                );
+            }
+            CommonDeviceType::Hpet(info) => {
+                hpet += 1;
+                debug!(
+                    "[bus][x86_64][probe] hpet @ {:#x}..{:#x}",
                     info.address_range.start.as_usize(),
                     info.address_range.end.as_usize()
                 );
@@ -285,9 +316,10 @@ fn log_probe(devices: &[CommonDeviceType]) {
     }
 
     debug!(
-        "[bus][x86_64][probe] summary: local_apic={}, io_apic={}, uart={}, rtc={}, pci_ecam={}, virtio={}",
+        "[bus][x86_64][probe] summary: local_apic={}, io_apic={}, hpet={}, uart={}, rtc={}, pci_ecam={}, virtio={}",
         local_apic,
         io_apic,
+        hpet,
         uart,
         rtc,
         pci_ecam,

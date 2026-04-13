@@ -42,6 +42,14 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     #[cfg(target_arch = "x86_64")]
     ("apic", DomainTypeRaw::APICDomain),
     #[cfg(target_arch = "x86_64")]
+    ("local_apic", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("io_apic", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("hpet", DomainTypeRaw::EmptyDeviceDomain),
+    #[cfg(target_arch = "x86_64")]
+    ("cmos_rtc", DomainTypeRaw::RtcDomain),
+    #[cfg(target_arch = "x86_64")]
     ("virtio_net", DomainTypeRaw::NetDeviceDomain),
     #[cfg(target_arch = "x86_64")]
     ("virtio_input", DomainTypeRaw::InputDomain),
