@@ -1,4 +1,7 @@
-use std::{env, fs, path::{Path, PathBuf}};
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+};
 
 const PLATFORM_QEMU_RISCV: &str = "plat_qemu_riscv";
 const PLATFORM_QEMU_X86_64: &str = "plat_qemu_x86_64";
@@ -44,7 +47,6 @@ impl TargetArch {
             Self::Riscv64 => 0x8020_0000,
         }
     }
-
 }
 
 fn resolve_platform(target_arch: TargetArch) -> String {

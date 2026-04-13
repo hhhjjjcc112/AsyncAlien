@@ -16,6 +16,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aarch64-cpu"
+version = "10.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a21cd0131c25c438e19cd6a774adf7e3f64f7f4d723022882facc2dee0f8bc9"
+dependencies = [
+ "tock-registers",
+]
+
+[[package]]
 name = "acpi"
 version = "6.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -231,7 +240,7 @@ version = "0.1.0"
 dependencies = [
  "percpu",
  "raw-cpuid 11.6.0",
- "riscv",
+ "riscv 0.11.1",
  "x86_64 0.15.4",
 ]
 
@@ -512,7 +521,7 @@ dependencies = [
  "pconst",
  "pod",
  "raw-cpuid 11.6.0",
- "riscv",
+ "riscv 0.11.1",
  "shared_heap",
  "spin 0.10.0",
  "task_meta",
@@ -674,6 +683,14 @@ dependencies = [
  "basic",
  "interface",
  "shared_heap",
+]
+
+[[package]]
+name = "build_vdso"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "xmas-elf 0.9.1",
 ]
 
 [[package]]
@@ -3578,7 +3595,7 @@ dependencies = [
  "pconst",
  "percpu",
  "platform",
- "riscv",
+ "riscv 0.11.1",
  "shared_heap",
  "spin 0.10.0",
  "storage",
@@ -3588,7 +3605,7 @@ dependencies = [
  "x86",
  "x86-pci",
  "x86_64 0.14.13",
- "xmas-elf",
+ "xmas-elf 0.10.0",
 ]
 
 [[package]]
@@ -3791,6 +3808,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "linkme"
+version = "0.3.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e3283ed2d0e50c06dd8602e0ab319bb048b6325d0bba739db64ed8205179898"
+dependencies = [
+ "linkme-impl",
+]
+
+[[package]]
+name = "linkme-impl"
+version = "0.3.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5cec0ec4228b4853bb129c84dbf093a27e6c7a20526da046defc334a1b017f7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3823,7 +3860,7 @@ dependencies = [
  "memory_addr 0.1.0",
  "shared_heap",
  "storage",
- "xmas-elf",
+ "xmas-elf 0.10.0",
 ]
 
 [[package]]
@@ -4726,6 +4763,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "page_table_entry"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dda9891ec368fda90e4b2cc36592b4881073e25a339fe7e3eddd811f0cf6bf18"
+dependencies = [
+ "aarch64-cpu",
+ "bitflags 2.11.0",
+ "memory_addr 0.4.1",
+ "x86_64 0.15.4",
+]
+
+[[package]]
 name = "pager"
 version = "0.1.0"
 dependencies = [
@@ -4926,7 +4975,7 @@ dependencies = [
  "memory_addr 0.4.1",
  "multiboot",
  "raw-cpuid 11.6.0",
- "riscv",
+ "riscv 0.11.1",
  "spin 0.10.0",
  "uart_16550",
  "x2apic",
@@ -4944,7 +4993,7 @@ dependencies = [
  "interface",
  "raw-plic",
  "shared_heap",
- "spin 0.9.8",
+ "spin 0.10.0",
 ]
 
 [[package]]
@@ -5497,6 +5546,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "riscv"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f1671c79a01a149fe000af2429ce9ccc8e58cdecda72672355d50e5536b363c"
+dependencies = [
+ "critical-section",
+ "embedded-hal",
+ "paste",
+ "riscv-macros",
+ "riscv-pac",
+]
+
+[[package]]
+name = "riscv-macros"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8c4aa1ea1af6dcc83a61be12e8189f9b293c3ba5a487778a4cd89fb060fdbbc"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "riscv-pac"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8188909339ccc0c68cfb5a04648313f09621e8b87dc03095454f1a11f6c5d436"
+
+[[package]]
 name = "rle-decode-fast"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6043,6 +6122,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
 name = "storage"
 version = "0.1.0"
 dependencies = [
@@ -6299,7 +6384,7 @@ dependencies = [
  "task_meta",
  "vfscore-ref",
  "vmspace",
- "xmas-elf",
+ "xmas-elf 0.10.0",
 ]
 
 [[package]]
@@ -6444,6 +6529,12 @@ name = "tinyvec_macros"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
+
+[[package]]
+name = "tock-registers"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b9e2fdb3a1e862c0661768b7ed25390811df1947a8acbfbefe09b47078d93c4"
 
 [[package]]
 name = "tokio"
@@ -6890,6 +6981,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "vdso_builder"
+version = "0.1.0"
+dependencies = [
+ "build_vdso",
+]
+
+[[package]]
+name = "vdso_helper"
+version = "0.1.0"
+source = "git+https://github.com/rosy233333/vdso_crate_template#285512cf8cd1d256d98e80b21740cdd3b5d4bd59"
+dependencies = [
+ "lazyinit",
+ "paste",
+ "vsched_hal",
+]
+
+[[package]]
+name = "vdso_impl"
+version = "0.1.0"
+dependencies = [
+ "vdso_helper",
+]
+
+[[package]]
 name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7071,6 +7186,23 @@ name = "volatile"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "442887c63f2c839b346c192d047a7c87e73d0689c9157b00b53dcc27dd5ea793"
+
+[[package]]
+name = "vsched_hal"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2b4383b05f5161712f03988daf29592ff11499cf63bbe5b27ceea58030e9be6"
+dependencies = [
+ "aarch64-cpu",
+ "cfg-if",
+ "linkme",
+ "memory_addr 0.4.1",
+ "page_table_entry",
+ "riscv 0.14.0",
+ "static_assertions",
+ "x86",
+ "x86_64 0.15.4",
+]
 
 [[package]]
 name = "vtable"
@@ -8029,6 +8161,15 @@ dependencies = [
  "interface",
  "log",
  "shared_heap",
+]
+
+[[package]]
+name = "xmas-elf"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42c49817e78342f7f30a181573d82ff55b88a35f86ccaf07fc64b3008f56d1c6"
+dependencies = [
+ "zero",
 ]
 
 [[package]]

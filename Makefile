@@ -103,6 +103,8 @@ name ?=
 VF2 ?= n
 TFTPBOOT := /home/godones/projects/tftpboot/
 VF2_SD ?= n
+VDSO_TOOLCHAIN ?= nightly-2026-01-23
+VDSO_VERBOSE ?= 0
 BUILD_CFG ?=  -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem
 BENCH ?= n
 USER_INITRD_DIR := user/initrd
@@ -242,6 +244,7 @@ help:
 	@echo "  make run                Build and run in QEMU"
 	@echo "  make ready              Build everything but don't run QEMU"
 	@echo "  make build              Build kernel only"
+	@echo "  make vdso               Build vDSO only (follows ARCH)"
 	@echo "  make vf2                Build and deploy to VF2 via TFTP"
 	@echo "  make domains            Build all domains"
 	@echo "  make clean              Clean build artifacts"
@@ -272,6 +275,8 @@ help:
 	@echo "  DOMAIN_UART_TEST=y/n    Enable domain_uart_test feature"
 	@echo "  DOMAIN_BLOCK_TEST=y/n   Enable domain_block_test feature"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
+	@echo "  VDSO_TOOLCHAIN=...      vDSO toolchain (default: nightly-2026-01-23)"
+	@echo "  VDSO_VERBOSE=0/1/2      vDSO build verbosity"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make ARCH=riscv64 PLATFORM=plat_qemu_riscv run"
@@ -293,6 +298,10 @@ build:
 	@echo "VF2_SD: $(VF2_SD)"
 	@#LOG=$(LOG) cargo build --release -p kernel --target $(TARGET) --features $(FEATURES)
 	PLATFORM=$(PLATFORM) RUSTFLAGS='--cfg getrandom_backend="custom" --cfg $(PLATFORM)' LOG=$(LOG) cargo build --release -p kernel --target $(TARGET_CONFIG) $(BUILD_CFG) --features $(FEATURES)
+
+vdso:
+	@echo "Building vDSO..."
+	VDSO_TOOLCHAIN=$(VDSO_TOOLCHAIN) VDSO_VERBOSE=$(VDSO_VERBOSE) cargo run --release -p vdso_builder
 
 vf2:
 	@$(MAKE) ARCH=riscv64 PLATFORM=plat_vf2 build
@@ -482,4 +491,4 @@ check:
 	@cargo fmt
 	@cargo clippy -p kernel --target $(TARGET_CONFIG)  -- -D warnings
 
-.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check run_uintr fake_run_uintr
+.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check run_uintr fake_run_uintr vdso

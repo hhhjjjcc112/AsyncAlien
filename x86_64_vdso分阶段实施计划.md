@@ -1,13 +1,27 @@
 # x86_64_vdso分阶段实施计划（AsyncAlien）
 
 ## 1. 目标与原则
-1. 总目标：基于 `reference/vdso_crate_template` 在 AsyncAlien 引入 vDSO 机制，先最小可运行，再逐步增强。  
+1. 总目标：基于 [rosy233333/vdso_crate_template](https://github.com/rosy233333/vdso_crate_template) 在 AsyncAlien 引入 vDSO 机制，先最小可运行，再逐步增强。  
 2. 约束：
 - 不修改 `reference/`。  
 - 不删除或破坏现有 `riscv64` 路径。  
 - 对外接口尽量保持平台无关，平台差异下沉到内部实现。  
 - 任何 vDSO 失败场景都必须可回退到 syscall，保证功能正确优先。  
 3. 当前优先级：先完成 Phase 1（最小可运行）。
+
+### 1.1 当前实现进度
+1. 已完成构建侧拆分：
+- `vdso/vdso_impl` 只保留 vDSO 代码和共享数据定义。
+- `vdso/vdso_builder` 负责 `BuildConfig` 组装与上游 `build_vdso` 调用。
+- `kernel/build.rs` 已移除 vDSO 构建逻辑。
+- `make vdso` 可独立生成 `build/vdso` 产物，并默认跟随 `ARCH`；`make build` 不再隐式触发它。
+2. 构建器已经去掉仓库内独立的 `vdso_shim`；x86_64 仍会在 `build/vdso/.cargo-wrapper` 下临时生成 cargo 包装脚本，riscv64 直接走上游模板。
+3. 待完成运行时链路：
+- 任务地址空间中的 vDSO 映射。
+- `AT_SYSINFO_EHDR` 注入。
+- userlib 的 vDSO 优先路径与 syscall 回退。
+- 更完整的时间接口导出。
+4. 当前导出仍以 `__vdso_gettimeofday` 占位实现为主，先用于保持构建链路可用。
 
 ## 2. 阶段划分
 

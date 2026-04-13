@@ -5,6 +5,7 @@ members = [
     "user/apps/init",
     "domains",
     "base/*",
+    "vdso/*",
     "tools/*",
     "rvfs-ref/*",
     "user/apps/d*",
@@ -27,6 +28,7 @@ members = [
     "user/tests/new/sys_random",
     "user/tests/new/syscall_all",
 ]
+exclude = ["build/vdso"]
 resolver = "2"
 
 [workspace.dependencies]
