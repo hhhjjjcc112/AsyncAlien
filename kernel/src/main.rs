@@ -59,6 +59,7 @@ static SECONDARY_RUN_RELEASED: AtomicBool = AtomicBool::new(false);
 fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
     platform::platform_init_percpu_primary(boot_cpu_id);
+    task::init_current_tid();
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
     mem::init_memory_system(true);
@@ -96,6 +97,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
     platform::platform_init_percpu_secondary(cpu_id);
+    task::init_current_tid();
 
     
     platform::platform_init_secondary(cpu_id);

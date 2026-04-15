@@ -5,6 +5,7 @@ use std::{env, path::{Path, PathBuf}};
 enum TargetArch {
     Riscv64,
     X86_64,
+    ARM64,
 }
 
 impl TargetArch {
@@ -12,6 +13,7 @@ impl TargetArch {
         match raw {
             "riscv64" => Self::Riscv64,
             "x86_64" => Self::X86_64,
+            "aarch64" | "arm64" => Self::ARM64,
             other => panic!(
                 "不支持的 vDSO 架构 '{}', 只接受 x86_64 或 riscv64",
                 other
@@ -23,6 +25,7 @@ impl TargetArch {
         match self {
             Self::X86_64 => "x86_64",
             Self::Riscv64 => "riscv64",
+            Self::ARM64 => "aarch64",
         }
     }
 }

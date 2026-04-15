@@ -16,7 +16,7 @@ pconst = { path = "../utils/pconst", features = [
 spin = "0"
 
 ksync = { path = "../domain-lib/ksync" }
-arch = { path = "../domain-lib/arch", features = ["percpu_cpu_id"] }
+arch = { path = "../domain-lib/arch" }
 config = { path = "../domain-lib/config" }
 shared_heap = { path = "../domain-lib/shared_heap" }
 interface = { path = "../domain-lib/interface" }

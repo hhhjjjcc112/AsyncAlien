@@ -9,7 +9,7 @@
 
 use std::{
     env, fs,
-    io::{stderr, stdout, ErrorKind, Write},
+    io::{stderr, stdout, Write},
     path::Path,
     process::Command,
 };
@@ -52,6 +52,26 @@ pub fn build_vdso(config: &BuildConfig) {
     gen_api(config);
 }
 
+// 选择编译目标三元组
+fn build_target(arch: &str) -> &'static str {
+    match arch {
+        "x86_64" => "x86_64-unknown-none",
+        "aarch64" => "aarch64-unknown-none",
+        "riscv64" => "riscv64gc-unknown-none-elf",
+        _ => panic!("Unsupported arch"),
+    }
+}
+
+// 选择链接器程序
+fn linker_program(arch: &str) -> &'static str {
+    match arch {
+        "x86_64" => "x86_64-linux-musl-ld",
+        "aarch64" => "aarch64-linux-musl-ld",
+        "riscv64" => "riscv64-linux-musl-ld",
+        _ => panic!("Unsupported arch"),
+    }
+}
+
 /// 生成链接脚本的代码
 fn gen_linker_script(arch: &str) -> String {
     // Copied and modified from https://github.com/AsyncModules/vsched/blob/e19b572714a6931972f1428e42d43cc34bcf47f2/vsched/build.rs
@@ -62,58 +82,57 @@ fn gen_linker_script(arch: &str) -> String {
         _ => panic!("Unsupported arch"),
     };
     let linker = format!(
-        r#"
-    OUTPUT_ARCH({})
+r#"OUTPUT_ARCH({})
 
-    SECTIONS {{
-        . = SIZEOF_HEADERS;
+SECTIONS {{
+    . = SIZEOF_HEADERS;
 
-        /* 先放置动态链接相关的只读段 */
-        .hash		: {{ *(.hash) }}
-    	.gnu.hash	: {{ *(.gnu.hash) }}
-    	.dynsym		: {{ *(.dynsym) }}
-    	.dynstr		: {{ *(.dynstr) }}
-    	.gnu.version	: {{ *(.gnu.version) }}
-    	.gnu.version_d	: {{ *(.gnu.version_d) }}
-    	.gnu.version_r	: {{ *(.gnu.version_r) }}
+    /* 先放置动态链接相关的只读段 */
+    .hash		: {{ *(.hash) }}
+    .gnu.hash	: {{ *(.gnu.hash) }}
+    .dynsym		: {{ *(.dynsym) }}
+    .dynstr		: {{ *(.dynstr) }}
+    .gnu.version	: {{ *(.gnu.version) }}
+    .gnu.version_d	: {{ *(.gnu.version_d) }}
+    .gnu.version_r	: {{ *(.gnu.version_r) }}
 
-        /* 动态段单独分配 */
-        .dynamic    : {{ *(.dynamic) }}
+    /* 动态段单独分配 */
+    .dynamic    : {{ *(.dynamic) }}
 
-        . = ALIGN(16);
-        /* 代码段（.text）需要放在只读数据段之前 */
-        .text       : {{
-            *(.text.start)
-            *(.text .text.*)
-        }}
-
-        . = ALIGN(4K);
-        /* 只读数据段（.rodata等） */
-        .rodata     : {{
-            *(.rodata .rodata.* .gnu.linkonce.r.*)
-            *(.note.*)
-        }}
-
-        . = ALIGN(4K);
-        .plt : {{ *(.plt .plt.*) }}
-
-        . = ALIGN(4K);
-        /* 数据段（.data、.bss等）单独分配 */
-        .data       : {{
-            *(.data .data.* .gnu.linkonce.d.*)
-            *(.got.plt) *(.got)
-        }}
-
-        . = ALIGN(4K);
-        .bss        : {{
-            *(.bss .bss.* .gnu.linkonce.b.*)
-            *(COMMON)
-        }}
-
-        .eh_frame_hdr	: {{ *(.eh_frame_hdr) }}
-    	.eh_frame	: {{ KEEP (*(.eh_frame)) }}
+    . = ALIGN(16);
+    /* 代码段（.text）需要放在只读数据段之前 */
+    .text       : {{
+        *(.text.start)
+        *(.text .text.*)
     }}
-    "#,
+
+    . = ALIGN(4K);
+    /* 只读数据段（.rodata等） */
+    .rodata     : {{
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+        *(.note.*)
+    }}
+
+    . = ALIGN(4K);
+    .plt : {{ *(.plt .plt.*) }}
+
+    . = ALIGN(4K);
+    /* 数据段（.data、.bss等）单独分配 */
+    .data       : {{
+        *(.data .data.* .gnu.linkonce.d.*)
+        *(.got.plt) *(.got)
+    }}
+
+    . = ALIGN(4K);
+    .bss        : {{
+        *(.bss .bss.* .gnu.linkonce.b.*)
+        *(COMMON)
+    }}
+
+    .eh_frame_hdr	: {{ *(.eh_frame_hdr) }}
+    .eh_frame	: {{ KEEP (*(.eh_frame)) }}
+}}
+"#,
         arch_lds
     );
     linker
@@ -121,34 +140,41 @@ fn gen_linker_script(arch: &str) -> String {
 
 /// 先编译为静态库，再单独链接成 so。
 fn build_so(config: &BuildConfig) {
+    // 获取输出目录和生成链接脚本路径
     let out_dir = Path::new(&config.out_dir);
     let absolute_script_dir = fs::canonicalize(out_dir.join("vdso_linker.lds"))
         .unwrap()
         .display()
         .to_string();
+    // 生成版本脚本
     let version_script_path = out_dir.join("vdso_version.map");
     fs::write(&version_script_path, version_script_content(config)).unwrap();
 
+    // 获取编译目标和链接器程序
     let build_target = build_target(&config.arch);
     let linker = linker_program(&config.arch);
+    // 获取是否为release模式
     let build_mode = match config.mode.as_str() {
         "debug" => "",
         "release" => "--release",
         _ => panic!("Unsupported mode"),
     };
+    // 获取编译输出的冗长程度
     let build_verbose = match config.verbose {
         0 => "",
         1 => "-v",
         2 => "-vv",
         _ => panic!("Unsupported verbose level"),
     };
+    // 获取.a输出目录
     fs::create_dir_all(out_dir.join("target")).unwrap();
     let absolute_build_target_dir = fs::canonicalize(out_dir.join("target"))
         .unwrap()
         .display()
         .to_string();
-    cleanup_stale_wrapper_so(Path::new(&absolute_build_target_dir), build_target, &config.mode);
+    // 三元组参数
     let toolchain_arg = format!("+{}", &config.toolchain);
+
     let mut cargo_args = vec![
         &toolchain_arg,
         "build",
@@ -171,10 +197,21 @@ fn build_so(config: &BuildConfig) {
     }
     let mut cargo = Command::new("cargo");
 
+    // 添加环境变量，过滤掉以CARGO或RUST开头的环境变量
+    cargo.env_clear();
+    for (key, value) in env::vars() {
+        if !(key.starts_with("CARGO") || key.starts_with("RUST")) {
+            cargo.env(key, value);
+        }
+    }
+
+    // wrappper输出目录
     let wrapper_dir = out_dir.join("vdso_wrapper");
+    // 构建编译命令
     cargo.current_dir(&wrapper_dir).env("ARCH", &config.arch).args(cargo_args);
     println!("----------------cargo command----------------");
     println!("{:?}", &cargo);
+    // output()会触发执行命令并等待完成
     let cargo_output = cargo.output().expect("Failed to execute cargo build");
     println!("-----------------cargo stdout----------------");
     stdout().write_all(&cargo_output.stdout).unwrap();
@@ -184,6 +221,7 @@ fn build_so(config: &BuildConfig) {
         panic!("cargo build failed");
     }
 
+    // 获取.a路径
     let src_file = Path::new(&absolute_build_target_dir)
         .join(build_target)
         .join(&config.mode)
@@ -191,12 +229,14 @@ fn build_so(config: &BuildConfig) {
         .with_extension("a")
         .display()
         .to_string();
+    // 目标so路径
     let dst_file = Path::new(&config.out_dir)
         .join(&config.so_name)
         .with_extension("so")
         .display()
         .to_string();
     let mut linker_cmd = Command::new(linker);
+    // 链接命令参数
     linker_cmd.args([
         "-shared",
         "-soname",
@@ -223,38 +263,6 @@ fn build_so(config: &BuildConfig) {
     stderr().write_all(&linker_output.stderr).unwrap();
     if !linker_output.status.success() {
         panic!("linker failed");
-    }
-}
-
-fn cleanup_stale_wrapper_so(build_target_dir: &Path, build_target: &str, mode: &str) {
-    let release_dir = build_target_dir.join(build_target).join(mode);
-    remove_file_if_exists(&release_dir.join("libvdso_wrapper.so"));
-    remove_file_if_exists(&release_dir.join("deps").join("libvdso_wrapper.so"));
-}
-
-fn remove_file_if_exists(path: &Path) {
-    match fs::remove_file(path) {
-        Ok(()) => {}
-        Err(err) if err.kind() == ErrorKind::NotFound => {}
-        Err(err) => panic!("无法清理旧的 vDSO 产物 {}: {}", path.display(), err),
-    }
-}
-
-fn build_target(arch: &str) -> &'static str {
-    match arch {
-        "x86_64" => "x86_64-unknown-linux-musl",
-        "aarch64" => "aarch64-unknown-linux-musl",
-        "riscv64" => "riscv64gc-unknown-linux-musl",
-        _ => panic!("Unsupported arch"),
-    }
-}
-
-fn linker_program(arch: &str) -> &'static str {
-    match arch {
-        "x86_64" => "x86_64-linux-musl-ld",
-        "aarch64" => "aarch64-linux-musl-ld",
-        "riscv64" => "riscv64-linux-musl-ld",
-        _ => panic!("Unsupported arch"),
     }
 }
 

@@ -1,49 +1,1526 @@
-Building vDSO...
-VDSO_TOOLCHAIN=nightly-2026-01-23 VDSO_VERBOSE=0 cargo run --release -p vdso_builder
-   Compiling build_vdso v0.1.0 (/home/hjch/AsyncAlien/vdso/build_vdso)
-warning: unused import: `fmt::format`
- --> vdso/build_vdso/src/gen_api.rs:1:11
-  |
-1 | use std::{fmt::format, fs, path::Path};
-  |           ^^^^^^^^^^^
-  |
-  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+cd domains && ARCH=x86_64 PLATFORM=plat_qemu_x86_64 DOMAIN_PROFILE= cargo domain build-all -l "" -o /home/hjch/AsyncAlien/build
+    Blocking waiting for file lock on artifact directory
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.32s
+     Running `/home/hjch/AsyncAlien/target/debug/domain build-all -l '' -o /home/hjch/AsyncAlien/build`
+Building all domain projects, LOG: 
+Start building all domains
+Building domain [syscall] project for target: x86_64
+Start building domain,path: "./common/syscall/gsyscall/Cargo.toml"
+   Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling syscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/syscall)
+   Compiling gsyscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/gsyscall)
+    Finished `release` profile [optimized] target(s) in 4.38s
+Build domain [syscall] project success
+Copy domain [syscall] project success
+Building domain [task] project for target: x86_64
+Start building domain,path: "./common/task/gtask/Cargo.toml"
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling task v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/task)
+   Compiling gtask v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/gtask)
+    Finished `release` profile [optimized] target(s) in 6.27s
+Build domain [task] project success
+Copy domain [task] project success
+Building domain [vfs] project for target: x86_64
+Start building domain,path: "./common/vfs/gvfs/Cargo.toml"
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling vfs_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/vfs_common)
+   Compiling vfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/vfs)
+   Compiling gvfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/gvfs)
+    Finished `release` profile [optimized] target(s) in 5.95s
+Build domain [vfs] project success
+Copy domain [vfs] project success
+Building domain [buf_uart] project for target: x86_64
+Start building domain,path: "./drivers/buf_uart/gbuf_uart/Cargo.toml"
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling buf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/buf_uart)
+   Compiling gbuf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/gbuf_uart)
+    Finished `release` profile [optimized] target(s) in 1.57s
+Build domain [buf_uart] project success
+Copy domain [buf_uart] project success
+Building domain [buf_input] project for target: x86_64
+Start building domain,path: "./drivers/buf_input/gbuf_input/Cargo.toml"
+   Compiling buf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/buf_input)
+   Compiling gbuf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/gbuf_input)
+    Finished `release` profile [optimized] target(s) in 1.46s
+Build domain [buf_input] project success
+Copy domain [buf_input] project success
+Building domain [cache_blk] project for target: x86_64
+Start building domain,path: "./drivers/cache_blk/gcache_blk/Cargo.toml"
+   Compiling cache_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cache_blk/cache_blk)
+   Compiling gcache_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cache_blk/gcache_blk)
+    Finished `release` profile [optimized] target(s) in 1.60s
+Build domain [cache_blk] project success
+Copy domain [cache_blk] project success
+Building domain [null] project for target: x86_64
+Start building domain,path: "./drivers/null/gnull/Cargo.toml"
+   Compiling null v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/null)
+   Compiling gnull v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/gnull)
+    Finished `release` profile [optimized] target(s) in 1.05s
+Build domain [null] project success
+Copy domain [null] project success
+Building domain [random] project for target: x86_64
+Start building domain,path: "./drivers/random/grandom/Cargo.toml"
+   Compiling random v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/random)
+   Compiling grandom v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/grandom)
+    Finished `release` profile [optimized] target(s) in 1.04s
+Build domain [random] project success
+Copy domain [random] project success
+Building domain [shadow_blk] project for target: x86_64
+Start building domain,path: "./drivers/shadow_blk/gshadow_blk/Cargo.toml"
+   Compiling shadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/shadow_blk)
+   Compiling gshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/gshadow_blk)
+    Finished `release` profile [optimized] target(s) in 1.13s
+Build domain [shadow_blk] project success
+Copy domain [shadow_blk] project success
+Building domain [apic] project for target: x86_64
+Start building domain,path: "./common/apic/gapic/Cargo.toml"
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling apic v0.1.0 (/home/hjch/AsyncAlien/domains/common/apic/apic)
+   Compiling gapic v0.1.0 (/home/hjch/AsyncAlien/domains/common/apic/gapic)
+    Finished `release` profile [optimized] target(s) in 1.46s
+Build domain [apic] project success
+Copy domain [apic] project success
+Building domain [local_apic] project for target: x86_64
+Start building domain,path: "./drivers/local_apic/glocal_apic/Cargo.toml"
+   Compiling glocal_apic v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/local_apic/glocal_apic)
+    Finished `release` profile [optimized] target(s) in 0.86s
+Build domain [local_apic] project success
+Copy domain [local_apic] project success
+Building domain [io_apic] project for target: x86_64
+Start building domain,path: "./drivers/io_apic/gio_apic/Cargo.toml"
+   Compiling gio_apic v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/io_apic/gio_apic)
+    Finished `release` profile [optimized] target(s) in 0.85s
+Build domain [io_apic] project success
+Copy domain [io_apic] project success
+Building domain [hpet] project for target: x86_64
+Start building domain,path: "./drivers/hpet/ghpet/Cargo.toml"
+   Compiling hpet v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/hpet/hpet)
+   Compiling ghpet v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/hpet/ghpet)
+    Finished `release` profile [optimized] target(s) in 0.97s
+Build domain [hpet] project success
+Copy domain [hpet] project success
+Building domain [cmos_rtc] project for target: x86_64
+Start building domain,path: "./drivers/cmos_rtc/gcmos_rtc/Cargo.toml"
+   Compiling cmos_rtc v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cmos_rtc/cmos_rtc)
+   Compiling gcmos_rtc v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cmos_rtc/gcmos_rtc)
+    Finished `release` profile [optimized] target(s) in 1.03s
+Build domain [cmos_rtc] project success
+Copy domain [cmos_rtc] project success
+Building domain [uart16550] project for target: x86_64
+Start building domain,path: "./drivers/uart16550/guart16550/Cargo.toml"
+   Compiling domain_uart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/uart16550)
+   Compiling guart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/guart16550)
+    Finished `release` profile [optimized] target(s) in 1.09s
+Build domain [uart16550] project success
+Copy domain [uart16550] project success
+Building domain [virtio_blk] project for target: x86_64
+Start building domain,path: "./drivers/virtio_blk/gvirtio_blk/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-warning: `build_vdso` (lib) generated 1 warning (run `cargo fix --lib -p build_vdso` to apply 1 suggestion)
-   Compiling vdso_builder v0.1.0 (/home/hjch/AsyncAlien/vdso/vdso_builder)
-    Finished `release` profile [optimized] target(s) in 16.81s
-     Running `target/release/vdso_builder`
-[vdso_builder] 构建 arch=x86_64 src=/home/hjch/AsyncAlien/vdso/vdso_impl out=/home/hjch/AsyncAlien/build/vdso
-----------------cargo command----------------
-cd "/home/hjch/AsyncAlien/build/vdso/vdso_wrapper" && env -i ARCH="x86_64" BUNDLED_DEBUGPY_PATH="/home/hjch/.vscode-server/extensions/ms-python.debugpy-2025.18.0/bundled/libs/debugpy" COLORTERM="truecolor" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/1000/bus" DISPLAY=":0" GIT_ASKPASS="/home/hjch/.vscode-server/bin/41dd792b5e652393e7787322889ed5fdc58bd75b/extensions/git/dist/askpass.sh" GIT_EDITOR=":" GIT_MERGE_AUTOEDIT="no" GIT_PAGER="cat" HISTCONTROL="ignorespace" HOME="/home/hjch" HOSTTYPE="x86_64" HTTPS_PROXY="http://127.0.0.1:7890" HTTP_PROXY="http://127.0.0.1:7890" LANG="C.UTF-8" LD_LIBRARY_PATH="/home/hjch/AsyncAlien/target/release:/home/hjch/AsyncAlien/target/release/deps:/home/hjch/.rustup/toolchains/nightly-2026-01-23-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib:/home/hjch/.rustup/toolchains/nightly-2026-01-23-x86_64-unknown-linux-gnu/lib" LESSCLOSE="/usr/bin/lesspipe %s %s" LESSOPEN="| /usr/bin/lesspipe %s" LOGNAME="hjch" LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:" MAKEFLAGS="" MAKELEVEL="1" MFLAGS="" NAME="LAPTOP-RF714NVU" NO_PROXY="192.168.*,172.31.*,172.30.*,172.29.*,172.28.*,172.27.*,172.26.*,172.25.*,172.24.*,172.23.*,172.22.*,172.21.*,172.20.*,172.19.*,172.18.*,172.17.*,172.16.*,10.*,127.*,localhost,<local>" NVM_BIN="/home/hjch/.nvm/versions/node/v16.20.2/bin" NVM_CD_FLAGS="" NVM_DIR="/home/hjch/.nvm" NVM_INC="/home/hjch/.nvm/versions/node/v16.20.2/include/node" OLDPWD="/home/hjch/AsyncAlien" PATH="/home/hjch/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/hjch/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/hjch/.vscode-server/bin/41dd792b5e652393e7787322889ed5fdc58bd75b/bin/remote-cli:/home/hjch/.nvm/versions/node/v16.20.2/bin:/home/hjch/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/d/applications/Microsoft VS Code:/mnt/d/applications/VMWare Workstation/bin/:/mnt/c/Program Files/Java/jdk-21/bin:/mnt/c/Program Files/Java/jdk-17/bin:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.7/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.7/libnvvp:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/Smart Projects/IsoBuster:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2022.2.1/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Microsoft SQL Server/120/Tools/Binn/:/mnt/d/applications/MATLAB 2021a/runtime/win64:/mnt/d/applications/MATLAB 2021a/bin:/mnt/d/applications/MATLAB 2021a/polyspace/bin:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/d/BaiduNetdiskDownload/工具/WinMerge:/mnt/d/applications/flutter/bin:/mnt/d/applications/XShell/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files (x86)/NetSarang/Xftp 8/:/mnt/c/ProgramData/anaconda3/Scripts:/mnt/c/ProgramData/anaconda3/:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/d/BaiduNetdiskDownload/工具/ffmpeg/ffmpeg-6.0-full_build/bin:/mnt/c/Users/hjch1/AppData/Local/nvm:/mnt/c/nvm4w/nodejs:/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Users/hjch1/.local/bin:/mnt/c/Users/hjch1/.cargo/bin:/mnt/d/applications/flutter/bin:/mnt/c/texlive/2024/bin/:/mnt/c/texlive/:/mnt/d/applications/sqlite3.45.1:/mnt/c/Users/hjch1/AppData/Local/Microsoft/WindowsApps:/mnt/d/BaiduNetdiskDownload/工具/ffmpeg/ffmpeg-6.0-full_build/bin:/mnt/d/applications/mingw64/bin:/mnt/c/Program Files/JetBrains/PyCharm Community Edition 2023.2.1/bin:/mnt/d/applications/CLion 2023.2.2/bin:/mnt/c/Program Files (x86)/WiX Toolset v3.11/bin:/mnt/c/Users/hjch1/.dotnet/tools:/mnt/c/Users/hjch1/AppData/Local/Programs/Fiddler:/mnt/c/Program Files/OpenSSL-Win64/bin:/mnt/c/texlive/2024/bin/windows:/mnt/c/Users/hjch1/AppData/Local/JetBrains/Toolbox/scripts:/mnt/d/applications/Microsoft VS Code/bin:/mnt/d/BaiduNetdiskDownload/工具/adb/platform-tools:/mnt/c/Users/hjch1/AppData/Local/nvm:/mnt/c/nvm4w/nodejs:/mnt/d/applications/mysql8.4.7/bin:/mnt/c/Users/hjch1/.dotnet/tools:/mnt/c/Users/hjch1/AppData/Local/Microsoft/WindowsApps:/snap/bin:/home/hjch/qemu-riscv64:/home/hjch/qemu-x86_64:/opt/riscv/riscv64-linux-musl-cross/bin:/opt/x86_64/x86_64-linux-musl-cross/bin:/opt/riscv/riscv64-unknown-elf-gcc-8.3.0/bin:/home/hjch/.vscode-server/extensions/ms-python.debugpy-2025.18.0/bundled/scripts/noConfigScripts:/home/hjch/qemu-riscv64:/home/hjch/qemu-x86_64:/opt/riscv/riscv64-linux-musl-cross/bin:/opt/x86_64/x86_64-linux-musl-cross/bin:/opt/riscv/riscv64-unknown-elf-gcc-8.3.0/bin" PLATFORM="plat_qemu_x86_64" PULSE_SERVER="unix:/mnt/wslg/PulseServer" PWD="/home/hjch/AsyncAlien" PYDEVD_DISABLE_FILE_VALIDATION="1" PYTHONSTARTUP="/home/hjch/.vscode-server/data/User/workspaceStorage/634c3e2aec9afdcbdd9d64afb9b54175/ms-python.python/pythonrc.py" PYTHON_BASIC_REPL="1" SHELL="/bin/bash" SHLVL="0" SMP="1" SSL_CERT_DIR="/usr/lib/ssl/certs" SSL_CERT_FILE="/usr/lib/ssl/certs/ca-certificates.crt" TERM="xterm-256color" TERM_PROGRAM="vscode" TERM_PROGRAM_VERSION="1.115.0" USER="hjch" VDSO_TOOLCHAIN="nightly-2026-01-23" VDSO_VERBOSE="0" VF2_SD="n" VSCODE_DEBUGPY_ADAPTER_ENDPOINTS="/home/hjch/.vscode-server/extensions/ms-python.debugpy-2025.18.0/.noConfigDebugAdapterEndpoints/endpoint-8a4b8a0bfb538607.txt" VSCODE_GIT_ASKPASS_EXTRA_ARGS="" VSCODE_GIT_ASKPASS_MAIN="/home/hjch/.vscode-server/bin/41dd792b5e652393e7787322889ed5fdc58bd75b/extensions/git/dist/askpass-main.js" VSCODE_GIT_ASKPASS_NODE="/home/hjch/.vscode-server/bin/41dd792b5e652393e7787322889ed5fdc58bd75b/node" VSCODE_GIT_IPC_HANDLE="/run/user/1000/vscode-git-e16f35af17.sock" VSCODE_IPC_HOOK_CLI="/run/user/1000/vscode-ipc-1e571dd8-cc07-4257-ba3d-b2aa8882450d.sock" VSCODE_PYTHON_AUTOACTIVATE_GUARD="1" WAYLAND_DISPLAY="wayland-0" WSL2_GUI_APPS_ENABLED="1" WSLENV="VSCODE_WSL_EXT_LOCATION/up" WSL_DISTRO_NAME="Ubuntu-22.04" WSL_INTEROP="/run/WSL/96248_interop" XDG_DATA_DIRS="/usr/local/share:/usr/share:/var/lib/snapd/desktop" XDG_RUNTIME_DIR="/run/user/1000/" _="/usr/bin/timeout" http_proxy="http://127.0.0.1:7890" https_proxy="http://127.0.0.1:7890" no_proxy="192.168.*,172.31.*,172.30.*,172.29.*,172.28.*,172.27.*,172.26.*,172.25.*,172.24.*,172.23.*,172.22.*,172.21.*,172.20.*,172.19.*,172.18.*,172.17.*,172.16.*,10.*,127.*,localhost,<local>" "cargo" "+nightly-2026-01-23" "build" "-Z" "unstable-options" "-Z" "build-std=core,compiler_builtins,alloc" "-Z" "build-std-features=compiler-builtins-mem" "--target" "x86_64-unknown-linux-musl" "--target-dir" "/home/hjch/AsyncAlien/build/vdso/target" "--release"
------------------cargo stdout----------------
------------------cargo stderr----------------
-   Compiling compiler_builtins v0.1.160 (/home/hjch/.rustup/toolchains/nightly-2026-01-23-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/compiler-builtins/compiler-builtins)
-   Compiling core v0.0.0 (/home/hjch/.rustup/toolchains/nightly-2026-01-23-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core)
-   Compiling rustversion v1.0.22
-   Compiling const_fn v0.4.12
-   Compiling linkme v0.3.35
-   Compiling x86 v0.52.0
-   Compiling alloc v0.0.0 (/home/hjch/.rustup/toolchains/nightly-2026-01-23-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc)
-   Compiling bit_field v0.10.3
-   Compiling bitflags v1.3.2
-   Compiling volatile v0.4.6
-   Compiling bitflags v2.11.0
-   Compiling memory_addr v0.4.1
-   Compiling cfg-if v1.0.4
-   Compiling static_assertions v1.1.0
-   Compiling lazyinit v0.2.2
-   Compiling raw-cpuid v10.7.0
-   Compiling x86_64 v0.15.4
-   Compiling page_table_entry v0.5.7
-   Compiling vsched_hal v0.1.0
-   Compiling vdso_helper v0.1.0 (https://github.com/rosy233333/vdso_crate_template#285512cf)
-   Compiling vdso_impl v0.1.0 (/home/hjch/AsyncAlien/vdso/vdso_impl)
-   Compiling vdso_wrapper v0.0.0 (/home/hjch/AsyncAlien/build/vdso/vdso_wrapper)
-    Finished `release` profile [optimized] target(s) in 20.54s
----------------linker command---------------
-"x86_64-linux-musl-ld" "-shared" "-soname" "libvdso" "-T" "/home/hjch/AsyncAlien/build/vdso/vdso_linker.lds" "--version-script" "/home/hjch/AsyncAlien/build/vdso/vdso_version.map" "--gc-sections" "--whole-archive" "/home/hjch/AsyncAlien/build/vdso/target/x86_64-unknown-linux-musl/release/libvdso_wrapper.a" "--no-whole-archive" "-o" "/home/hjch/AsyncAlien/build/vdso/libvdso.so"
-----------------linker stdout----------------
-----------------linker stderr----------------
-cargo:warning=vsched_interface_file_content: // 预留后续 vDSO 对外接口扩展。
-[vdso_builder] 构建完成
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_mmio_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/virtio_mmio_common)
+   Compiling virtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/virtio_blk)
+   Compiling gvirtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/gvirtio_blk)
+    Finished `release` profile [optimized] target(s) in 1.53s
+Build domain [virtio_blk] project success
+Copy domain [virtio_blk] project success
+Building domain [virtio_net] project for target: x86_64
+Start building domain,path: "./drivers/virtio_net/gvirtio_net/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/virtio_net)
+   Compiling gvirtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/gvirtio_net)
+    Finished `release` profile [optimized] target(s) in 1.49s
+Build domain [virtio_net] project success
+Copy domain [virtio_net] project success
+Building domain [virtio_input] project for target: x86_64
+Start building domain,path: "./drivers/virtio_input/gvirtio_input/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/virtio_input)
+   Compiling gvirtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/gvirtio_input)
+    Finished `release` profile [optimized] target(s) in 1.41s
+Build domain [virtio_input] project success
+Copy domain [virtio_input] project success
+Building domain [virtio_gpu] project for target: x86_64
+Start building domain,path: "./drivers/virtio_gpu/gvirtio_gpu/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/virtio_gpu)
+   Compiling gvirtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/gvirtio_gpu)
+    Finished `release` profile [optimized] target(s) in 1.47s
+Build domain [virtio_gpu] project success
+Copy domain [virtio_gpu] project success
+Building domain [devfs] project for target: x86_64
+Start building domain,path: "./fs/devfs/gdevfs/Cargo.toml"
+   Compiling vfs_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/vfs_common)
+   Compiling generic v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/generic)
+   Compiling devfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/devfs)
+   Compiling gdevfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/gdevfs)
+    Finished `release` profile [optimized] target(s) in 4.09s
+Build domain [devfs] project success
+Copy domain [devfs] project success
+Building domain [fatfs] project for target: x86_64
+Start building domain,path: "./fs/fatfs/gfatfs/Cargo.toml"
+   Compiling domain_fatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/fatfs)
+   Compiling gfatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/gfatfs)
+    Finished `release` profile [optimized] target(s) in 4.04s
+Build domain [fatfs] project success
+Copy domain [fatfs] project success
+Building domain [pipefs] project for target: x86_64
+Start building domain,path: "./fs/pipefs/gpipefs/Cargo.toml"
+   Compiling pipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/pipefs)
+   Compiling gpipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/gpipefs)
+    Finished `release` profile [optimized] target(s) in 2.81s
+Build domain [pipefs] project success
+Copy domain [pipefs] project success
+Building domain [ramfs] project for target: x86_64
+Start building domain,path: "./fs/ramfs/gramfs/Cargo.toml"
+   Compiling ramfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/ramfs/ramfs)
+   Compiling gramfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/ramfs/gramfs)
+    Finished `release` profile [optimized] target(s) in 3.25s
+Build domain [ramfs] project success
+Copy domain [ramfs] project success
+Building domain [sysfs] project for target: x86_64
+Start building domain,path: "./fs/sysfs/gsysfs/Cargo.toml"
+   Compiling sysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/sysfs)
+   Compiling gsysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/gsysfs)
+    Finished `release` profile [optimized] target(s) in 2.94s
+Build domain [sysfs] project success
+Copy domain [sysfs] project success
+Building domain [procfs] project for target: x86_64
+Start building domain,path: "./fs/procfs/gprocfs/Cargo.toml"
+   Compiling procfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/procfs)
+   Compiling gprocfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/gprocfs)
+    Finished `release` profile [optimized] target(s) in 3.07s
+Build domain [procfs] project success
+Copy domain [procfs] project success
+Building domain [fifo_scheduler] project for target: x86_64
+Start building domain,path: "./common/fifo_scheduler/gfifo_scheduler/Cargo.toml"
+   Compiling common_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/common_scheduler)
+   Compiling fifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/fifo_scheduler)
+   Compiling gfifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/gfifo_scheduler)
+    Finished `release` profile [optimized] target(s) in 1.11s
+Build domain [fifo_scheduler] project success
+Copy domain [fifo_scheduler] project success
+Building domain [logger] project for target: x86_64
+Start building domain,path: "./common/logger/glogger/Cargo.toml"
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+   Compiling logger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/logger)
+   Compiling glogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/glogger)
+    Finished `release` profile [optimized] target(s) in 1.11s
+Build domain [logger] project success
+Copy domain [logger] project success
+Building domain [net_stack] project for target: x86_64
+Start building domain,path: "./common/net_stack/gnet_stack/Cargo.toml"
+warning: variants `ICMP` and `IGMP` are never constructed
+  --> /home/hjch/AsyncAlien/utils/lose-net-stack/src/consts.rs:29:5
+   |
+28 | pub enum IpProtocal {
+   |          ---------- variants in this enum
+29 |     ICMP = 1,
+   |     ^^^^
+30 |     IGMP = 2,
+   |     ^^^^
+   |
+   = note: `IpProtocal` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lose-net-stack` (lib) generated 1 warning
+   Compiling net_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/net_stack)
+   Compiling gnet_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/gnet_stack)
+    Finished `release` profile [optimized] target(s) in 2.37s
+Build domain [net_stack] project success
+Copy domain [net_stack] project success
+Building domain [domainfs] project for target: x86_64
+Start building domain,path: "./fs/domainfs/gdomainfs/Cargo.toml"
+   Compiling domainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/domainfs)
+   Compiling gdomainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/gdomainfs)
+    Finished `release` profile [optimized] target(s) in 3.02s
+Build domain [domainfs] project success
+Copy domain [domainfs] project success
+Building domain [mem_block] project for target: x86_64
+Start building domain,path: "./drivers/mem_block/gmem_block/Cargo.toml"
+   Compiling mem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/mem_block)
+   Compiling gmem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/gmem_block)
+    Finished `release` profile [optimized] target(s) in 1.05s
+Build domain [mem_block] project success
+Copy domain [mem_block] project success
+Building domain [sshadow_blk] project for target: x86_64
+Start building domain,path: "./drivers/sshadow_blk/gsshadow_blk/Cargo.toml"
+   Compiling sshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/sshadow_blk)
+   Compiling gsshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/gsshadow_blk)
+    Finished `release` profile [optimized] target(s) in 1.16s
+Build domain [sshadow_blk] project success
+Copy domain [sshadow_blk] project success
+Building domain [random_scheduler] project for target: x86_64
+Start building domain,path: "./common/random_scheduler/grandom_scheduler/Cargo.toml"
+   Compiling random_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/random_scheduler)
+   Compiling grandom_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/grandom_scheduler)
+    Finished `release` profile [optimized] target(s) in 1.05s
+Build domain [random_scheduler] project success
+Copy domain [random_scheduler] project success
+Building domain [xlogger] project for target: x86_64
+Start building domain,path: "./common/xlogger/gxlogger/Cargo.toml"
+   Compiling xlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/xlogger)
+   Compiling gxlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/gxlogger)
+    Finished `release` profile [optimized] target(s) in 1.02s
+Build domain [xlogger] project success
+Copy domain [xlogger] project success
+Building domain [vfs2] project for target: x86_64
+Start building domain,path: "./common/vfs2/gvfs2/Cargo.toml"
+   Compiling vfs2 v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs2/vfs2)
+   Compiling gvfs2 v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs2/gvfs2)
+    Finished `release` profile [optimized] target(s) in 4.61s
+Build domain [vfs2] project success
+Copy domain [vfs2] project success
+Building domain [loopback] project for target: x86_64
+Start building domain,path: "./drivers/loopback/gloopback/Cargo.toml"
+   Compiling loopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/loopback)
+   Compiling gloopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/gloopback)
+    Finished `release` profile [optimized] target(s) in 1.13s
+Build domain [loopback] project success
+Copy domain [loopback] project success
+dd if=/dev/zero of=build/sdcard.img bs=1M count=72;
+72+0 records in
+72+0 records out
+75497472 bytes (75 MB, 72 MiB) copied, 0.102748 s, 735 MB/s
+mkfs.fat 4.2 (2021-01-31)
+Building user apps
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/apps'
+Building apps
+init dtest dgpu dtask dlog dinput dnet dvfs ping client out nice
+    Finished `release` profile [optimized] target(s) in 0.22s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.15s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/apps'
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/tests'
+Building tests
+new/sys_time new/sys_fs new/sys_link new/sys_proc new/sys_poll new/sys_random new/syscall_all
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.18s
+Moving tests to /home/hjch/AsyncAlien/build/sdcard.img
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/tests'
+make[1]: Entering directory '/home/hjch/AsyncAlien/user/musl'
+Building apps
+(CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p hello);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p async_test);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p ftest);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p fs_update);  (CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl -Z build-std=core,std,panic_abort -p pingpong);
+    Finished `release` profile [optimized] target(s) in 0.26s
+    Finished `release` profile [optimized] target(s) in 0.23s
+warning: function `read_once_test` is never used
+  --> user/musl/ftest/src/main.rs:41:4
+   |
+41 | fn read_once_test() {
+   |    ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ftest` (bin "ftest") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.21s
+    Finished `release` profile [optimized] target(s) in 0.22s
+    Finished `release` profile [optimized] target(s) in 0.21s
+Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
+make[1]: Leaving directory '/home/hjch/AsyncAlien/user/musl'
+Building user apps done
+[sdcard] 使用 mtools 写入 build/sdcard.img
+ Volume in drive : has no label
+ Volume Serial Number is D6ED-FB21
+Directory for ::/
+
+init             30512 2026-04-15  23:23 
+dtest            34608 2026-04-15  23:23 
+dgpu             34608 2026-04-15  23:23 
+dtask            34632 2026-04-15  23:23 
+dlog             38976 2026-04-15  23:23 
+dinput           34632 2026-04-15  23:23 
+dnet             34608 2026-04-15  23:23 
+dvfs             34608 2026-04-15  23:23 
+ping             38976 2026-04-15  23:23 
+client           34776 2026-04-15  23:23 
+out              30352 2026-04-15  23:23 
+nice             34656 2026-04-15  23:23 
+new          <DIR>     2026-04-15  23:23 
+hello           430632 2026-04-15  23:23 
+ASYNC_~1        545384 2026-04-15  23:23  async_test
+ftest           418224 2026-04-15  23:23 
+FS_UPD~1        447016 2026-04-15  23:23  fs_update
+pingpong        467496 2026-04-15  23:23 
+GLOOPB~1        122672 2026-04-15  23:23  gloopback
+GRANDO~1        114448 2026-04-15  23:23  grandom_scheduler
+GSSHAD~1        118408 2026-04-15  23:23  gsshadow_blk
+gvfs2           497056 2026-04-15  23:23 
+GVIRTI~1        119472 2026-04-15  23:23  gvirtio_gpu
+GVIRTI~2        114664 2026-04-15  23:23  gvirtio_input
+GVIRTI~3        123280 2026-04-15  23:23  gvirtio_mmio_gpu
+GVIRTI~4        114384 2026-04-15  23:23  gvirtio_mmio_input
+GVIRTI~5        123200 2026-04-15  23:23  gvirtio_mmio_net
+GVIRTI~6        123208 2026-04-15  23:23  gvirtio_net
+gxlogger        105792 2026-04-15  23:23 
+bash           5569896 2026-04-15  23:23 
+REDIS-~1        502256 2026-04-15  23:23  redis-benchmark
+REDIS-~2        759640 2026-04-15  23:23  redis-cli
+REDIS-~3       3814760 2026-04-15  23:23  redis-server
+REDIS~1  CON     46695 2026-04-15  23:23  redis.conf
+domains      <DIR>     2026-04-15  23:23 
+       35 files          15 094 527 bytes
+                         58 998 272 bytes free
+
+[initrd] skip user/initrd rebuild (up-to-date)
+14486 blocks
+Building...
+ARCH: x86_64
+PLATFORM: plat_qemu_x86_64
+TARGET: x86_64-unknown-none
+FEATURES: default
+SMP: 1
+VF2_SD: n
+PLATFORM=plat_qemu_x86_64 RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_x86_64' LOG= cargo build --release -p kernel --target ./tools/x86_64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default
+   Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling platform v0.1.0 (/home/hjch/AsyncAlien/base/platform)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
+warning: function `cpu_num` is never used
+  --> base/platform/src/common_x86_64/ap.rs:61:8
+   |
+61 | pub fn cpu_num() -> usize {
+   |        ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `start_aps` is never used
+  --> base/platform/src/common_x86_64/ap.rs:68:8
+   |
+68 | pub fn start_aps() {
+   |        ^^^^^^^^^
+
+warning: function `current_time_nanos` is never used
+  --> base/platform/src/common_x86_64/time/mod.rs:31:8
+   |
+31 | pub fn current_time_nanos() -> u64 {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `current_wall_time_secs` is never used
+  --> base/platform/src/common_x86_64/time/rtc.rs:23:8
+   |
+23 | pub fn current_wall_time_secs() -> u64 {
+   |        ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `current_wall_time_nanos` is never used
+  --> base/platform/src/common_x86_64/time/rtc.rs:30:8
+   |
+30 | pub fn current_wall_time_nanos() -> u128 {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `ticks_since_init` is never used
+  --> base/platform/src/common_x86_64/time/tsc.rs:93:8
+   |
+93 | pub fn ticks_since_init() -> u64 {
+   |        ^^^^^^^^^^^^^^^^
+
+   Compiling mem v0.1.0 (/home/hjch/AsyncAlien/base/mem)
+warning: `platform` (lib) generated 6 warnings
+   Compiling kernel v0.1.0 (/home/hjch/AsyncAlien/kernel)
+warning: static `PLIC_DOMAIN` is never used
+  --> kernel/src/trap/mod.rs:41:12
+   |
+41 | pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();
+   |            ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `register_plic_domain` is never used
+  --> kernel/src/trap/mod.rs:69:8
+   |
+69 | pub fn register_plic_domain(plic_domain: Arc<dyn PLICDomain>) {
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: `kernel` (bin "kernel") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 12.04s
+qemu-system-x86_64 \
+            -m 2048M \
+            -smp 1 \
+		-cpu max \
+            -kernel target/x86_64/release/kernel \
+            -machine q35,accel=tcg -nographic -device virtio-net-pci,netdev=net0,disable-modern=on,disable-legacy=off,x-disable-pcie=on -netdev user,id=net0,hostfwd=tcp::55555-:55555,hostfwd=udp::5555-:5555 -drive file=build/sdcard.img,if=none,format=raw,id=x0 -device virtio-blk-pci,drive=x0,disable-modern=on,disable-legacy=off,x-disable-pcie=on -initrd ./build/initramfs.cpio.gz -append "rdinit=/init" \
+            -serial mon:stdio
+c[?7l[2J[0mSeaBIOS (version rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:02.0 CA00 PCI2.10 PnP PMM+7FF90E40+7FEF0E40 CA00
+Press Ctrl-B to configure iPXE (PCI 00:02.0)...                                                                               
+
+
+Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] 
+     _      _   _
+    / \    | | (_)   ___   _ __
+   / _ \   | | | |  / _ \ | '_ \
+  / ___ \  | | | | |  __/ | | | |
+ /_/   \_\ |_| |_|  \___| |_| |_|
+
+[0] Initrd from multiboot: 0xb25000..0xe1fb36
+[0] Init logger Some("")
+[0] Frame range: 0x10b24000..0x7ffdc000, pages=0x6f4b8
+[0] initrd copy: src=0xb25000, size=3124022, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xd5719973, dst=0xd5719973
+[0] Relocate initrd data to 0x10b32000
+[0] Frame allocator init success
+[0] Talloc allocator init success
+[0] kernel text:          0x200000-0x2b0000
+[0] kernel rodata:        0x2b0000-0x2c7000
+[0] kernel init_array:    0x2c7000-0x2c7000
+[0] kernel data:          0x2c7000-0xb0c000
+[0] kernel bss:           0xb0c000-0xb24000
+[0] kernel heap:          0xb24000-0x10b24000
+[0] kernel alloc range:   0x10b24000-0x7ffdc000
+[0] map local_apic: 0xfee00000-0xfee01000
+[0] map io_apic: 0xfec00000-0xfec01000
+[0] map hpet: 0xfed00000-0xfed01000
+[0] map pci_ecam: 0xb0000000-0xc0000000
+[0] Build kernel address space success
+[0] Activate paging mode success
+[0] ++++ setup interrupt ++++
+[0] ++++ setup interrupt done, enable:true ++++
+[0] Boot CPU 0
+[0] Machine: qemu-x86_64-pc
+SMP:     1 CPUs
+Memory:  0x100000..0x7ffdc000
+Compat:  plic=0x0..0x0, clint=0x0..0x0
+Initrd:  0xb25000..0xe1fb36
+Bootargs: target/x86_64/release/kernel rdinit=/init
+
+[0] [bus][x86_64][pci] virtio summary: blk=1, net=1, input=0, gpu=0
+[0] [bus][x86_64][pci] virtio-net @ 0000:00:02.0 (vendor=1af4, device=1000)
+[0] [bus][x86_64][pci] virtio-blk @ 0000:00:03.0 (vendor=1af4, device=1001)
+[0] <register domain>: buf_uart
+[0] <register domain>: buf_input
+[0] <register domain>: cache_blk
+[0] <register domain>: devfs
+[0] <register domain>: fatfs
+[0] <register domain>: null
+[0] <register domain>: pipefs
+[0] <register domain>: procfs
+[0] <register domain>: ramfs
+[0] <register domain>: random
+[0] <register domain>: shadow_blk
+[0] <register domain>: syscall
+[0] <register domain>: sysfs
+[0] <register domain>: fifo_scheduler
+[0] <register domain>: task
+[0] <register domain>: vfs
+[0] <register domain>: uart16550
+[0] <register domain>: virtio_blk
+[0] <register domain>: net_stack
+[0] <register domain>: logger
+[0] <register domain>: domainfs
+[0] <register domain>: apic
+[0] <register domain>: local_apic
+[0] <register domain>: io_apic
+[0] <register domain>: hpet
+[0] <register domain>: cmos_rtc
+[0] <register domain>: virtio_net
+[0][Domain:1] Fifo Scheduler
+[0] [31m[Load new domain] Time elapsed: 4261 us[0m
+[0] <attach domain>: scheduler, it's name is scheduler
+[0] [31m[Load new domain] Time elapsed: 871 us[0m
+[0][Domain:2] Logger init
+[0] <attach domain>: logger, it's name is logger
+[0] [31m[Load new domain] Time elapsed: 2616 us[0m
+[0] <attach domain>: fatfs, it's name is fatfs-1
+[0] [31m[Load new domain] Time elapsed: 1446 us[0m
+[0] <attach domain>: ramfs, it's name is ramfs-1
+[0] [31m[Load new domain] Time elapsed: 2647 us[0m
+[0] <attach domain>: devfs, it's name is devfs
+[0] [31m[Load new domain] Time elapsed: 2430 us[0m
+[0] <attach domain>: procfs, it's name is procfs
+[0] [31m[Load new domain] Time elapsed: 2253 us[0m
+[0] <attach domain>: sysfs, it's name is sysfs
+[0] [31m[Load new domain] Time elapsed: 2066 us[0m
+[0] <attach domain>: pipefs, it's name is pipefs
+[0] [31m[Load new domain] Time elapsed: 2603 us[0m
+[0] <attach domain>: domainfs, it's name is domainfs
+[0] [31m[Load new domain] Time elapsed: 1661 us[0m
+[0] <attach domain>: vfs, it's name is vfs
+[0] [31m[Load new domain] Time elapsed: 1353 us[0m
+[0] <attach domain>: task, it's name is task
+[0][Domain:12] syscall get 0 input domain
+[0] [31m[Load new domain] Time elapsed: 2857 us[0m
+[0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
+[0][Domain:12] syscall domain init
+[0] <attach domain>: syscall, it's name is syscall
+[0] [31m[Load new domain] Time elapsed: 1131 us[0m
+[0][Domain:13] APIC domain init
+[0] <attach domain>: apic, it's name is apic
+[0] [31m[Load new domain] Time elapsed: 676 us[0m
+[0] <attach domain>: local_apic, it's name is local_apic
+[0] [31m[Load new domain] Time elapsed: 623 us[0m
+[0] <attach domain>: io_apic, it's name is io_apic
+[0] [31m[Load new domain] Time elapsed: 578 us[0m
+[0] <attach domain>: hpet, it's name is hpet
+[0] [31m[Load new domain] Time elapsed: 718 us[0m
+[0][Domain:17] CmosRtc region: 0x70..0x72
+[0] <attach domain>: rtc, it's name is rtc
+[0] [31m[Load new domain] Time elapsed: 1127 us[0m
+[0][Domain:18] uart_addr: 0x3f8-0x400
+[0][Domain:18] init uart success
+[0] <attach domain>: uart, it's name is uart
+[0] [31m[Load new domain] Time elapsed: 1183 us[0m
+[0][Domain:19] init buf uart success
+[0] <attach domain>: buf_uart, it's name is buf_uart
+[0][Domain:13] APIC enable irq 4
+[0] [31m[Load new domain] Time elapsed: 1051 us[0m
+[0][Domain:20] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
+[0][Domain:20] virtio_blk_pci: create blk driver
+[0][Domain:20] virtio_blk_pci: driver ready
+[0] virtio-pci block @ 0000:00:03.0
+[0] <attach domain>: virtio_block, it's name is virtio_block-1
+[0] <attach domain>: block, it's name is block-1
+[0] [31m[Load new domain] Time elapsed: 919 us[0m
+[0][Domain:21] virtio_net_pci(legacy): 0000:00:02.0, io=0xc0c0-0xc1c0
+[0] <attach domain>: virtio_net, it's name is virtio_net-1
+[0] <attach domain>: nic, it's name is nic-1
+[0] [31m[Load new domain] Time elapsed: 1359 us[0m
+[0][Domain:22] net stack init successes!
+[0] <attach domain>: net_stack, it's name is net_stack
+[0] [31m[Load new domain] Time elapsed: 993 us[0m
+[0] <attach domain>: shadow_blk, it's name is shadow_blk-1
+[0] [31m[Load new domain] Time elapsed: 3503 us[0m
+[0] <attach domain>: cache_blk, it's name is cache_blk-1
+[0] [31m[Load new domain] Time elapsed: 630 us[0m
+[0] <attach domain>: null, it's name is null
+[0] [31m[Load new domain] Time elapsed: 548 us[0m
+[0] <attach domain>: random, it's name is random
+[0][Domain:5] devfs FsDomain init
+[0][Domain:3] fatfs FsDomain init
+[0][Domain:4] ramfs FsDomain init
+[0][Domain:6] procfs FsDomain init
+[0][Domain:7] sysfs FsDomain init
+[0][Domain:9] get domain info success
+[0][Domain:9] domainfs FsDomain init
+[0] load_domains: before vfs init
+[0][Domain:4] ramfs mount success
+[0][Domain:10] ramfs init success
+[0][Domain:6] procfs mount success
+[0] [31m[Load new domain] Time elapsed: 2567 us[0m
+[0][Domain:27] ramfs FsDomain init
+[0] <attach domain>: ramfs, it's name is ramfs-2
+[0][Domain:27] ramfs mount success
+[0][Domain:10] procfs init success
+[0][Domain:5] devfs mount success
+[0][Domain:10] gpu domain not found
+[0][Domain:10] mouse domain not found
+[0][Domain:10] keyboard domain not found
+[0][Domain:10] devfs init success
+[0][Domain:7] sysfs mount success
+[0][Domain:10] sysfs init success
+[0] [31m[Load new domain] Time elapsed: 1676 us[0m
+[0][Domain:28] ramfs FsDomain init
+[0] <attach domain>: ramfs, it's name is ramfs-3
+[0][Domain:28] ramfs mount success
+[0][Domain:8] pipefs mount success
+[0][Domain:10] pipefs init success
+[0] [31m[Load new domain] Time elapsed: 1656 us[0m
+[0][Domain:29] ramfs FsDomain init
+[0] <attach domain>: ramfs, it's name is ramfs-4
+[0][Domain:29] ramfs mount success
+[0][Domain:9] domainfs mount success
+[0][Domain:10] Initrd populate success
+[0][Domain:10] fatfs mount begin: /tests
+[0][Domain:10] fatfs 已打开块设备 /dev/sda
+[0][Domain:3] fatfs mount success
+[0][Domain:10] fatfs mount success: /tests
+[0][Domain:10] Vfs Tree:
+drwxr-xr-x      4KB root 
+drwxr-xr-x      4KB var 
+drwxr-xr-x      4KB etc 
+drwxr-xr-x      4KB dev 
+drwxr-xr-x      4KB proc 
+drwxr-xr-x      4KB sys 
+drwxrwxrwx      4KB tmp 
+drwxr-xr-x      4KB tests 
+drwxr-xr-x      4KB domain 
+drwxr-xr-x      4KB bin 
+drwxr-xr-x      4KB sbin 
+drwxr-xr-x      4KB usr 
+[0][Domain:10] Init filesystem success
+[0][Domain:10] vfs init success
+[0] load_domains: after vfs init
+[0] Drop initrd data
+[0] load_domains: before task init
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13bd5000
+[0][Domain:11] task::current_task: no current tid
+[0][Domain:11] Task::from_elf success: name=/tests/init, tid=1, entry=0x4000000, user_sp=0x4059f80, k_sp=0x13cc5000, cpu_id=0, cpus_allowed=0x1
+[0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
+[0][Domain:11] init_task enqueue init process tid=1
+[0][Domain:11] Init task domain success
+[0] load_domains: after task init
+[0] Load domains done
+[0] Register task domain and syscall domain to trap system
+[0] Begin run task...
+[0] run_task bootstrap wake 0 tasks
+[0][Domain:11] kthread_init start...
+Init process is running
+[Init] start /tests/new/syscall_all
+[syscall_all] start
+[sys_poll] start
+[sys_poll] PASS
+[0][Domain:11] release task [3-3]
+[sys_fs] start
+[sys_fs] PASS
+[0][Domain:11] release task [3-3]
+[sys_link] start
+[sys_link] PASS
+[0][Domain:11] release task [3-3]
+[sys_proc] start
+[0][Domain:11] release task [4-4]
+[0][Domain:11] release task [4-4]
+[sys_proc] PASS
+[0][Domain:11] release task [3-3]
+[sys_random] start
+[sys_random] PASS
+[0][Domain:11] release task [3-3]
+[sys_time] start
+[sys_time] PASS
+[0][Domain:11] release task [3-3]
+[syscall_all] PASS
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/new/syscall_all
+[Init] start /tests/ping
+Test socket
+Created socket: 3
+socket bind successes!
+Created socket: 4
+socket bind successes!
+Sent data to server: Ok("Hello Server!")
+receive 13 bytes from client 10.0.2.15:20001
+Received data from client: Ok("Hello Server!")
+Test socket successes!
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/ping
+[Init] all tests passed
+[1m[32mAlien[0m:[1m[34m/[0m# cd tes[1m[32mAlien[0m:[1m[34m/[0m# cd tests/[J
+[1m[32mAlien[0m:[1m[34m/tests[0m# ls
+[1;32masync_test[m          [1;32mftest[m               [1;32mhello[m
+[1;32mbash[m                [1;32mgloopback[m           [1;32minit[m
+[1;32mclient[m              [1;32mgrandom_scheduler[m   [1;34mnew[m
+[1;32mdgpu[m                [1;32mgsshadow_blk[m        [1;32mnice[m
+[1;32mdinput[m              [1;32mgvfs2[m               [1;32mout[m
+[1;32mdlog[m                [1;32mgvirtio_gpu[m         [1;32mping[m
+[1;32mdnet[m                [1;32mgvirtio_input[m       [1;32mpingpong[m
+[1;34mdomains[m             [1;32mgvirtio_mmio_gpu[m    [1;32mredis-benchmark[m
+[1;32mdtask[m               [1;32mgvirtio_mmio_input[m  [1;32mredis-cli[m
+[1;32mdtest[m               [1;32mgvirtio_mmio_net[m    [1;32mredis-server[m
+[1;32mdvfs[m                [1;32mgvirtio_net[m         [1;32mredis.conf[m
+[1;32mfs_update[m           [1;32mgxlogger[m
+[0][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/tests[0m# cd ne[1m[32mAlien[0m:[1m[34m/tests[0m# cd new/[J
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# ls
+[1;32msys_fs[m       [1;32msys_poll[m     [1;32msys_random[m   [1;32msyscall_all[m
+[1;32msys_link[m     [1;32msys_proc[m     [1;32msys_time[m
+[0][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# syscall_all
+[syscall_all] start
+[sys_poll] start
+[sys_poll] PASS
+[0][Domain:11] release task [4-4]
+[sys_fs] start
+[sys_fs] PASS
+[0][Domain:11] release task [4-4]
+[sys_link] start
+[sys_link] PASS
+[0][Domain:11] release task [4-4]
+[sys_proc] start
+[0][Domain:11] release task [5-5]
+[0][Domain:11] release task [5-5]
+[sys_proc] PASS
+[0][Domain:11] release task [4-4]
+[sys_random] start
+[sys_random] PASS
+[0][Domain:11] release task [4-4]
+[sys_time] start
+[sys_time] PASS
+[0][Domain:11] release task [4-4]
+[syscall_all] PASS
+[0][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# [1m[32mAlien[0m:[1m[34m/tests/new[0m# syscall_all[J
+[syscall_all] start
+[sys_poll] start
+[sys_poll] PASS
+[0][Domain:11] release task [4-4]
+[sys_fs] start
+[sys_fs] PASS
+[0][Domain:11] release task [4-4]
+[sys_link] start
+[sys_link] PASS
+[0][Domain:11] release task [4-4]
+[sys_proc] start
+[0][Domain:11] release task [5-5]
+[0][Domain:11] release task [5-5]
+[sys_proc] PASS
+[0][Domain:11] release task [4-4]
+[sys_random] start
+[sys_random] PASS
+[0][Domain:11] release task [4-4]
+[sys_time] start
+[sys_time] PASS
+[0][Domain:11] release task [4-4]
+[syscall_all] PASS
+[0][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# /bin/b[Jsh
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# sh
+[1m[32mAlien[0m:[1m[34m/tests/new[0m# bash
+[0] line 99, file kernel/src/trap/x86_64/handler.rs: do_load_page_fault failed: addr=0xa6f2181, rip=0x111a9, rsp=0x14ad28, err_code=0x4, err=EINVAL

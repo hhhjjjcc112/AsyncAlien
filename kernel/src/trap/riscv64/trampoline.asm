@@ -36,13 +36,10 @@ user_v:
     ld t0, 33*8(sp)
     # load trap_handler into t1
     ld t1, 35*8(sp)
-    # load tp
-    ld tp,36*8(sp)
+    # 恢复当前 CPU 的内核 percpu 基址
+    ld gp, 36*8(sp)
     # move to kernel_sp
     ld sp, 34*8(sp)
-
-    # load hartid into tp(x4)
-    # ld tp, 36*8(tp)
     # 保证用户态缓存全部刷新到内存
     sfence.vma
     # switch to kernel space
@@ -63,8 +60,8 @@ user_r:
     # restore sstatus/sepc
     ld t1, 32*8(sp)
     ld t0, 37*8(sp)
-    # save cpu_id
-    sd tp, 36*8(sp)
+    # 保存当前 CPU 的内核 percpu 基址
+    sd gp, 36*8(sp)
 
     csrw sepc, t1
     csrw sstatus, t0

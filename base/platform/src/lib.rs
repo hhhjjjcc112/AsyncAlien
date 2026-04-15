@@ -125,7 +125,7 @@ pub fn platform_init_percpu_primary(cpu_id: usize) {
     }
     #[cfg(target_arch = "riscv64")]
     {
-        let _ = cpu_id;
+        arch::init_percpu_primary(cpu_id);
     }
 }
 
@@ -137,7 +137,7 @@ pub fn platform_init_percpu_secondary(cpu_id: usize) {
     }
     #[cfg(target_arch = "riscv64")]
     {
-        let _ = cpu_id;
+        arch::init_percpu_secondary(cpu_id);
     }
 }
 

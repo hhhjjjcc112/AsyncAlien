@@ -34,6 +34,16 @@ syscall!(sys_exit, SYSCALL_EXIT, i32);
 syscall!(sys_yield, SYSCALL_SCHED_YIELD);
 syscall!(sys_getpid, SYSCALL_GETPID);
 syscall!(sys_gettid, SYSCALL_GETTID);
+syscall!(sys_setpgid, SYSCALL_SETPGID, usize, usize);
+syscall!(sys_getpgid, SYSCALL_GETPGID, usize);
+#[cfg(target_arch = "x86_64")]
+syscall!(sys_getpgrp, SYSCALL_GETPGRP);
+#[cfg(target_arch = "riscv64")]
+pub fn sys_getpgrp() -> isize {
+    sys_getpgid(0)
+}
+syscall!(sys_getsid, SYSCALL_GETSID, usize);
+syscall!(sys_setsid, SYSCALL_SETSID);
 syscall!(sys_gettimeofday, SYSCALL_GETTIMEOFDAY, *mut u8, *mut u8);
 pub fn sys_get_time(tv: *mut u8) -> isize {
     sys_gettimeofday(tv, core::ptr::null_mut())

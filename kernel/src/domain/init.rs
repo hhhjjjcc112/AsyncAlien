@@ -51,6 +51,8 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("cmos_rtc", DomainTypeRaw::RtcDomain),
     #[cfg(target_arch = "x86_64")]
     ("virtio_net", DomainTypeRaw::NetDeviceDomain),
+    #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
+    ("virtio_net", DomainTypeRaw::NetDeviceDomain),
     #[cfg(target_arch = "x86_64")]
     ("virtio_input", DomainTypeRaw::InputDomain),
     #[cfg(target_arch = "x86_64")]

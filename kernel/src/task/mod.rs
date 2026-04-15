@@ -16,6 +16,7 @@ use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;
 pub use processor::current_tid;
+pub use processor::init_current_tid;
 pub use processor::current_task;
 pub use scheduler::{
     exit_now, get_task_priority, is_task_exit, remove_task, set_task_priority, wait_now,
@@ -54,14 +55,12 @@ pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
         (*now).save_fp_simd();
         (*next).restore_fp_simd();
 
-        // 任务切换前保存当前任务的 TLS 相关基址。
+        // 任务切换时仅保存 task-owned 的 TLS 基址。
         (*now).set_fs_base(FsBase::read().as_u64() as usize);
         (*now).set_gs_base(KernelGsBase::read().as_u64() as usize);
 
-        // 在任务切换处统一更新 rsp0，避免分散到 trap 返回路径。
-        crate::trap::write_tss_rsp0((*next).kstack_top());
-
         // 切到下一个任务前恢复其 TLS 相关基址。
+        // 活跃的内核 GS 仍由 percpu + swapgs 维护，不放入 TaskContext。
         FsBase::write(VirtAddr::new((*next).fs_base() as u64));
         KernelGsBase::write(VirtAddr::new((*next).gs_base() as u64));
 

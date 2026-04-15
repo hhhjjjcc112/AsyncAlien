@@ -1,15 +1,18 @@
 mod init;
-#[cfg(all(
-    target_arch = "x86_64",
-    any(
-        feature = "domain_test",
-        feature = "domain_syscall_test",
-        feature = "domain_task_test",
-        feature = "domain_apic_test",
-        feature = "domain_uart_test",
-        feature = "domain_block_test",
-        feature = "domain_net_test",
-    )
+#[cfg(any(
+    all(
+        target_arch = "x86_64",
+        any(
+            feature = "domain_test",
+            feature = "domain_syscall_test",
+            feature = "domain_task_test",
+            feature = "domain_apic_test",
+            feature = "domain_uart_test",
+            feature = "domain_block_test",
+            feature = "domain_net_test",
+        )
+    ),
+    all(target_arch = "riscv64", feature = "domain_net_test"),
 ))]
 mod test;
 
@@ -1153,6 +1156,10 @@ pub fn load_domains() -> AlienResult<()> {
             feature = "domain_net_test",
         )
     ))]
+    test::run()?;
+
+    // riscv64 默认不跑域测试，仅在显式开启网络回归时触发。
+    #[cfg(all(target_arch = "riscv64", feature = "domain_net_test"))]
     test::run()?;
 
     devfs.init_by_box(Box::new(()))?;

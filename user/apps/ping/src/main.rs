@@ -10,12 +10,12 @@ use Mstd::{
 };
 
 #[unsafe(no_mangle)]
-fn main() {
+fn main() -> i32 {
     println!("Test socket");
     let server = socket(Domain::AF_INET, SocketType::SOCK_DGRAM, 0);
     if server < 0 {
         println!("Failed to create socket");
-        return;
+        return 1;
     } else {
         println!("Created socket: {}", server);
     }
@@ -32,7 +32,7 @@ fn main() {
     );
     if res < 0 {
         println!("Failed to bind socket");
-        return;
+        return 2;
     } else {
         println!("socket bind successes!");
     }
@@ -40,7 +40,7 @@ fn main() {
     let client = socket(Domain::AF_INET, SocketType::SOCK_DGRAM, 0);
     if client < 0 {
         println!("Failed to create socket");
-        return;
+        return 3;
     } else {
         println!("Created socket: {}", client);
     }
@@ -58,7 +58,7 @@ fn main() {
     );
     if res < 0 {
         println!("Failed to bind socket");
-        return;
+        return 4;
     } else {
         println!("socket bind successes!");
     }
@@ -75,7 +75,7 @@ fn main() {
 
     if res != data.len() as isize {
         println!("Failed to send data to server");
-        return;
+        return 5;
     } else {
         println!("Sent data to server: {:?}", core::str::from_utf8(data));
     }
@@ -97,7 +97,7 @@ fn main() {
 
     if res != data.len() as isize {
         println!("Failed to receive data from client");
-        return;
+        return 6;
     } else {
         assert_eq!(data, &buf[..res as usize]);
         println!(
@@ -106,4 +106,5 @@ fn main() {
         );
     }
     println!("Test socket successes!");
+    0
 }

@@ -427,9 +427,9 @@ initrd:
 	@mkdir -p ./initrd
 	@cp ./build/init/g* ./initrd
 	@if [ "$(ARCH_KIND)" = "x86_64" ]; then \
-		rm -f ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
+		rm -f ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
 	else \
-		rm -f ./initrd/gvirtio_blk ./initrd/gvirtio_net ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
+		rm -f ./initrd/gvirtio_input ./initrd/gvirtio_gpu; \
 	fi
 	@if [ -d ./user/initrd/initramfs-$(ARCH_KIND) ]; then \
 		cp ./user/initrd/initramfs-$(ARCH_KIND)/* ./initrd -r; \

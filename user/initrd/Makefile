@@ -1,4 +1,4 @@
-VERSION = 1.33.1
+VERSION = 1.36.1
 BB = busybox
 ARCH ?= riscv64
 
@@ -57,6 +57,7 @@ prepare-config:
 	@if [ ! -f $(BB_WORK)/.config ]; then \
 		echo "Generating default busybox config for $(ARCH)"; \
 		CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make defconfig -C $(BB_WORK); \
+		CROSS_COMPILE=$(COMPILER) ARCH=$(ARCH) make menuconfig -C $(BB_WORK); \
 	fi
 
 build: prepare-config

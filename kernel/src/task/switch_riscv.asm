@@ -10,14 +10,14 @@
 __switch:
     # save kernel stack of current task
     sd sp, 8(a0)
-    # save ra & s0~s11 of current execution
+    # save ra 和 s0~s11
     sd ra, 0(a0)
     .set n, 0
     .rept 12
         SAVE_SN %n
         .set n, n + 1
     .endr
-    # restore ra & s0~s11 of next execution
+    # restore ra 和 s0~s11
     ld ra, 0(a1)
     .set n, 0
     .rept 12
@@ -27,4 +27,3 @@ __switch:
     # restore kernel stack of next task
     ld sp, 8(a1)
     ret
-
