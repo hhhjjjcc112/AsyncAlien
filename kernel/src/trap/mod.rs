@@ -14,20 +14,21 @@ mod riscv64;
 mod x86_64;
 
 // Re-export architecture-specific items
-#[cfg(target_arch = "riscv64")]
-pub use riscv64::*;
-#[cfg(target_arch = "x86_64")]
-pub use x86_64::*;
-
 // Common includes
 use alloc::sync::Arc;
 use core::arch::global_asm;
 
 use basic::sync::Once;
-use interface::{APICDomain, PLICDomain, SysCallDomain};
+#[cfg(target_arch = "x86_64")]
+use interface::APICDomain as InterruptControllerDomain;
+#[cfg(target_arch = "riscv64")]
+use interface::PLICDomain as InterruptControllerDomain;
+use interface::SysCallDomain;
 use platform::println;
-
-
+#[cfg(target_arch = "riscv64")]
+pub use riscv64::*;
+#[cfg(target_arch = "x86_64")]
+pub use x86_64::*;
 
 #[cfg(target_arch = "riscv64")]
 global_asm!(include_str!("./riscv64/kernel_v.asm"));
@@ -38,8 +39,8 @@ global_asm!(include_str!("./riscv64/trampoline.asm"));
 global_asm!(include_str!("./x86_64/trampoline.asm"));
 
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
-pub static PLIC_DOMAIN: Once<Arc<dyn PLICDomain>> = Once::new();
-pub static APIC_DOMAIN: Once<Arc<dyn APICDomain>> = Once::new();
+/// 当前架构唯一可见的中断控制器域。
+pub static INTERRUPT_CONTROLLER_DOMAIN: Once<Arc<dyn InterruptControllerDomain>> = Once::new();
 
 #[macro_export]
 macro_rules! syscall_domain {
@@ -49,16 +50,9 @@ macro_rules! syscall_domain {
 }
 
 #[macro_export]
-macro_rules! plic_domain {
+macro_rules! interrupt_controller_domain {
     () => {
-        basic::sync::OnceGet::get_must(&$crate::trap::PLIC_DOMAIN)
-    };
-}
-
-#[macro_export]
-macro_rules! apic_domain {
-    () => {
-        basic::sync::OnceGet::get_must(&$crate::trap::APIC_DOMAIN)
+        basic::sync::OnceGet::get_must(&$crate::trap::INTERRUPT_CONTROLLER_DOMAIN)
     };
 }
 
@@ -66,25 +60,22 @@ pub fn register_syscall_domain(syscall_domain: Arc<dyn SysCallDomain>) {
     SYSCALL_DOMAIN.call_once(|| syscall_domain);
 }
 
-pub fn register_plic_domain(plic_domain: Arc<dyn PLICDomain>) {
-    PLIC_DOMAIN.call_once(|| plic_domain);
+pub fn register_interrupt_controller_domain(
+    interrupt_controller_domain: Arc<dyn InterruptControllerDomain>,
+) {
+    INTERRUPT_CONTROLLER_DOMAIN.call_once(|| interrupt_controller_domain);
 }
-
-pub fn register_apic_domain(apic_domain: Arc<dyn APICDomain>) {
-    APIC_DOMAIN.call_once(|| apic_domain);
-}
-
 
 pub fn init_trap_subsystem() {
     println!("++++ setup interrupt ++++");
     // 架构相关的trap初始化
     init_trap();
-    
+
     // 通用步骤：打开外部中断、时钟中断与全局中断使能。
     arch::external_interrupt_enable();
     arch::timer_interrupt_enable();
     arch::interrupt_enable();
-    
+
     let enable = arch::is_interrupt_enable();
     println!("++++ setup interrupt done, enable:{:?} ++++", enable);
 }

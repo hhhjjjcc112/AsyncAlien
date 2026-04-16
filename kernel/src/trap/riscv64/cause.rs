@@ -1,12 +1,11 @@
+use basic::task::TrapFrame;
+use mem::PhysAddr;
 use riscv::register::{
     scause::{Exception, Interrupt, Trap},
     sepc, stval,
 };
 
-use basic::task::TrapFrame;
-use mem::PhysAddr;
-
-use crate::{plic_domain, syscall_domain, task_domain, timer};
+use crate::{interrupt_controller_domain, syscall_domain, task_domain, timer};
 
 #[inline]
 fn handle_user_syscall() {
@@ -14,8 +13,8 @@ fn handle_user_syscall() {
     let trap_frame_phy_addr = task_domain.trap_frame_phy_addr().unwrap();
     let cx = TrapFrame::from_raw_phy_ptr(PhysAddr::from(trap_frame_phy_addr));
 
-    // ecall 返回前前移 sepc，避免重复陷入。
-    cx.update_sepc(cx.sepc() + 4);
+    // ecall 返回前前移用户 PC，避免重复陷入。
+    cx.update_user_pc(cx.user_pc() + 4);
 
     let parameters = cx.parameters();
     let result = syscall_domain!().call(
@@ -67,7 +66,9 @@ impl TrapHandler for Trap {
                     .expect("do_load_page_fault failed");
                 log::debug!(
                     "<do_user_handle> {:?}, stval:{:#x?} sepc:{:#x?}",
-                    self, stval, sepc
+                    self,
+                    stval,
+                    sepc
                 );
             }
             Trap::Exception(Exception::InstructionPageFault) => {
@@ -80,7 +81,9 @@ impl TrapHandler for Trap {
             }
             Trap::Interrupt(Interrupt::SupervisorExternal) => {
                 trace!("[{}] <do_user_handle> external interrupt", arch::cpu_id());
-                plic_domain!().handle_irq().expect("handle_irq failed");
+                interrupt_controller_domain!()
+                    .handle_irq()
+                    .expect("handle_irq failed");
             }
             _ => {
                 panic!(
@@ -108,7 +111,9 @@ impl TrapHandler for Trap {
             }
             Trap::Interrupt(Interrupt::SupervisorExternal) => {
                 platform::println!("<do_kernel_handle> external interrupt");
-                plic_domain!().handle_irq().expect("handle_irq failed");
+                interrupt_controller_domain!()
+                    .handle_irq()
+                    .expect("handle_irq failed");
             }
             _ => {
                 panic!(

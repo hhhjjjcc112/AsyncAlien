@@ -3,8 +3,8 @@ use core::{any::Any, sync::atomic::AtomicBool};
 
 use config::FRAME_BITS;
 use corelib::{
-    domain_info::{DomainDataInfo, DomainFileInfo},
     CoreFunction,
+    domain_info::{DomainDataInfo, DomainFileInfo},
 };
 use domain_manager::resource::DOMAIN_RESOURCE;
 use interface::*;
@@ -323,6 +323,26 @@ impl CoreFunction for DomainSyscall {
                 let nice = crate::task::get_task_priority();
                 Ok(OperationResult::Priority(nice))
             }
+            #[cfg(target_arch = "x86_64")]
+            TaskOperation::SetUserFsBase(fs_base) => {
+                crate::task::set_current_user_fs_base(fs_base)?;
+                Ok(OperationResult::Null)
+            }
+            #[cfg(target_arch = "x86_64")]
+            TaskOperation::GetUserFsBase => {
+                let fs_base = crate::task::current_user_fs_base()?;
+                Ok(OperationResult::FsBase(fs_base))
+            }
+            #[cfg(target_arch = "x86_64")]
+            TaskOperation::SetUserGsBase(gs_base) => {
+                crate::task::set_current_user_gs_base(gs_base)?;
+                Ok(OperationResult::Null)
+            }
+            #[cfg(target_arch = "x86_64")]
+            TaskOperation::GetUserGsBase => {
+                let gs_base = crate::task::current_user_gs_base()?;
+                Ok(OperationResult::GsBase(gs_base))
+            }
         }
     }
     fn checkout_shared_data(&self) -> AlienResult<()> {
@@ -340,7 +360,6 @@ unsafe extern "C" {
     fn strampoline();
 }
 static BLK_CRASH: AtomicBool = AtomicBool::new(true);
-
 
 fn unwind() {
     BLK_CRASH.store(false, core::sync::atomic::Ordering::Relaxed);

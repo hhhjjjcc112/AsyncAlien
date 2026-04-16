@@ -19,10 +19,10 @@ use spin::Once;
 use vfscore::{fstype::FileSystemFlags, inode::InodeAttr, superblock::SuperType, utils::*};
 
 use crate::{
-    domain_helper::{free_domain_resource, FreeShared},
+    domain_helper::{FreeShared, free_domain_resource},
     domain_loader::loader::DomainLoader,
     error::{AlienError, AlienResult},
-    sync::{sync_cpus, RcuData, SleepMutex},
+    sync::{RcuData, SleepMutex, sync_cpus},
     task::yield_now,
     timer::TimeTick,
     *,
@@ -70,6 +70,7 @@ impl PerCpuCounter {
 gen_for_BufInputDomain!();
 gen_for_BufUartDomain!();
 gen_for_CacheBlkDeviceDomain!();
+#[cfg(target_arch = "x86_64")]
 gen_for_APICDomain!();
 gen_for_EmptyDeviceDomain!();
 gen_for_FsDomain!();
@@ -81,6 +82,7 @@ gen_for_SysCallDomain!();
 gen_for_TaskDomain!();
 gen_for_UartDomain!();
 gen_for_VfsDomain!();
+#[cfg(target_arch = "riscv64")]
 gen_for_PLICDomain!();
 // show how to use the macro
 // gen_for_SchedulerDomain!();

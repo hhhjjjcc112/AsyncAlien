@@ -1,19 +1,20 @@
-use core::arch::asm;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::{
+    arch::asm,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
 use config::TRAMPOLINE;
 use platform;
 
-use crate::{task_domain, timer};
-#[cfg(target_arch = "riscv64")]
-use crate::plic_domain;
-
 #[cfg(feature = "trap_test")]
 use super::test;
 use super::{
-    context::{fault_address, X86TrapFrame, X86TrapFrameExt}, syscall,
-    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult}, vectors,
+    context::{X86TrapFrame, X86TrapFrameExt, fault_address},
+    syscall,
+    user_ctx::{UserTrapResult, current_trap_frame, prepare_user_return},
+    vectors,
 };
+use crate::{task_domain, timer};
 
 unsafe extern "C" {
     fn strampoline();
@@ -98,11 +99,7 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
                 Err(err) => {
                     panic!(
                         "do_load_page_fault failed: addr={:#x}, rip={:#x}, rsp={:#x}, err_code={:#x}, err={:?}",
-                        fault_addr,
-                        frame.rip,
-                        frame.rsp,
-                        frame.error_code,
-                        err
+                        fault_addr, frame.rip, frame.rsp, frame.error_code, err
                     );
                 }
             }
@@ -130,9 +127,13 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
-            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
+            trace!(
+                "[{}] External interrupt: IRQ {}",
+                arch::cpu_id(),
+                v - vectors::IRQ_BASE
+            );
             let irq = (v - vectors::IRQ_BASE) as usize;
-            if let Some(apic) = crate::trap::APIC_DOMAIN.get() {
+            if let Some(apic) = crate::trap::INTERRUPT_CONTROLLER_DOMAIN.get() {
                 apic.handle_irq(irq).expect("handle_irq failed");
             } else {
                 log::warn!("APIC domain not ready, drop irq {}", irq);
@@ -204,18 +205,17 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::SYSCALL => panic!("syscall from kernel mode"),
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
-            trace!("[{}] External interrupt: IRQ {}", arch::cpu_id(), v - vectors::IRQ_BASE);
-            #[cfg(target_arch = "x86_64")]
-            {
-                let irq = (v - vectors::IRQ_BASE) as usize;
-                if let Some(apic) = crate::trap::APIC_DOMAIN.get() {
-                    apic.handle_irq(irq).expect("handle_irq failed");
-                } else {
-                    log::warn!("APIC domain not ready, drop irq {}", irq);
-                }
+            trace!(
+                "[{}] External interrupt: IRQ {}",
+                arch::cpu_id(),
+                v - vectors::IRQ_BASE
+            );
+            let irq = (v - vectors::IRQ_BASE) as usize;
+            if let Some(apic) = crate::trap::INTERRUPT_CONTROLLER_DOMAIN.get() {
+                apic.handle_irq(irq).expect("handle_irq failed");
+            } else {
+                log::warn!("APIC domain not ready, drop irq {}", irq);
             }
-            #[cfg(target_arch = "riscv64")]
-            plic_domain!().handle_irq().expect("handle_irq failed");
             send_apic_eoi();
         }
 

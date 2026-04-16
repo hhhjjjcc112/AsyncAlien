@@ -1,72 +1,36 @@
 mod processor;
 mod resource;
+#[cfg(target_arch = "riscv64")]
+mod riscv64;
 mod scheduler;
+#[cfg(target_arch = "x86_64")]
+mod x86_64;
 
-use alloc::sync::Arc;
-use alloc::vec::Vec;
-use core::arch::global_asm;
-#[cfg(target_arch = "x86_64")]
-use x86_64::VirtAddr;
-#[cfg(target_arch = "x86_64")]
-use x86_64::registers::model_specific::{FsBase, KernelGsBase};
+use alloc::{sync::Arc, vec::Vec};
 
 use arch::cpu_id;
-use basic::{sync::Once, task::TaskContext};
+use basic::sync::Once;
 use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;
-pub use processor::current_tid;
-pub use processor::init_current_tid;
-pub use processor::current_task;
+pub use processor::{current_task, current_tid, init_current_tid};
 pub use scheduler::{
     exit_now, get_task_priority, is_task_exit, remove_task, set_task_priority, wait_now,
     wake_up_wait_task, yield_now,
 };
 use task_meta::{TaskMeta, TaskStatus};
 
+#[cfg(target_arch = "riscv64")]
+pub use self::riscv64::switch;
+#[cfg(target_arch = "x86_64")]
+pub use self::x86_64::{
+    current_user_fs_base, current_user_gs_base, set_current_user_fs_base, set_current_user_gs_base,
+    switch,
+};
 use crate::{
     error::AlienResult,
     task::{resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},
 };
-
-// Architecture-specific task switch assembly
-#[cfg(target_arch = "riscv64")]
-global_asm!(include_str!("switch_riscv.asm"));
-#[cfg(target_arch = "x86_64")]
-global_asm!(include_str!("switch_x86_64.asm"));
-
-unsafe extern "C" {
-    fn __switch(now: *mut TaskContext, next: *const TaskContext);
-}
-
-#[inline(always)]
-#[cfg(target_arch = "riscv64")]
-pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
-    unsafe {
-        __switch(now, next);
-    }
-}
-
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
-    unsafe {
-        // FP/SIMD 状态在 Rust 路径保存恢复，汇编只处理通用寄存器。
-        (*now).save_fp_simd();
-        (*next).restore_fp_simd();
-
-        // 任务切换时仅保存 task-owned 的 TLS 基址。
-        (*now).set_fs_base(FsBase::read().as_u64() as usize);
-        (*now).set_gs_base(KernelGsBase::read().as_u64() as usize);
-
-        // 切到下一个任务前恢复其 TLS 相关基址。
-        // 活跃的内核 GS 仍由 percpu + swapgs 维护，不放入 TaskContext。
-        FsBase::write(VirtAddr::new((*next).fs_base() as u64));
-        KernelGsBase::write(VirtAddr::new((*next).gs_base() as u64));
-
-        __switch(now, next);
-    }
-}
 
 pub static TASK_DOMAIN: Once<Arc<dyn TaskDomain>> = Once::new();
 #[macro_export]

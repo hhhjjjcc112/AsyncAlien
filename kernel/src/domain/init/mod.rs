@@ -1,24 +1,31 @@
+#[cfg(target_arch = "riscv64")]
+mod riscv64;
+#[cfg(target_arch = "x86_64")]
+mod x86_64;
+
 use alloc::{collections::BTreeMap, string::ToString, vec};
 
 use core2::io::Read;
 use interface::DomainTypeRaw;
 use log::warn;
 
-use crate::error::{AlienError, AlienResult};
-use crate::domain_loader::creator::register_domain_elf;
+#[cfg(target_arch = "riscv64")]
+use self::riscv64::ARCH_INIT_DOMAIN_LIST;
+#[cfg(target_arch = "x86_64")]
+use self::x86_64::ARCH_INIT_DOMAIN_LIST;
+use crate::{
+    domain_loader::creator::register_domain_elf,
+    error::{AlienError, AlienResult},
+};
 
-const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
+const COMMON_INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("buf_uart", DomainTypeRaw::BufUartDomain),
     ("buf_input", DomainTypeRaw::BufInputDomain),
     ("cache_blk", DomainTypeRaw::CacheBlkDeviceDomain),
     ("devfs", DomainTypeRaw::DevFsDomain),
     ("fatfs", DomainTypeRaw::FsDomain),
-    #[cfg(target_arch = "riscv64")]
-    ("goldfish", DomainTypeRaw::RtcDomain),
     ("null", DomainTypeRaw::EmptyDeviceDomain),
     ("pipefs", DomainTypeRaw::FsDomain),
-    #[cfg(target_arch = "riscv64")]
-    ("plic", DomainTypeRaw::PLICDomain),
     ("procfs", DomainTypeRaw::FsDomain),
     ("ramfs", DomainTypeRaw::FsDomain),
     ("random", DomainTypeRaw::EmptyDeviceDomain),
@@ -28,43 +35,11 @@ const INIT_DOMAIN_LIST: &[(&str, DomainTypeRaw)] = &[
     ("fifo_scheduler", DomainTypeRaw::SchedulerDomain),
     ("task", DomainTypeRaw::TaskDomain),
     ("vfs", DomainTypeRaw::VfsDomain),
-    #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
-    ("uart16550", DomainTypeRaw::UartDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("uart16550", DomainTypeRaw::UartDomain),
-    #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
-    ("virtio_blk", DomainTypeRaw::BlkDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("virtio_blk", DomainTypeRaw::BlkDeviceDomain),
     ("net_stack", DomainTypeRaw::NetDomain),
     ("logger", DomainTypeRaw::LogDomain),
     ("domainfs", DomainTypeRaw::FsDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("apic", DomainTypeRaw::APICDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("local_apic", DomainTypeRaw::EmptyDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("io_apic", DomainTypeRaw::EmptyDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("hpet", DomainTypeRaw::EmptyDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("cmos_rtc", DomainTypeRaw::RtcDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("virtio_net", DomainTypeRaw::NetDeviceDomain),
-    #[cfg(all(target_arch = "riscv64", plat_qemu_riscv))]
-    ("virtio_net", DomainTypeRaw::NetDeviceDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("virtio_input", DomainTypeRaw::InputDomain),
-    #[cfg(target_arch = "x86_64")]
-    ("virtio_gpu", DomainTypeRaw::GpuDomain),
-    #[cfg(all(target_arch = "riscv64", plat_vf2, not(plat_vf2_sd)))]
-    ("mem_block", DomainTypeRaw::BlkDeviceDomain),
     #[cfg(feature = "bench")]
     ("mem_block", DomainTypeRaw::BlkDeviceDomain),
-    #[cfg(all(target_arch = "riscv64", plat_vf2))]
-    ("uart8250", DomainTypeRaw::UartDomain),
-    #[cfg(all(target_arch = "riscv64", plat_vf2, plat_vf2_sd))]
-    ("vf2_sd", DomainTypeRaw::BlkDeviceDomain),
 ];
 
 pub fn init_domains() -> AlienResult<()> {
@@ -105,7 +80,11 @@ pub fn init_domains() -> AlienResult<()> {
         }
     };
 
-    for (domain_file_name, domain) in INIT_DOMAIN_LIST {
+    for (domain_file_name, domain) in COMMON_INIT_DOMAIN_LIST {
+        register(domain_file_name, *domain);
+    }
+
+    for (domain_file_name, domain) in ARCH_INIT_DOMAIN_LIST {
         register(domain_file_name, *domain);
     }
 
