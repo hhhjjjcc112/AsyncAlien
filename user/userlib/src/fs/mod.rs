@@ -5,11 +5,14 @@ use alloc::{
 
 pub use attr::*;
 use bitflags::bitflags;
-pub use pconst::io::{
-    FaccessatFlags, FaccessatMode, FileMode, FileStat as Stat, FsStat as StatFs, LinkFlags,
-    OpenFlags, PollEvents, PollFd, StatFlags, UnlinkatFlags,
+use pconst::time::TimeSpec;
+pub use pconst::{
+    AT_FDCWD,
+    io::{
+        FaccessatFlags, FaccessatMode, FileMode, FileStat as Stat, FsStat as StatFs, LinkFlags,
+        OpenFlags, PollEvents, PollFd, StatFlags, UnlinkatFlags,
+    },
 };
-pub use pconst::AT_FDCWD;
 
 use crate::syscall::*;
 
@@ -102,11 +105,25 @@ pub fn write(fd: usize, buf: &[u8]) -> isize {
 }
 
 pub fn readdir(fd: usize, buf: &mut [u8]) -> isize {
-    sys_getdents(fd, buf.as_mut_ptr(), buf.len())
+    sys_getdents64(fd, buf.as_mut_ptr(), buf.len())
 }
 
 pub fn poll(fds: &mut [PollFd], timeout_ms: i32) -> isize {
-    sys_poll(fds.as_mut_ptr(), fds.len(), timeout_ms)
+    // 统一走公共 ppoll；负超时表示无限等待。
+    if timeout_ms < 0 {
+        return sys_ppoll(
+            fds.as_mut_ptr(),
+            fds.len(),
+            core::ptr::null(),
+            core::ptr::null(),
+            0,
+        );
+    }
+    let timeout = TimeSpec::new(
+        (timeout_ms as usize) / 1000,
+        ((timeout_ms as usize) % 1000) * 1_000_000,
+    );
+    sys_ppoll(fds.as_mut_ptr(), fds.len(), &timeout, core::ptr::null(), 0)
 }
 
 pub fn list(path: &str) -> isize {
@@ -119,6 +136,7 @@ pub fn list(path: &str) -> isize {
 }
 
 pub fn open(name: &str, flag: OpenFlags) -> isize {
+    // 用户态统一走 openat(AT_FDCWD, ...)。
     sys_openat(
         AT_FDCWD,
         name.as_ptr(),
@@ -142,7 +160,7 @@ pub fn close(fd: usize) -> isize {
 }
 
 pub fn get_cwd(buf: &mut [u8]) -> Result<&str, IoError> {
-    let len = sys_get_cwd(buf.as_mut_ptr(), buf.len());
+    let len = sys_getcwd(buf.as_mut_ptr(), buf.len());
     if len == -1 {
         return Err(IoError::BufferTooSmall);
     } else {
@@ -162,7 +180,8 @@ pub fn chdir(path: &str) -> isize {
 }
 
 pub fn mkdir(path: &str, mode: usize) -> isize {
-    sys_mkdir(path.as_ptr(), mode)
+    // 用户态统一走 mkdirat(AT_FDCWD, ...)。
+    sys_mkdirat(AT_FDCWD, path.as_ptr(), mode)
 }
 
 pub fn seek(fd: usize, offset: isize, whence: usize) -> isize {
@@ -212,7 +231,7 @@ pub fn readlinkat(fd: isize, path: &str, buf: &mut [u8]) -> isize {
 }
 
 pub fn fstatat(fd: isize, path: &str, stat: &mut Stat, flag: StatFlags) -> isize {
-    sys_fstatat(
+    sys_newfstatat(
         fd,
         path.as_ptr(),
         stat as *mut Stat as *mut u8,
@@ -229,7 +248,8 @@ pub fn fstatfs(fd: usize, stat: &mut StatFs) -> isize {
 }
 
 pub fn renameat(old_fd: isize, old_path: &str, new_fd: isize, new_path: &str) -> isize {
-    sys_renameat(old_fd, old_path.as_ptr(), new_fd, new_path.as_ptr())
+    // 无 flags 的 renameat 兼容为 renameat2(..., 0)。
+    sys_renameat2(old_fd, old_path.as_ptr(), new_fd, new_path.as_ptr(), 0)
 }
 
 pub fn mkdirat(fd: isize, path: &str, mode: usize) -> isize {

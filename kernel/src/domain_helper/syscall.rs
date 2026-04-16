@@ -51,6 +51,10 @@ impl CoreFunction for DomainSyscall {
         iprint!("{}", s);
     }
 
+    fn sys_current_cpu_id(&self) -> usize {
+        arch::cpu_id()
+    }
+
     fn sys_backtrace(&self, domain_id: u64) {
         let mut info = DOMAIN_INFO.lock();
         info.domain_list

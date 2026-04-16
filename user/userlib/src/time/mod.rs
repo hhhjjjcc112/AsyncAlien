@@ -1,6 +1,6 @@
-use crate::syscall::{sys_get_time, sys_nanosleep};
-
 pub use pconst::time::{TimeSpec, TimeVal, Times};
+
+use crate::syscall::{sys_gettimeofday, sys_nanosleep};
 
 pub fn now_timeval() -> TimeVal {
     let mut tv = TimeVal::default();
@@ -17,7 +17,7 @@ pub fn get_time_ms() -> isize {
 }
 
 pub fn get_time_of_day(tv: &mut TimeVal) -> isize {
-    let res = sys_get_time(tv as *mut TimeVal as *mut u8);
+    let res = sys_gettimeofday(tv as *mut TimeVal as *mut u8, core::ptr::null_mut());
     if res != 0 {
         return -1;
     }

@@ -81,5 +81,5 @@ pub fn ftruncate(fd: usize, len: usize) -> isize {
 }
 
 pub fn getdents(fd: usize, buf: &mut [u8]) -> isize {
-    sys_getdents(fd, buf.as_mut_ptr(), buf.len())
+    sys_getdents64(fd, buf.as_mut_ptr(), buf.len())
 }

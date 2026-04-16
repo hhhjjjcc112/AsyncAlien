@@ -1,10 +1,14 @@
 use bitflags::bitflags;
 pub use pconst::task::CloneFlags;
-use pconst::{signal::SigInfo, sys::Rusage, task::WaitOptions};
+use pconst::{
+    signal::{SigInfo, SignalNumber},
+    sys::Rusage,
+    task::WaitOptions,
+};
 
 use crate::syscall::{
-    sys_execve, sys_exit, sys_fork, sys_getpid, sys_getpriority, sys_setpriority, sys_vfork,
-    sys_waitid, sys_waitpid,
+    sys_clone, sys_execve, sys_exit, sys_getpid, sys_getpriority, sys_setpriority, sys_wait4,
+    sys_waitid,
 };
 
 pub fn exit(exit_code: i32) -> ! {
@@ -13,11 +17,20 @@ pub fn exit(exit_code: i32) -> ! {
 }
 
 pub fn fork() -> isize {
-    sys_fork()
+    // Linux fork 等价于 clone(SIGCHLD, ...) 的兼容语义。
+    sys_clone(SignalNumber::SIGCHLD as usize, 0, 0, 0, 0)
 }
 
 pub fn vfork() -> isize {
-    sys_vfork()
+    // vfork 通过 clone(CLONE_VFORK | CLONE_VM | SIGCHLD) 实现。
+    sys_clone(
+        (CloneFlags::CLONE_VFORK | CloneFlags::CLONE_VM).bits() as usize
+            | SignalNumber::SIGCHLD as usize,
+        0,
+        0,
+        0,
+        0,
+    )
 }
 
 pub fn getpid() -> isize {
@@ -33,11 +46,13 @@ pub fn exec(cmd: &str, args: &[*const u8], env: &[*const u8]) -> isize {
 }
 
 pub fn wait(exit_code: &mut i32, option: WaitOptions) -> isize {
-    sys_waitpid(-1, exit_code as *mut _, option.bits())
+    // wait 是 wait4(-1, ...) 的便捷封装。
+    sys_wait4(-1, exit_code as *mut _, option.bits(), 0)
 }
 
 pub fn waitpid(pid: usize, exit_code: &mut i32) -> isize {
-    sys_waitpid(pid as isize, exit_code as *mut _, 0)
+    // waitpid 是 wait4(pid, ..., 0, 0) 的便捷封装。
+    sys_wait4(pid as isize, exit_code as *mut _, 0, 0)
 }
 
 /// 直接透传 rusage，保持 waitid 的 Linux 原型。

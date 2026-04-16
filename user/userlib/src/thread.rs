@@ -1,7 +1,7 @@
-use crate::syscall::{sys_gettid, sys_yield};
+use crate::syscall::{sys_gettid, sys_sched_yield};
 
 pub fn m_yield() -> isize {
-    sys_yield()
+    sys_sched_yield()
 }
 
 pub fn gettid() -> isize {

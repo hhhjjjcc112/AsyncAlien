@@ -4,8 +4,7 @@ use pconst::net::{Domain, ShutdownFlag, SocketAddrIn, SocketType};
 
 use crate::syscall::{
     sys_accept, sys_bind, sys_connect, sys_getpeername, sys_getsockname, sys_getsockopt,
-    sys_listen, sys_recvfrom, sys_sendto, sys_setsockopt, sys_shutdown, sys_socket,
-    sys_socket_pair,
+    sys_listen, sys_recvfrom, sys_sendto, sys_setsockopt, sys_shutdown, sys_socket, sys_socketpair,
 };
 
 pub fn socket(domain: Domain, socket_type: SocketType, protocol: usize) -> isize {
@@ -18,7 +17,7 @@ pub fn socket_pair(
     protocol: usize,
     sv: *mut usize,
 ) -> isize {
-    sys_socket_pair(domain as usize, socket_type as usize, protocol, sv)
+    sys_socketpair(domain as usize, socket_type as usize, protocol, sv)
 }
 
 pub fn bind(socket: usize, address: *const SocketAddrIn, address_len: usize) -> isize {

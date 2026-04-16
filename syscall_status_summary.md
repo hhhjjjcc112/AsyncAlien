@@ -6,9 +6,9 @@
 
 ### 文件系统与 I/O
 - `openat`, `close`, `read`, `write`, `readv`, `writev`
-- `fstatat`, `ftruncate`, `faccessat`, `lseek`, `fstat`, `fsync`
+- `pread64`, `pwrite64`, `fstatat`, `ftruncate`, `faccessat`, `lseek`, `fstat`, `fsync`
 - `utimensat`, `sendfile`
-- `pselect6`, `ppoll`, `getdents64`, `chdir`, `getcwd`
+- `pselect6`, `select`, `ppoll`, `getdents64`, `chdir`, `fchdir`, `getcwd`
 - `mkdirat`, `unlinkat`, `renameat2`, `truncate`, `statfs`, `fstatfs`
 - `linkat`, `symlinkat`, `readlinkat`
 - `pipe2`, `epoll_create1`, `epoll_ctl`, `eventfd2`
@@ -21,7 +21,7 @@
 - `getuid`, `geteuid`, `getgid`, `getegid`
 - `setpgid`, `getpgid`, `setsid`
 - `sigaltstack`, `sigaction`, `sigprocmask`, `futex`
-- `setpriority`, `getpriority`, `prlimit64`, `madvise`
+- `setpriority`, `getpriority`, `getrlimit`, `setrlimit`, `getrusage`, `prlimit64`, `umask`, `madvise`
 
 ### 时间与系统信息
 - `clock_gettime`, `gettimeofday`, `nanosleep`
@@ -49,9 +49,11 @@
 | `wait4` | 返回的是 Linux 风格状态字，需要按 `status >> 8` 读退出码。 |
 | `waitid` | 仅支持 `P_ALL` / `P_PID`，`siginfo` 只回填最小字段。 |
 | `faccessat` | 目前更接近“能否打开”的最小检查，不是完整的逐位权限判定。 |
-| `pselect6` / `ppoll` | 采用简单轮询实现，`fd` 位图只覆盖 64 个位置；`ppoll` 的无效 fd 记为 `EPOLLERR`。 |
+| `select` / `pselect6` / `ppoll` | 采用简单轮询实现，`fd` 位图只覆盖 64 个位置；`ppoll` 的无效 fd 记为 `EPOLLERR`，`select` 只是 x86_64 兼容别名。 |
 | `nanosleep` | 忙等 + `yield`，`rem` 只回写零值，不处理信号打断。 |
 | `clock_gettime` | 只支持 `CLOCK_MONOTONIC`、`CLOCK_REALTIME`、`CLOCK_PROCESS_CPUTIME_ID`，其他 clock id 目前会触发 panic。 |
+| `getrusage` | 当前返回零值统计，先满足常见调用路径。 |
+| `umask` | 当前作为 task 级状态保存并返回旧值，尚未接入 VFS 创建掩码。 |
 | `getrandom` | 使用 `oorandom` 生成伪随机字节流；只接受 `GRND_NONBLOCK` / `GRND_RANDOM`，`GRND_RANDOM` 单次最多返回 512 字节。 |
 | `setpgid` / `getpgid` / `setsid` | 当前是最小 stub，直接返回成功，不维护真实会话/进程组。 |
 | `getuid` / `geteuid` / `getgid` / `getegid` | 当前固定返回 0。 |

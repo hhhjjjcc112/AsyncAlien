@@ -3658,6 +3658,7 @@ version = "0.1.0"
 dependencies = [
  "arch",
  "config",
+ "corelib",
  "kernel-sync",
  "spin 0.10.0",
 ]
