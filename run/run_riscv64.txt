@@ -1,6 +1,7 @@
-cd domains && ARCH=riscv64 PLATFORM=plat_qemu_riscv DOMAIN_PROFILE=stage4 cargo domain build-all -l "" -o /home/hjch/AsyncAlien/build
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
-     Running `target/debug/domain build-all -l '' -o /home/hjch/AsyncAlien/build`
+make[1]: Entering directory '/home/hjch/AsyncAlien'
+cd domains && ARCH=riscv64 PLATFORM=plat_qemu_riscv DOMAIN_PROFILE= cargo domain build-all -l "" -o /home/hjch/AsyncAlien/build
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.35s
+     Running `/home/hjch/AsyncAlien/target/debug/domain build-all -l '' -o /home/hjch/AsyncAlien/build`
 Building all domain projects, LOG: 
 Start building all domains
 Building domain [plic] project for target: riscv64
@@ -10,205 +11,118 @@ Start building domain,path: "./common/plic/gplic/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling plic v0.1.0 (/home/hjch/AsyncAlien/domains/common/plic/plic)
    Compiling gplic v0.1.0 (/home/hjch/AsyncAlien/domains/common/plic/gplic)
-    Finished `release` profile [optimized] target(s) in 1.65s
+    Finished `release` profile [optimized] target(s) in 1.70s
 Build domain [plic] project success
 Copy domain [plic] project success
 Building domain [syscall] project for target: riscv64
 Start building domain,path: "./common/syscall/gsyscall/Cargo.toml"
+   Compiling ksync v0.1.0 (/home/hjch/AsyncAlien/domain-lib/ksync)
+   Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling syscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/syscall)
    Compiling gsyscall v0.1.0 (/home/hjch/AsyncAlien/domains/common/syscall/gsyscall)
-    Finished `release` profile [optimized] target(s) in 2.39s
+    Finished `release` profile [optimized] target(s) in 2.60s
 Build domain [syscall] project success
 Copy domain [syscall] project success
 Building domain [task] project for target: riscv64
 Start building domain,path: "./common/task/gtask/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling task v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/task)
-warning: function `find_task` is never used
-  --> task/src/processor.rs:25:8
+warning: fields `primary` and `secondary` are never read
+  --> task/src/arch/mod.rs:14:5
    |
-25 | pub fn find_task(tid: usize) -> Option<Arc<Task>> {
-   |        ^^^^^^^^^
+13 | pub(crate) struct UserArchState {
+   |                   ------------- fields in this struct
+14 |     primary: usize,
+   |     ^^^^^^^
+15 |     secondary: usize,
+   |     ^^^^^^^^^
    |
+   = note: `UserArchState` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-warning: method `top` is never used
-   --> task/src/resource.rs:156:12
-    |
-125 | impl UserStack {
-    | -------------- method in this implementation
+warning: methods `primary` and `secondary` are never used
+  --> task/src/arch/mod.rs:23:18
+   |
+18 | impl UserArchState {
+   | ------------------ methods in this implementation
 ...
-156 |     pub fn top(&self) -> VirtAddr {
-    |            ^^^
+23 |     pub const fn primary(self) -> usize {
+   |                  ^^^^^^^
+...
+27 |     pub const fn secondary(self) -> usize {
+   |                  ^^^^^^^^^
 
-warning: methods `get` and `del` are never used
-   --> task/src/resource.rs:294:12
-    |
-282 | impl AuxVec {
-    | ----------- methods in this implementation
-...
-294 |     pub fn get(&self, key: usize) -> Option<u64> {
-    |            ^^^
-...
-298 |     pub fn del(&mut self, key: usize) -> Option<u64> {
-    |            ^^^
-
-warning: `task` (lib) generated 3 warnings
+warning: `task` (lib) generated 2 warnings
    Compiling gtask v0.1.0 (/home/hjch/AsyncAlien/domains/common/task/gtask)
-    Finished `release` profile [optimized] target(s) in 4.70s
+    Finished `release` profile [optimized] target(s) in 4.34s
 Build domain [task] project success
 Copy domain [task] project success
 Building domain [vfs] project for target: riscv64
 Start building domain,path: "./common/vfs/gvfs/Cargo.toml"
    Compiling vfs_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/vfs_common)
    Compiling vfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/vfs)
-warning: method `interest` is never used
-  --> vfs/src/epoll.rs:46:12
-   |
-23 | impl EpollFile {
-   | -------------- method in this implementation
-...
-46 |     pub fn interest(&self) -> MutexGuard<'_, BTreeMap<usize, EpollEvent>> {
-   |            ^^^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: methods `is_readable`, `is_writable`, and `is_append` are never used
-   --> vfs/src/kfile.rs:120:8
-    |
- 87 | pub trait File: DowncastSync + Debug {
-    |           ---- methods in this trait
-...
-120 |     fn is_readable(&self) -> bool;
-    |        ^^^^^^^^^^^
-121 |     fn is_writable(&self) -> bool;
-    |        ^^^^^^^^^^^
-122 |     fn is_append(&self) -> bool;
-    |        ^^^^^^^^^
-
-warning: field `inode` is never read
-  --> vfs/src/socket.rs:26:5
-   |
-21 | pub struct SocketFile {
-   |            ---------- field in this struct
-...
-26 |     inode: Arc<dyn VfsInode>,
-   |     ^^^^^
-
-warning: `vfs` (lib) generated 3 warnings
    Compiling gvfs v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs/gvfs)
-    Finished `release` profile [optimized] target(s) in 5.42s
+    Finished `release` profile [optimized] target(s) in 4.97s
 Build domain [vfs] project success
 Copy domain [vfs] project success
 Building domain [buf_uart] project for target: riscv64
 Start building domain,path: "./drivers/buf_uart/gbuf_uart/Cargo.toml"
    Compiling buf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/buf_uart)
    Compiling gbuf_uart v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_uart/gbuf_uart)
-    Finished `release` profile [optimized] target(s) in 1.22s
+    Finished `release` profile [optimized] target(s) in 1.15s
 Build domain [buf_uart] project success
 Copy domain [buf_uart] project success
 Building domain [buf_input] project for target: riscv64
 Start building domain,path: "./drivers/buf_input/gbuf_input/Cargo.toml"
    Compiling buf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/buf_input)
    Compiling gbuf_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/buf_input/gbuf_input)
-    Finished `release` profile [optimized] target(s) in 1.22s
+    Finished `release` profile [optimized] target(s) in 1.10s
 Build domain [buf_input] project success
 Copy domain [buf_input] project success
 Building domain [cache_blk] project for target: riscv64
 Start building domain,path: "./drivers/cache_blk/gcache_blk/Cargo.toml"
    Compiling cache_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cache_blk/cache_blk)
-warning: struct `PageCache` is never constructed
-  --> cache_blk/src/frame.rs:25:8
-   |
-25 | struct PageCache(FrameTracker);
-   |        ^^^^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: struct `GenericBlockDevice` is never constructed
-  --> cache_blk/src/frame.rs:41:12
-   |
-41 | pub struct GenericBlockDevice {
-   |            ^^^^^^^^^^^^^^^^^^
-
-warning: associated items `new` and `check` are never used
-  --> cache_blk/src/frame.rs:54:12
-   |
-53 | impl GenericBlockDevice {
-   | ----------------------- associated items in this implementation
-54 |     pub fn new(max_cache_frames: usize) -> Self {
-   |            ^^^
-...
-62 |     fn check(&self, page_id: usize) {
-   |        ^^^^^
-
-warning: constant `MAX_BLOCK_CACHE_FRAMES` is never used
-   --> cache_blk/src/frame.rs:181:11
-    |
-181 | pub const MAX_BLOCK_CACHE_FRAMES: usize = 1024 * 4 * 4;
-    |           ^^^^^^^^^^^^^^^^^^^^^^
-
-warning: function `main` is never used
-   --> cache_blk/src/frame.rs:185:8
-    |
-185 | pub fn main() -> Box<dyn CacheBlkDeviceDomain> {
-    |        ^^^^
-
-warning: `cache_blk` (lib) generated 5 warnings
    Compiling gcache_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/cache_blk/gcache_blk)
-    Finished `release` profile [optimized] target(s) in 1.48s
+    Finished `release` profile [optimized] target(s) in 1.44s
 Build domain [cache_blk] project success
 Copy domain [cache_blk] project success
 Building domain [goldfish] project for target: riscv64
 Start building domain,path: "./drivers/goldfish/ggoldfish/Cargo.toml"
    Compiling goldfish v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/goldfish/goldfish)
    Compiling ggoldfish v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/goldfish/ggoldfish)
-    Finished `release` profile [optimized] target(s) in 0.98s
+    Finished `release` profile [optimized] target(s) in 1.06s
 Build domain [goldfish] project success
 Copy domain [goldfish] project success
 Building domain [null] project for target: riscv64
 Start building domain,path: "./drivers/null/gnull/Cargo.toml"
    Compiling null v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/null)
    Compiling gnull v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/null/gnull)
-    Finished `release` profile [optimized] target(s) in 0.89s
+    Finished `release` profile [optimized] target(s) in 0.91s
 Build domain [null] project success
 Copy domain [null] project success
 Building domain [random] project for target: riscv64
 Start building domain,path: "./drivers/random/grandom/Cargo.toml"
    Compiling random v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/random)
    Compiling grandom v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/random/grandom)
-    Finished `release` profile [optimized] target(s) in 0.89s
+    Finished `release` profile [optimized] target(s) in 0.94s
 Build domain [random] project success
 Copy domain [random] project success
 Building domain [shadow_blk] project for target: riscv64
 Start building domain,path: "./drivers/shadow_blk/gshadow_blk/Cargo.toml"
    Compiling shadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/shadow_blk)
    Compiling gshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/shadow_blk/gshadow_blk)
-    Finished `release` profile [optimized] target(s) in 1.08s
+    Finished `release` profile [optimized] target(s) in 1.20s
 Build domain [shadow_blk] project success
 Copy domain [shadow_blk] project success
 Building domain [uart16550] project for target: riscv64
 Start building domain,path: "./drivers/uart16550/guart16550/Cargo.toml"
-   Compiling uart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/uart16550)
+   Compiling domain_uart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/uart16550)
    Compiling guart16550 v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/uart16550/guart16550)
-error[E0425]: cannot find function `domain_id` in this scope
-  --> guart16550/src/main.rs:17:1
-   |
-17 | #[domain_main]
-   | ^^^^^^^^^^^^^^ not found in this scope
-   |
-   = note: this error originates in the attribute macro `domain_main` (in Nightly builds, run with -Z macro-backtrace for more info)
-help: consider importing this function
-   |
- 7 + use shared_heap::domain_id;
-   |
-
-For more information about this error, try `rustc --explain E0425`.
-error: could not compile `guart16550` (bin "guart16550") due to 1 previous error
+    Finished `release` profile [optimized] target(s) in 1.03s
 Build domain [uart16550] project success
 Copy domain [uart16550] project success
-Building domain [virtio_mmio_block] project for target: riscv64
-Start building domain,path: "./drivers/virtio_mmio_block/gvirtio_mmio_block/Cargo.toml"
+Building domain [virtio_blk] project for target: riscv64
+Start building domain,path: "./drivers/virtio_blk/gvirtio_blk/Cargo.toml"
 warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
    |
@@ -366,21 +280,21 @@ warning: field `queue_page` is never read
    |     ^^^^^^^^^^
 
 warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:27:11
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
    |
 25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
    | ---------------------------------------------------------- associated constant in this implementation
-26 |     const AVAIL_RING_OFFSET: usize = size_of::<Descriptor>() * SIZE;
-27 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
    |           ^^^^^^^^^^^^^^^^^^^^^^^
 
 warning: associated constant `INDIRECT` is never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:297:11
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
     |
-293 | impl DescFlag {
+309 | impl DescFlag {
     | ------------- associated constant in this implementation
 ...
-297 |     const INDIRECT: u16 = 4;
+313 |     const INDIRECT: u16 = 4;
     |           ^^^^^^^^
 
 warning: field `config_generation` is never read
@@ -396,31 +310,224 @@ warning: field `config_generation` is never read
 
 warning: `virtio-drivers` (lib) generated 16 warnings
    Compiling virtio_mmio_common v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/virtio_mmio_common)
-   Compiling virtio_mmio_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_block/virtio_mmio_block)
-   Compiling gvirtio_mmio_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_block/gvirtio_mmio_block)
+   Compiling virtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/virtio_blk)
+   Compiling gvirtio_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_blk/gvirtio_blk)
+    Finished `release` profile [optimized] target(s) in 1.47s
+Build domain [virtio_blk] project success
+Copy domain [virtio_blk] project success
+Building domain [virtio_net] project for target: riscv64
+Start building domain,path: "./drivers/virtio_net/gvirtio_net/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/virtio_net)
+   Compiling gvirtio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_net/gvirtio_net)
     Finished `release` profile [optimized] target(s) in 1.44s
-Build domain [virtio_mmio_block] project success
-Copy domain [virtio_mmio_block] project success
+Build domain [virtio_net] project success
+Copy domain [virtio_net] project success
 Building domain [devfs] project for target: riscv64
 Start building domain,path: "./fs/devfs/gdevfs/Cargo.toml"
    Compiling generic v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/generic)
    Compiling devfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/devfs)
    Compiling gdevfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/devfs/gdevfs)
-    Finished `release` profile [optimized] target(s) in 3.85s
+    Finished `release` profile [optimized] target(s) in 3.82s
 Build domain [devfs] project success
 Copy domain [devfs] project success
 Building domain [fatfs] project for target: riscv64
 Start building domain,path: "./fs/fatfs/gfatfs/Cargo.toml"
-   Compiling fatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/fatfs)
+   Compiling domain_fatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/fatfs)
    Compiling gfatfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/fatfs/gfatfs)
-    Finished `release` profile [optimized] target(s) in 4.13s
+    Finished `release` profile [optimized] target(s) in 4.00s
 Build domain [fatfs] project success
 Copy domain [fatfs] project success
 Building domain [pipefs] project for target: riscv64
 Start building domain,path: "./fs/pipefs/gpipefs/Cargo.toml"
    Compiling pipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/pipefs)
    Compiling gpipefs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/pipefs/gpipefs)
-    Finished `release` profile [optimized] target(s) in 2.78s
+    Finished `release` profile [optimized] target(s) in 2.74s
 Build domain [pipefs] project success
 Copy domain [pipefs] project success
 Building domain [ramfs] project for target: riscv64
@@ -434,34 +541,22 @@ Building domain [sysfs] project for target: riscv64
 Start building domain,path: "./fs/sysfs/gsysfs/Cargo.toml"
    Compiling sysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/sysfs)
    Compiling gsysfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/sysfs/gsysfs)
-    Finished `release` profile [optimized] target(s) in 2.80s
+    Finished `release` profile [optimized] target(s) in 2.76s
 Build domain [sysfs] project success
 Copy domain [sysfs] project success
 Building domain [procfs] project for target: riscv64
 Start building domain,path: "./fs/procfs/gprocfs/Cargo.toml"
    Compiling procfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/procfs)
    Compiling gprocfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/procfs/gprocfs)
-    Finished `release` profile [optimized] target(s) in 3.06s
+    Finished `release` profile [optimized] target(s) in 3.02s
 Build domain [procfs] project success
 Copy domain [procfs] project success
 Building domain [fifo_scheduler] project for target: riscv64
 Start building domain,path: "./common/fifo_scheduler/gfifo_scheduler/Cargo.toml"
    Compiling common_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common_lib/common_scheduler)
-warning: field `name` is never read
-  --> /home/hjch/AsyncAlien/domains/common_lib/common_scheduler/src/lib.rs:18:5
-   |
-17 | pub struct CommonSchedulerDomain {
-   |            --------------------- field in this struct
-18 |     name: &'static str,
-   |     ^^^^
-   |
-   = note: `CommonSchedulerDomain` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
    Compiling fifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/fifo_scheduler)
-warning: `common_scheduler` (lib) generated 1 warning
    Compiling gfifo_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/fifo_scheduler/gfifo_scheduler)
-    Finished `release` profile [optimized] target(s) in 1.06s
+    Finished `release` profile [optimized] target(s) in 1.09s
 Build domain [fifo_scheduler] project success
 Copy domain [fifo_scheduler] project success
 Building domain [logger] project for target: riscv64
@@ -469,7 +564,7 @@ Start building domain,path: "./common/logger/glogger/Cargo.toml"
    Compiling basic v0.1.0 (/home/hjch/AsyncAlien/domain-lib/basic)
    Compiling logger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/logger)
    Compiling glogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/logger/glogger)
-    Finished `release` profile [optimized] target(s) in 0.98s
+    Finished `release` profile [optimized] target(s) in 1.07s
 Build domain [logger] project success
 Copy domain [logger] project success
 Building domain [net_stack] project for target: riscv64
@@ -490,32 +585,32 @@ warning: variants `ICMP` and `IGMP` are never constructed
 warning: `lose-net-stack` (lib) generated 1 warning
    Compiling net_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/net_stack)
    Compiling gnet_stack v0.1.0 (/home/hjch/AsyncAlien/domains/common/net_stack/gnet_stack)
-    Finished `release` profile [optimized] target(s) in 2.40s
+    Finished `release` profile [optimized] target(s) in 2.39s
 Build domain [net_stack] project success
 Copy domain [net_stack] project success
 Building domain [domainfs] project for target: riscv64
 Start building domain,path: "./fs/domainfs/gdomainfs/Cargo.toml"
    Compiling domainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/domainfs)
    Compiling gdomainfs v0.1.0 (/home/hjch/AsyncAlien/domains/fs/domainfs/gdomainfs)
-    Finished `release` profile [optimized] target(s) in 2.98s
+    Finished `release` profile [optimized] target(s) in 3.01s
 Build domain [domainfs] project success
 Copy domain [domainfs] project success
 Building domain [mem_block] project for target: riscv64
 Start building domain,path: "./drivers/mem_block/gmem_block/Cargo.toml"
    Compiling mem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/mem_block)
    Compiling gmem_block v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/mem_block/gmem_block)
-    Finished `release` profile [optimized] target(s) in 0.98s
+    Finished `release` profile [optimized] target(s) in 1.01s
 Build domain [mem_block] project success
 Copy domain [mem_block] project success
 Building domain [sshadow_blk] project for target: riscv64
 Start building domain,path: "./drivers/sshadow_blk/gsshadow_blk/Cargo.toml"
    Compiling sshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/sshadow_blk)
    Compiling gsshadow_blk v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/sshadow_blk/gsshadow_blk)
-    Finished `release` profile [optimized] target(s) in 1.07s
+    Finished `release` profile [optimized] target(s) in 1.12s
 Build domain [sshadow_blk] project success
 Copy domain [sshadow_blk] project success
-Building domain [virtio_mmio_gpu] project for target: riscv64
-Start building domain,path: "./drivers/virtio_mmio_gpu/gvirtio_mmio_gpu/Cargo.toml"
+Building domain [virtio_gpu] project for target: riscv64
+Start building domain,path: "./drivers/virtio_gpu/gvirtio_gpu/Cargo.toml"
 warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
    |
@@ -673,21 +768,21 @@ warning: field `queue_page` is never read
    |     ^^^^^^^^^^
 
 warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:27:11
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
    |
 25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
    | ---------------------------------------------------------- associated constant in this implementation
-26 |     const AVAIL_RING_OFFSET: usize = size_of::<Descriptor>() * SIZE;
-27 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
    |           ^^^^^^^^^^^^^^^^^^^^^^^
 
 warning: associated constant `INDIRECT` is never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:297:11
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
     |
-293 | impl DescFlag {
+309 | impl DescFlag {
     | ------------- associated constant in this implementation
 ...
-297 |     const INDIRECT: u16 = 4;
+313 |     const INDIRECT: u16 = 4;
     |           ^^^^^^^^
 
 warning: field `config_generation` is never read
@@ -702,511 +797,338 @@ warning: field `config_generation` is never read
     = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
 
 warning: `virtio-drivers` (lib) generated 16 warnings
-   Compiling virtio_mmio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_gpu/virtio_mmio_gpu)
-   Compiling gvirtio_mmio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_gpu/gvirtio_mmio_gpu)
-    Finished `release` profile [optimized] target(s) in 1.38s
-Build domain [virtio_mmio_gpu] project success
-Copy domain [virtio_mmio_gpu] project success
-Building domain [virtio_mmio_input] project for target: riscv64
-Start building domain,path: "./drivers/virtio_mmio_input/gvirtio_mmio_input/Cargo.toml"
-warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
-   |
-64 | pub enum BlkReqType {
-   |          ---------- variants in this enum
-...
-71 |     GetLifetime = 10,
-   |     ^^^^^^^^^^^
-72 |     Discard = 11,
-   |     ^^^^^^^
-73 |     WriteZeroes = 13,
-   |     ^^^^^^^^^^^
-74 |     SecureErase = 14,
-   |     ^^^^^^^^^^^
-   |
-   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
-    |
-128 | pub struct BlkConfig {
-    |            --------- fields in this struct
-...
-131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
-    |                ^^^^^^^^
-132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
-    |                ^^^^^^^
-...
-136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
-    |                ^^^^^^^^
-137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
-    |                ^^^^^^^^
-...
-141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
-    |                ^^^^^^^^
-142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
-    |                ^^^^^^^^^^^
-    |
-    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: field `emerg_wr` is never read
- --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
-  |
-5 | pub struct ConsoleConfig {
-  |            ------------- field in this struct
-...
-9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
-  |                ^^^^^^^^
-  |
-  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: field `config` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
-   |
-24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
-   |            --------- field in this struct
-...
-35 |     config: GpuConfig,
-   |     ^^^^^^
-
-warning: constant `EVENT_DISPLAY` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
-   |
-22 | const EVENT_DISPLAY: u32 = 1 << 0;
-   |       ^^^^^^^^^^^^^
-
-warning: multiple associated constants are never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
-   |
-54 | impl Command {
-   | ------------ associated constants in this implementation
-...
-57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
-   |                      ^^^^^^^^^^^^^^
-...
-62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
-   |                      ^^^^^^^^^^^^^^^^^^^^^^^
-63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
-   |                      ^^^^^^^^^^^^^^^
-64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
-   |                      ^^^^^^^^^^
-65 |     pub(super) const GET_EDID: Command = Command(0x10a);
-   |                      ^^^^^^^^
-...
-72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
-   |                      ^^^^^^^^^^^^^^
-73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
-   |                      ^^^^^^^^^
-74 |     pub(super) const OK_EDID: Command = Command(0x1104);
-   |                      ^^^^^^^
-75 |
-76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
-   |                      ^^^^^^^^^^
-77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
-   |                      ^^^^^^^^^^^^^^^^^
-78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
-   |                      ^^^^^^^^^^^^^^^^^^^^^^
-
-warning: constant `GPU_FLAG_FENCE` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
-   |
-87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
-   |       ^^^^^^^^^^^^^^
-
-warning: field `status_queue` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
-   |
-26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
-   |            ----------- field in this struct
-...
-29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
-   |     ^^^^^^^^^^^^
-
-warning: struct `AbsInfo` is never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
-   |
-34 | struct AbsInfo {
-   |        ^^^^^^^
-
-warning: struct `DevIDs` is never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
-   |
-44 | struct DevIDs {
-   |        ^^^^^^
-
-warning: constant `MAX_BUFFER_LEN` is never used
- --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
-  |
-9 | pub const MAX_BUFFER_LEN: usize = 65535;
-  |           ^^^^^^^^^^^^^^
-
-warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
-    |
-171 | impl GsoType {
-    | ------------ associated constants in this implementation
-172 |     const NONE: GsoType = GsoType(0);
-    |           ^^^^
-173 |     const TCPV4: GsoType = GsoType(1);
-    |           ^^^^^
-174 |     const UDP: GsoType = GsoType(3);
-    |           ^^^
-175 |     const TCPV6: GsoType = GsoType(4);
-    |           ^^^^^
-176 |     const ECN: GsoType = GsoType(0x80);
-    |           ^^^
-
-warning: field `queue_page` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
-   |
-13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
-   |            ----------- field in this struct
-14 |     queue_page: Box<dyn QueuePage<SIZE>>,
-   |     ^^^^^^^^^^
-
-warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:27:11
-   |
-25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
-   | ---------------------------------------------------------- associated constant in this implementation
-26 |     const AVAIL_RING_OFFSET: usize = size_of::<Descriptor>() * SIZE;
-27 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
-   |           ^^^^^^^^^^^^^^^^^^^^^^^
-
-warning: associated constant `INDIRECT` is never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:297:11
-    |
-293 | impl DescFlag {
-    | ------------- associated constant in this implementation
-...
-297 |     const INDIRECT: u16 = 4;
-    |           ^^^^^^^^
-
-warning: field `config_generation` is never read
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
-    |
- 17 | pub struct VirtIOHeader {
-    |            ------------ field in this struct
-...
-155 |     config_generation: ReadOnly<0xfc, u32>,
-    |     ^^^^^^^^^^^^^^^^^
-    |
-    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: `virtio-drivers` (lib) generated 16 warnings
-   Compiling virtio_mmio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_input/virtio_mmio_input)
-   Compiling gvirtio_mmio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_input/gvirtio_mmio_input)
-    Finished `release` profile [optimized] target(s) in 1.43s
-Build domain [virtio_mmio_input] project success
-Copy domain [virtio_mmio_input] project success
-Building domain [virtio_mmio_net] project for target: riscv64
-Start building domain,path: "./drivers/virtio_mmio_net/gvirtio_mmio_net/Cargo.toml"
-warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
-   |
-64 | pub enum BlkReqType {
-   |          ---------- variants in this enum
-...
-71 |     GetLifetime = 10,
-   |     ^^^^^^^^^^^
-72 |     Discard = 11,
-   |     ^^^^^^^
-73 |     WriteZeroes = 13,
-   |     ^^^^^^^^^^^
-74 |     SecureErase = 14,
-   |     ^^^^^^^^^^^
-   |
-   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
-    |
-128 | pub struct BlkConfig {
-    |            --------- fields in this struct
-...
-131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
-    |                ^^^^^^^^
-132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
-    |                ^^^^^^^
-...
-136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
-    |                ^^^^^^^^
-137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
-    |                ^^^^^^^^
-...
-141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
-    |                ^^^^^^^^
-142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
-    |                ^^^^^^^^^^^
-    |
-    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: field `emerg_wr` is never read
- --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
-  |
-5 | pub struct ConsoleConfig {
-  |            ------------- field in this struct
-...
-9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
-  |                ^^^^^^^^
-  |
-  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: field `config` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
-   |
-24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
-   |            --------- field in this struct
-...
-35 |     config: GpuConfig,
-   |     ^^^^^^
-
-warning: constant `EVENT_DISPLAY` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
-   |
-22 | const EVENT_DISPLAY: u32 = 1 << 0;
-   |       ^^^^^^^^^^^^^
-
-warning: multiple associated constants are never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
-   |
-54 | impl Command {
-   | ------------ associated constants in this implementation
-...
-57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
-   |                      ^^^^^^^^^^^^^^
-...
-62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
-   |                      ^^^^^^^^^^^^^^^^^^^^^^^
-63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
-   |                      ^^^^^^^^^^^^^^^
-64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
-   |                      ^^^^^^^^^^
-65 |     pub(super) const GET_EDID: Command = Command(0x10a);
-   |                      ^^^^^^^^
-...
-72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
-   |                      ^^^^^^^^^^^^^^
-73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
-   |                      ^^^^^^^^^
-74 |     pub(super) const OK_EDID: Command = Command(0x1104);
-   |                      ^^^^^^^
-75 |
-76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
-   |                      ^^^^^^^^^^
-77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
-   |                      ^^^^^^^^^^^^^^^^^
-78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
-   |                      ^^^^^^^^^^^^^^^^^^^^^^
-
-warning: constant `GPU_FLAG_FENCE` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
-   |
-87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
-   |       ^^^^^^^^^^^^^^
-
-warning: field `status_queue` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
-   |
-26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
-   |            ----------- field in this struct
-...
-29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
-   |     ^^^^^^^^^^^^
-
-warning: struct `AbsInfo` is never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
-   |
-34 | struct AbsInfo {
-   |        ^^^^^^^
-
-warning: struct `DevIDs` is never constructed
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
-   |
-44 | struct DevIDs {
-   |        ^^^^^^
-
-warning: constant `MAX_BUFFER_LEN` is never used
- --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
-  |
-9 | pub const MAX_BUFFER_LEN: usize = 65535;
-  |           ^^^^^^^^^^^^^^
-
-warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
-    |
-171 | impl GsoType {
-    | ------------ associated constants in this implementation
-172 |     const NONE: GsoType = GsoType(0);
-    |           ^^^^
-173 |     const TCPV4: GsoType = GsoType(1);
-    |           ^^^^^
-174 |     const UDP: GsoType = GsoType(3);
-    |           ^^^
-175 |     const TCPV6: GsoType = GsoType(4);
-    |           ^^^^^
-176 |     const ECN: GsoType = GsoType(0x80);
-    |           ^^^
-
-warning: field `queue_page` is never read
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
-   |
-13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
-   |            ----------- field in this struct
-14 |     queue_page: Box<dyn QueuePage<SIZE>>,
-   |     ^^^^^^^^^^
-
-warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
-  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:27:11
-   |
-25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
-   | ---------------------------------------------------------- associated constant in this implementation
-26 |     const AVAIL_RING_OFFSET: usize = size_of::<Descriptor>() * SIZE;
-27 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
-   |           ^^^^^^^^^^^^^^^^^^^^^^^
-
-warning: associated constant `INDIRECT` is never used
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:297:11
-    |
-293 | impl DescFlag {
-    | ------------- associated constant in this implementation
-...
-297 |     const INDIRECT: u16 = 4;
-    |           ^^^^^^^^
-
-warning: field `config_generation` is never read
-   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
-    |
- 17 | pub struct VirtIOHeader {
-    |            ------------ field in this struct
-...
-155 |     config_generation: ReadOnly<0xfc, u32>,
-    |     ^^^^^^^^^^^^^^^^^
-    |
-    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-
-warning: `virtio-drivers` (lib) generated 16 warnings
-   Compiling virtio_mmio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_net/virtio_mmio_net)
-   Compiling gvirtio_mmio_net v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_mmio_net/gvirtio_mmio_net)
+   Compiling virtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/virtio_gpu)
+   Compiling gvirtio_gpu v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_gpu/gvirtio_gpu)
     Finished `release` profile [optimized] target(s) in 1.39s
-Build domain [virtio_mmio_net] project success
-Copy domain [virtio_mmio_net] project success
+Build domain [virtio_gpu] project success
+Copy domain [virtio_gpu] project success
+Building domain [virtio_input] project for target: riscv64
+Start building domain,path: "./drivers/virtio_input/gvirtio_input/Cargo.toml"
+warning: variants `GetLifetime`, `Discard`, `WriteZeroes`, and `SecureErase` are never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:71:5
+   |
+64 | pub enum BlkReqType {
+   |          ---------- variants in this enum
+...
+71 |     GetLifetime = 10,
+   |     ^^^^^^^^^^^
+72 |     Discard = 11,
+   |     ^^^^^^^
+73 |     WriteZeroes = 13,
+   |     ^^^^^^^^^^^
+74 |     SecureErase = 14,
+   |     ^^^^^^^^^^^
+   |
+   = note: `BlkReqType` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `size_max`, `seg_max`, `geometry`, `blk_size`, `topology`, and `opt_io_size` are never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/block/ty.rs:131:16
+    |
+128 | pub struct BlkConfig {
+    |            --------- fields in this struct
+...
+131 |     pub(super) size_max: ReadWrite<{ CONFIG_OFFSET + 0x8 }, u32>,
+    |                ^^^^^^^^
+132 |     pub(super) seg_max: ReadWrite<{ CONFIG_OFFSET + 0xc }, u32>,
+    |                ^^^^^^^
+...
+136 |     pub(super) geometry: ReadWrite<{ CONFIG_OFFSET + 0x10 }, u32>,
+    |                ^^^^^^^^
+137 |     pub(super) blk_size: ReadWrite<{ CONFIG_OFFSET + 0x14 }, u32>,
+    |                ^^^^^^^^
+...
+141 |     pub(super) topology: ReadWrite<{ CONFIG_OFFSET + 0x18 }, u32>,
+    |                ^^^^^^^^
+142 |     pub(super) opt_io_size: ReadWrite<{ CONFIG_OFFSET + 0x1c }, u32>,
+    |                ^^^^^^^^^^^
+    |
+    = note: `BlkConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `emerg_wr` is never read
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/console/ty.rs:9:16
+  |
+5 | pub struct ConsoleConfig {
+  |            ------------- field in this struct
+...
+9 |     pub(super) emerg_wr: WriteOnly<{ CONFIG_OFFSET + 8 }, u32>,
+  |                ^^^^^^^^
+  |
+  = note: `ConsoleConfig` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `config` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/mod.rs:35:5
+   |
+24 | pub struct VirtIOGpu<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            --------- field in this struct
+...
+35 |     config: GpuConfig,
+   |     ^^^^^^
+
+warning: constant `EVENT_DISPLAY` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:22:7
+   |
+22 | const EVENT_DISPLAY: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^
+
+warning: multiple associated constants are never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:57:22
+   |
+54 | impl Command {
+   | ------------ associated constants in this implementation
+...
+57 |     pub(super) const RESOURCE_UNREF: Command = Command(0x102);
+   |                      ^^^^^^^^^^^^^^
+...
+62 |     pub(super) const RESOURCE_DETACH_BACKING: Command = Command(0x107);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^
+63 |     pub(super) const GET_CAPSET_INFO: Command = Command(0x108);
+   |                      ^^^^^^^^^^^^^^^
+64 |     pub(super) const GET_CAPSET: Command = Command(0x109);
+   |                      ^^^^^^^^^^
+65 |     pub(super) const GET_EDID: Command = Command(0x10a);
+   |                      ^^^^^^^^
+...
+72 |     pub(super) const OK_CAPSET_INFO: Command = Command(0x1102);
+   |                      ^^^^^^^^^^^^^^
+73 |     pub(super) const OK_CAPSET: Command = Command(0x1103);
+   |                      ^^^^^^^^^
+74 |     pub(super) const OK_EDID: Command = Command(0x1104);
+   |                      ^^^^^^^
+75 |
+76 |     pub(super) const ERR_UNSPEC: Command = Command(0x1200);
+   |                      ^^^^^^^^^^
+77 |     pub(super) const ERR_OUT_OF_MEMORY: Command = Command(0x1201);
+   |                      ^^^^^^^^^^^^^^^^^
+78 |     pub(super) const ERR_INVALID_SCANOUT_ID: Command = Command(0x1202);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GPU_FLAG_FENCE` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/gpu/ty.rs:87:7
+   |
+87 | const GPU_FLAG_FENCE: u32 = 1 << 0;
+   |       ^^^^^^^^^^^^^^
+
+warning: field `status_queue` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/mod.rs:29:5
+   |
+26 | pub struct VirtIOInput<H: Hal<QUEUE_SIZE>, T: Transport> {
+   |            ----------- field in this struct
+...
+29 |     status_queue: VirtIoQueue<H, QUEUE_SIZE>,
+   |     ^^^^^^^^^^^^
+
+warning: struct `AbsInfo` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:34:8
+   |
+34 | struct AbsInfo {
+   |        ^^^^^^^
+
+warning: struct `DevIDs` is never constructed
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/input/ty.rs:44:8
+   |
+44 | struct DevIDs {
+   |        ^^^^^^
+
+warning: constant `MAX_BUFFER_LEN` is never used
+ --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:9:11
+  |
+9 | pub const MAX_BUFFER_LEN: usize = 65535;
+  |           ^^^^^^^^^^^^^^
+
+warning: associated constants `NONE`, `TCPV4`, `UDP`, `TCPV6`, and `ECN` are never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/device/net/ty.rs:172:11
+    |
+171 | impl GsoType {
+    | ------------ associated constants in this implementation
+172 |     const NONE: GsoType = GsoType(0);
+    |           ^^^^
+173 |     const TCPV4: GsoType = GsoType(1);
+    |           ^^^^^
+174 |     const UDP: GsoType = GsoType(3);
+    |           ^^^
+175 |     const TCPV6: GsoType = GsoType(4);
+    |           ^^^^^
+176 |     const ECN: GsoType = GsoType(0x80);
+    |           ^^^
+
+warning: field `queue_page` is never read
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:14:5
+   |
+13 | pub struct VirtIoQueue<H: Hal<SIZE>, const SIZE: usize> {
+   |            ----------- field in this struct
+14 |     queue_page: Box<dyn QueuePage<SIZE>>,
+   |     ^^^^^^^^^^
+
+warning: associated constant `DESCRIPTOR_TABLE_OFFSET` is never used
+  --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:29:11
+   |
+25 | impl<H: Hal<SIZE>, const SIZE: usize> VirtIoQueue<H, SIZE> {
+   | ---------------------------------------------------------- associated constant in this implementation
+...
+29 |     const DESCRIPTOR_TABLE_OFFSET: usize = 0;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `INDIRECT` is never used
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/queue.rs:313:11
+    |
+309 | impl DescFlag {
+    | ------------- associated constant in this implementation
+...
+313 |     const INDIRECT: u16 = 4;
+    |           ^^^^^^^^
+
+warning: field `config_generation` is never read
+   --> /home/hjch/AsyncAlien/utils/safe-virtio-drivers/virtio-drivers/src/transport/mmio.rs:155:5
+    |
+ 17 | pub struct VirtIOHeader {
+    |            ------------ field in this struct
+...
+155 |     config_generation: ReadOnly<0xfc, u32>,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `VirtIOHeader` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `virtio-drivers` (lib) generated 16 warnings
+   Compiling virtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/virtio_input)
+   Compiling gvirtio_input v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/virtio_input/gvirtio_input)
+    Finished `release` profile [optimized] target(s) in 1.47s
+Build domain [virtio_input] project success
+Copy domain [virtio_input] project success
 Building domain [random_scheduler] project for target: riscv64
 Start building domain,path: "./common/random_scheduler/grandom_scheduler/Cargo.toml"
-warning: field `name` is never read
-  --> /home/hjch/AsyncAlien/domains/common_lib/common_scheduler/src/lib.rs:18:5
-   |
-17 | pub struct CommonSchedulerDomain {
-   |            --------------------- field in this struct
-18 |     name: &'static str,
-   |     ^^^^
-   |
-   = note: `CommonSchedulerDomain` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: `common_scheduler` (lib) generated 1 warning
    Compiling random_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/random_scheduler)
    Compiling grandom_scheduler v0.1.0 (/home/hjch/AsyncAlien/domains/common/random_scheduler/grandom_scheduler)
-    Finished `release` profile [optimized] target(s) in 1.03s
+    Finished `release` profile [optimized] target(s) in 1.08s
 Build domain [random_scheduler] project success
 Copy domain [random_scheduler] project success
 Building domain [xlogger] project for target: riscv64
 Start building domain,path: "./common/xlogger/gxlogger/Cargo.toml"
    Compiling xlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/xlogger)
    Compiling gxlogger v0.1.0 (/home/hjch/AsyncAlien/domains/common/xlogger/gxlogger)
-    Finished `release` profile [optimized] target(s) in 0.94s
+    Finished `release` profile [optimized] target(s) in 0.96s
 Build domain [xlogger] project success
 Copy domain [xlogger] project success
 Building domain [vfs2] project for target: riscv64
 Start building domain,path: "./common/vfs2/gvfs2/Cargo.toml"
    Compiling vfs2 v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs2/vfs2)
-warning: unused variable: `ident`
-   --> vfs2/src/tree.rs:163:21
-    |
-163 |                 let ident = core::str::from_utf8(fs_domain_ident.as_slice()).unwrap();
-    |                     ^^^^^ help: if this is intentional, prefix it with an underscore: `_ident`
-    |
-    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
-
-warning: unused variable: `ramfs_root`
-   --> vfs2/src/tree.rs:180:9
-    |
-180 |     let ramfs_root = if is_init_done {
-    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_ramfs_root`
-
-warning: method `interest` is never used
-  --> vfs2/src/epoll.rs:46:12
-   |
-23 | impl EpollFile {
-   | -------------- method in this implementation
-...
-46 |     pub fn interest(&self) -> MutexGuard<'_, BTreeMap<usize, EpollEvent>> {
-   |            ^^^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: methods `is_readable`, `is_writable`, and `is_append` are never used
-   --> vfs2/src/kfile.rs:120:8
-    |
- 87 | pub trait File: DowncastSync + Debug {
-    |           ---- methods in this trait
-...
-120 |     fn is_readable(&self) -> bool;
-    |        ^^^^^^^^^^^
-121 |     fn is_writable(&self) -> bool;
-    |        ^^^^^^^^^^^
-122 |     fn is_append(&self) -> bool;
-    |        ^^^^^^^^^
-
-warning: field `inode` is never read
-  --> vfs2/src/socket.rs:26:5
-   |
-21 | pub struct SocketFile {
-   |            ---------- field in this struct
-...
-26 |     inode: Arc<dyn VfsInode>,
-   |     ^^^^^
-
-warning: struct `VfsOutPut` is never constructed
-   --> vfs2/src/tree.rs:191:8
-    |
-191 | struct VfsOutPut;
-    |        ^^^^^^^^^
-
-warning: `vfs2` (lib) generated 6 warnings (run `cargo fix --lib -p vfs2` to apply 2 suggestions)
    Compiling gvfs2 v0.1.0 (/home/hjch/AsyncAlien/domains/common/vfs2/gvfs2)
-    Finished `release` profile [optimized] target(s) in 4.52s
+    Finished `release` profile [optimized] target(s) in 4.56s
 Build domain [vfs2] project success
 Copy domain [vfs2] project success
 Building domain [loopback] project for target: riscv64
 Start building domain,path: "./drivers/loopback/gloopback/Cargo.toml"
    Compiling loopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/loopback)
    Compiling gloopback v0.1.0 (/home/hjch/AsyncAlien/domains/drivers/loopback/gloopback)
-    Finished `release` profile [optimized] target(s) in 1.09s
+    Finished `release` profile [optimized] target(s) in 1.12s
 Build domain [loopback] project success
 Copy domain [loopback] project success
-make[1]: Entering directory '/home/hjch/AsyncAlien'
-make[2]: Entering directory '/home/hjch/AsyncAlien/user/initrd'
-Busybox exists
-CROSS_COMPILE=riscv64-linux-musl- ARCH=riscv64 make -j 12 -C /home/hjch/AsyncAlien/user/initrd/busybox-build-riscv64
-make[3]: Entering directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-riscv64'
-  CC      applets/applets.o
-Bad system call (core dumped)
-make[4]: *** [scripts/Makefile.build:198: applets/applets.o] Error 159
-make[3]: *** [Makefile:372: applets_dir] Error 2
-make[3]: Leaving directory '/home/hjch/AsyncAlien/user/initrd/busybox-build-riscv64'
-make[2]: *** [Makefile:63: build] Error 2
-make[2]: Leaving directory '/home/hjch/AsyncAlien/user/initrd'
-make[1]: *** [Makefile:294: initrd] Error 2
-make[1]: Leaving directory '/home/hjch/AsyncAlien'
-make: *** [Makefile:287: domains] Error 2
+dd if=/dev/zero of=build/sdcard.img bs=1M count=72;
+72+0 records in
+72+0 records out
+75497472 bytes (75 MB, 72 MiB) copied, 0.109375 s, 690 MB/s
+mkfs.fat 4.2 (2021-01-31)
+Building user apps
+make[2]: Entering directory '/home/hjch/AsyncAlien/user/apps'
+Building apps
+init dtest dgpu dtask dlog dinput dnet dvfs ping client out nice
+    Finished `release` profile [optimized] target(s) in 0.20s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.18s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
+make[2]: Leaving directory '/home/hjch/AsyncAlien/user/apps'
+make[2]: Entering directory '/home/hjch/AsyncAlien/user/tests'
+Building tests
+new/sys_time new/sys_fs new/sys_link new/sys_proc new/sys_poll new/sys_random new/syscall_all
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.17s
+    Finished `release` profile [optimized] target(s) in 0.16s
+    Finished `release` profile [optimized] target(s) in 0.16s
+Moving tests to /home/hjch/AsyncAlien/build/sdcard.img
+make[2]: Leaving directory '/home/hjch/AsyncAlien/user/tests'
+make[2]: Entering directory '/home/hjch/AsyncAlien/user/musl'
+Building apps
+(CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-linux-musl-gcc cargo build --release --target riscv64gc-unknown-linux-musl -Z build-std=core,std,panic_abort -p hello);  (CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-linux-musl-gcc cargo build --release --target riscv64gc-unknown-linux-musl -Z build-std=core,std,panic_abort -p async_test);  (CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-linux-musl-gcc cargo build --release --target riscv64gc-unknown-linux-musl -Z build-std=core,std,panic_abort -p ftest);  (CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-linux-musl-gcc cargo build --release --target riscv64gc-unknown-linux-musl -Z build-std=core,std,panic_abort -p fs_update);  (CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-linux-musl-gcc cargo build --release --target riscv64gc-unknown-linux-musl -Z build-std=core,std,panic_abort -p pingpong);
+    Finished `release` profile [optimized] target(s) in 0.28s
+    Finished `release` profile [optimized] target(s) in 0.23s
+warning: function `read_once_test` is never used
+  --> user/musl/ftest/src/main.rs:41:4
+   |
+41 | fn read_once_test() {
+   |    ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ftest` (bin "ftest") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.21s
+    Finished `release` profile [optimized] target(s) in 0.21s
+    Finished `release` profile [optimized] target(s) in 0.20s
+Moving apps to /home/hjch/AsyncAlien/build/sdcard.img
+make[2]: Leaving directory '/home/hjch/AsyncAlien/user/musl'
+Building user apps done
+[sdcard] 使用 mtools 写入 build/sdcard.img
+ Volume in drive : has no label
+ Volume Serial Number is B9ED-5C4E
+Directory for ::/
+
+init             29440 2026-04-17  21:54 
+dtest            29440 2026-04-17  21:54 
+dgpu             29440 2026-04-17  21:54 
+dtask            29440 2026-04-17  21:54 
+dlog             37632 2026-04-17  21:54 
+dinput           29440 2026-04-17  21:54 
+dnet             29440 2026-04-17  21:54 
+dvfs             29440 2026-04-17  21:54 
+ping             33536 2026-04-17  21:54 
+client           33536 2026-04-17  21:54 
+out              29440 2026-04-17  21:54 
+nice             29440 2026-04-17  21:54 
+new          <DIR>     2026-04-17  21:54 
+hello           356568 2026-04-17  21:54 
+ASYNC_~1        450856 2026-04-17  21:54  async_test
+ftest           344168 2026-04-17  21:54 
+FS_UPD~1        368856 2026-04-17  21:54  fs_update
+pingpong        385240 2026-04-17  21:54 
+GLOOPB~1        113752 2026-04-17  21:54  gloopback
+GRANDO~1        113584 2026-04-17  21:54  grandom_scheduler
+GSSHAD~1        121672 2026-04-17  21:54  gsshadow_blk
+gvfs2           456592 2026-04-17  21:54 
+GVIRTI~1        144408 2026-04-17  21:54  gvirtio_gpu
+GVIRTI~2        139600 2026-04-17  21:54  gvirtio_input
+GVIRTI~3        123280 2026-04-17  21:54  gvirtio_mmio_gpu
+GVIRTI~4        114384 2026-04-17  21:54  gvirtio_mmio_input
+GVIRTI~5        123200 2026-04-17  21:54  gvirtio_mmio_net
+GVIRTI~6        123208 2026-04-17  21:54  gvirtio_net
+gxlogger        109144 2026-04-17  21:54 
+bash           5569896 2026-04-17  21:54 
+REDIS-~1        502256 2026-04-17  21:54  redis-benchmark
+REDIS-~2        759640 2026-04-17  21:54  redis-cli
+REDIS-~3       3814760 2026-04-17  21:54  redis-server
+REDIS~1  CON     46695 2026-04-17  21:54  redis.conf
+domains      <DIR>     2026-04-17  21:54 
+       35 files          14 651 423 bytes
+                         59 452 416 bytes free
+
+[initrd] skip user/initrd rebuild (up-to-date)
+14372 blocks
 Building...
 ARCH: riscv64
 PLATFORM: plat_qemu_riscv
 TARGET: riscv64gc-unknown-none-elf
-SMP: 2
+FEATURES: default
+SMP: 1
 VF2_SD: n
 PLATFORM=plat_qemu_riscv RUSTFLAGS='--cfg getrandom_backend="custom" --cfg plat_qemu_riscv' LOG= cargo build --release -p kernel --target ./tools/riscv64.json -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem --features default
    Compiling config v0.1.0 (/home/hjch/AsyncAlien/domain-lib/config)
@@ -1224,18 +1146,10 @@ warning: function `secondary_main` is never used
    Compiling mem v0.1.0 (/home/hjch/AsyncAlien/base/mem)
 warning: `platform` (lib) generated 1 warning
    Compiling kernel v0.1.0 (/home/hjch/AsyncAlien/kernel)
-warning: unused import: `pci_bus`
-  --> kernel/src/domain/mod.rs:21:15
-   |
-21 |     mmio_bus, pci_bus, platform_bus, register_domain,
-   |               ^^^^^^^
-   |
-   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
-
 warning: variable does not need to be mutable
-  --> kernel/src/domain/mod.rs:60:9
+  --> kernel/src/domain/riscv64.rs:43:9
    |
-60 |     let mut nic_irq = 0;
+43 |     let mut nic_irq = 0;
    |         ----^^^^^^^
    |         |
    |         help: remove this `mut`
@@ -1243,49 +1157,21 @@ warning: variable does not need to be mutable
    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
 
 warning: unused variable: `nic_irq`
-  --> kernel/src/domain/mod.rs:60:9
+  --> kernel/src/domain/riscv64.rs:43:9
    |
-60 |     let mut nic_irq = 0;
+43 |     let mut nic_irq = 0;
    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_nic_irq`
    |
    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
 
-warning: static `APIC_DOMAIN` is never used
-  --> kernel/src/trap/mod.rs:42:12
-   |
-42 | pub static APIC_DOMAIN: Once<Arc<dyn APICDomain>> = Once::new();
-   |            ^^^^^^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: function `register_apic_domain` is never used
-  --> kernel/src/trap/mod.rs:73:8
-   |
-73 | pub fn register_apic_domain(apic_domain: Arc<dyn APICDomain>) {
-   |        ^^^^^^^^^^^^^^^^^^^^
-
-warning: `kernel` (bin "kernel") generated 5 warnings (run `cargo fix --bin "kernel" -p kernel` to apply 3 suggestions)
-    Finished `release` profile [optimized] target(s) in 8.90s
-dd if=/dev/zero of=build/sdcard.img bs=1M count=72;
-72+0 records in
-72+0 records out
-75497472 bytes (75 MB, 72 MiB) copied, 0.0744584 s, 1.0 GB/s
-mkfs.fat 4.2 (2021-01-31)
-Mounting build/sdcard.img to ./diskfs
-sudo: /etc/sudo.conf is owned by uid 65534, should be 0
-sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
-sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.
-make: [Makefile:277: mount] Error 1 (ignored)
-sudo: /etc/sudo.conf is owned by uid 65534, should be 0
-sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
-sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.
-make: *** [Makefile:278: mount] Error 1
+warning: `kernel` (bin "kernel") generated 2 warnings (run `cargo fix --bin "kernel" -p kernel` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 9.06s
 qemu-system-riscv64 \
             -M virt \
             -bios default \
             -kernel target/riscv64/release/kernel \
-            -nographic -device virtio-net-device,netdev=net0 -netdev user,id=net0 -drive file=build/sdcard.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0 -initrd ./build/initramfs.cpio.gz -append "rdinit=/init" \
-            -smp 2 -m 2048M \
+            -nographic -device virtio-net-device,netdev=net0 -netdev user,id=net0,hostfwd=tcp::55555-:55555,hostfwd=udp::5555-:5555 -drive file=build/sdcard.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0 -initrd ./build/initramfs.cpio.gz -append "rdinit=/init" \
+            -smp 1 -m 2048M \
             -serial mon:stdio
 
 OpenSBI v1.0
@@ -1300,7 +1186,7 @@ OpenSBI v1.0
 
 Platform Name             : riscv-virtio,qemu
 Platform Features         : medeleg
-Platform HART Count       : 2
+Platform HART Count       : 1
 Platform IPI Device       : aclint-mswi
 Platform Timer Device     : aclint-mtimer @ 10000000Hz
 Platform Console Device   : uart8250
@@ -1308,14 +1194,14 @@ Platform HSM Device       : ---
 Platform Reboot Device    : sifive_test
 Platform Shutdown Device  : sifive_test
 Firmware Base             : 0x80000000
-Firmware Size             : 260 KB
+Firmware Size             : 252 KB
 Runtime SBI Version       : 0.3
 
 Domain0 Name              : root
 Domain0 Boot HART         : 0
-Domain0 HARTs             : 0*,1*
+Domain0 HARTs             : 0*
 Domain0 Region00          : 0x0000000002000000-0x000000000200ffff (I)
-Domain0 Region01          : 0x0000000080000000-0x000000008007ffff ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff ()
 Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff (R,W,X)
 Domain0 Next Address      : 0x0000000080200000
 Domain0 Next Arg1         : 0x00000000bf000000
@@ -1340,19 +1226,19 @@ Boot HART MEDELEG         : 0x0000000000f0b509
  /_/   \_\ |_| |_|  \___| |_| |_|
 
 [0] Init logger Some("")
-[0] Frame range: 0x842af000..0x100000000, pages=0x7bd51
-[0] initrd copy: src=0x88200000, size=2837779, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0x858ce98d, dst=0x858ce98d
-[0] Relocate initrd data to 0x842bf000
+[0] Frame range: 0x842a4000..0x100000000, pages=0x7bd5c
+[0] initrd copy: src=0x88200000, size=3136073, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xaab14d61, dst=0xaab14d61
+[0] Relocate initrd data to 0x842b4000
 [0] Frame allocator init success
 [0] Talloc allocator init success
-[0] kernel text:          0x80200000-0x80261000
-[0] kernel rodata:        0x80261000-0x80274000
-[0] kernel init_array:    0x80274000-0x80274000
-[0] kernel data:          0x80274000-0x80295000
-[0] kernel bss:           0x80295000-0x802af000
-[0] kernel heap:          0x802af000-0x842af000
-[0] kernel alloc range:   0x842af000-0x100000000
+[0] kernel text:          0x80200000-0x80262000
+[0] kernel rodata:        0x80262000-0x80275000
+[0] kernel init_array:    0x80275000-0x80275000
+[0] kernel data:          0x80275000-0x80286000
+[0] kernel bss:           0x80286000-0x802a4000
+[0] kernel heap:          0x802a4000-0x842a4000
+[0] kernel alloc range:   0x842a4000-0x100000000
 [0] map test: 0x100000-0x101000
 [0] map rtc: 0x101000-0x102000
 [0] map clint: 0x2000000-0x2010000
@@ -1364,12 +1250,12 @@ Boot HART MEDELEG         : 0x0000000000f0b509
 [0] ++++ setup interrupt done, enable:true ++++
 [0] Boot CPU 0
 [0] This is a device tree representation of a riscv-virtio,qemu machine
-SMP:    2
+SMP:    1
 Memory: 0x80000000..0x100000000
 PLIC:   0xc000000..0xc600000
 CLINT:  0x2000000..0x2010000
 Initrd: Some(
-    0x88200000..0x884b4d13,
+    0x88200000..0x884fda49,
 )
 Bootargs: Some("rdinit=/init")
 
@@ -1378,10 +1264,8 @@ Bootargs: Some("rdinit=/init")
 [0] <register domain>: cache_blk
 [0] <register domain>: devfs
 [0] <register domain>: fatfs
-[0] <register domain>: goldfish
 [0] <register domain>: null
 [0] <register domain>: pipefs
-[0] <register domain>: plic
 [0] <register domain>: procfs
 [0] <register domain>: ramfs
 [0] <register domain>: random
@@ -1391,69 +1275,78 @@ Bootargs: Some("rdinit=/init")
 [0] <register domain>: fifo_scheduler
 [0] <register domain>: task
 [0] <register domain>: vfs
-[0] <register domain>: uart16550
-[0] <register domain>: virtio_mmio_block
 [0] <register domain>: net_stack
 [0] <register domain>: logger
 [0] <register domain>: domainfs
+[0] <register domain>: goldfish
+[0] <register domain>: plic
+[0] <register domain>: uart16550
+[0] <register domain>: virtio_blk
+[0] <register domain>: virtio_net
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 4885 us[0m
+[0] [31m[Load new domain] Time elapsed: 4810 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 751 us[0m
+[0] [31m[Load new domain] Time elapsed: 892 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 2618 us[0m
+[0] [31m[Load new domain] Time elapsed: 3149 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 1653 us[0m
+[0] [31m[Load new domain] Time elapsed: 2073 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 2762 us[0m
+[0] [31m[Load new domain] Time elapsed: 3436 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 2611 us[0m
+[0] [31m[Load new domain] Time elapsed: 4007 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 2941 us[0m
+[0] [31m[Load new domain] Time elapsed: 4670 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 3350 us[0m
+[0] [31m[Load new domain] Time elapsed: 3757 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 4049 us[0m
+[0] [31m[Load new domain] Time elapsed: 5692 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 1894 us[0m
+[0] [31m[Load new domain] Time elapsed: 3058 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 1407 us[0m
+[0] [31m[Load new domain] Time elapsed: 2990 us[0m
 [0] <attach domain>: task, it's name is task
-[0] [31m[Load new domain] Time elapsed: 1974 us[0m
-[0][Domain:12] plic region: 0xc000000..0xc600000
-[0][Domain:12] Init qemu plic success
+[0][Domain:12] syscall get 0 input domain
+[0] [31m[Load new domain] Time elapsed: 5162 us[0m
+[0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
+[0][Domain:12] syscall domain init
+[0] <attach domain>: syscall, it's name is syscall
+[0] [31m[Load new domain] Time elapsed: 3900 us[0m
+[0][Domain:13] plic region: 0xc000000..0xc600000
+[0][Domain:13] Init qemu plic success
 [0] <attach domain>: plic, it's name is plic
-[0] [31m[Load new domain] Time elapsed: 1570 us[0m
-[0][Domain:13] Rtc region: 0x101000..0x102000
-[0][Domain:13] current time: 2026-03-30 11:18:17
+[0] [31m[Load new domain] Time elapsed: 3417 us[0m
+[0][Domain:14] Rtc region: 0x101000..0x102000
+[0][Domain:14] current time: 2026-04-17 21:54:55
 [0] <attach domain>: rtc, it's name is rtc
-[0][Domain:12] PLIC enable irq 11 for hart 0, priority 1
-[0] [31m[Load new domain] Time elapsed: 1829 us[0m
-[0][Domain:14] uart_addr: 0x10000000-0x10000100
-[0][Domain:14] init uart success
+[0][Domain:13] PLIC enable irq 11 for hart 0, priority 1
+[0] [31m[Load new domain] Time elapsed: 3249 us[0m
+[0][Domain:15] uart_addr: 0x10000000-0x10000100
+[0][Domain:15] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 1707 us[0m
-[0][Domain:15] init buf uart success
+[0] [31m[Load new domain] Time elapsed: 3407 us[0m
+[0][Domain:16] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
-[0][Domain:12] PLIC enable irq 10 for hart 0, priority 1
-[0] Create empty domain: virtio_mmio_net
+[0][Domain:13] PLIC enable irq 10 for hart 0, priority 1
+[0] [31m[Load new domain] Time elapsed: 3694 us[0m
+[0][Domain:17] virtio_net_mmio: 0x10008000-0x10009000
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 1853 us[0m
-[0][Domain:16] virtio_blk_mmio: 0x10007000-0x10008000
+[0] [31m[Load new domain] Time elapsed: 1456 us[0m
+[0][Domain:18] virtio_blk_mmio: 0x10007000-0x10008000
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
-[0] [31m[Load new domain] Time elapsed: 1234 us[0m
-[0][Domain:17] net stack init successes!
+[0] [31m[Load new domain] Time elapsed: 1598 us[0m
+[0][Domain:19] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 1324 us[0m
+[0] [31m[Load new domain] Time elapsed: 1185 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 2634 us[0m
+[0] [31m[Load new domain] Time elapsed: 3031 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 714 us[0m
+[0] [31m[Load new domain] Time elapsed: 878 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 559 us[0m
+[0] [31m[Load new domain] Time elapsed: 817 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -1462,35 +1355,38 @@ Bootargs: Some("rdinit=/init")
 [0][Domain:7] sysfs FsDomain init
 [0][Domain:9] get domain info success
 [0][Domain:9] domainfs FsDomain init
+[0] load_domains: before vfs init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 1413 us[0m
-[0][Domain:22] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 1964 us[0m
+[0][Domain:24] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
-[0][Domain:22] ramfs mount success
+[0][Domain:24] ramfs mount success
 [0][Domain:10] procfs init success
 [0][Domain:5] devfs mount success
 [0][Domain:10] gpu domain not found
 [0][Domain:10] mouse domain not found
 [0][Domain:10] keyboard domain not found
-[0][Domain:10] rtc domain not found
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 1536 us[0m
-[0][Domain:23] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 2679 us[0m
+[0][Domain:25] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
-[0][Domain:23] ramfs mount success
+[0][Domain:25] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 1467 us[0m
-[0][Domain:24] ramfs FsDomain init
+[0] [31m[Load new domain] Time elapsed: 2838 us[0m
+[0][Domain:26] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
-[0][Domain:24] ramfs mount success
+[0][Domain:26] ramfs mount success
 [0][Domain:9] domainfs mount success
 [0][Domain:10] Initrd populate success
+[0][Domain:10] fatfs mount begin: /tests
+[0][Domain:10] fatfs 已打开块设备 /dev/sda
 [0][Domain:3] fatfs mount success
+[0][Domain:10] fatfs mount success: /tests
 [0][Domain:10] Vfs Tree:
 drwxr-xr-x      4KB root 
 drwxr-xr-x      4KB var 
@@ -1503,26 +1399,92 @@ drwxr-xr-x      4KB tests
 drwxr-xr-x      4KB domain 
 drwxr-xr-x      4KB bin 
 drwxr-xr-x      4KB sbin 
+drwxr-xr-x      4KB usr 
 [0][Domain:10] Init filesystem success
 [0][Domain:10] vfs init success
+[0] load_domains: after vfs init
 [0] Drop initrd data
+[0] load_domains: before task init
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x872cf000
+[0][Domain:11] task::current_task: no current tid
+[0][Domain:11] Task::from_elf success: name=/tests/init, tid=1, entry=0x0, user_sp=0x58f80, k_sp=0x87365000, cpu_id=0, cpus_allowed=0x1
+[0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
+[0][Domain:11] init_task enqueue init process tid=1
 [0][Domain:11] Init task domain success
-[0][Domain:25] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 3356 us[0m
-[0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
-[0][Domain:25] syscall domain init
-[0] <attach domain>: syscall, it's name is syscall
+[0] load_domains: after task init
 [0] Load domains done
 [0] Register task domain and syscall domain to trap system
-[1] ++++ setup interrupt ++++
-[1] ++++ setup interrupt done, enable:true ++++
-[1] CPU 1 start...
-[0] Test panic...
-[0] line 32, file kernel/src/panic.rs: Test panic
-[1][Domain:11] kthread_init start...
-[0] Drop UnwindTest
-[0] Test no panic...
-[0] Drop UnwindTest
 [0] Begin run task...
-[0] line 67, file kernel/src/trap/riscv64/cause.rs: do_load_page_fault failed: EINVAL
-[0] shutdown...
+[0] run_task bootstrap wake 0 tasks
+[0][Domain:11] kthread_init start...
+Init process is running
+[Init] start /tests/new/syscall_all
+[0][Domain:11] sys_execve: path=/tests/new/syscall_all, argc=1, envc=14
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/syscall_all
+[syscall_all] start
+[0][Domain:11] sys_execve: path=/tests/new/sys_poll, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_poll
+[sys_poll] start
+[sys_poll] PASS
+[0][Domain:11] release task [3-3]
+[0][Domain:11] sys_execve: path=/tests/new/sys_fs, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_fs
+[sys_fs] start
+[sys_fs] PASS
+[0][Domain:11] release task [3-3]
+[0][Domain:11] sys_execve: path=/tests/new/sys_link, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_link
+[sys_link] start
+[sys_link] PASS
+[0][Domain:11] release task [3-3]
+[0][Domain:11] sys_execve: path=/tests/new/sys_proc, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_proc
+[sys_proc] start
+[0][Domain:11] release task [4-4]
+[0][Domain:11] release task [4-4]
+[sys_proc] PASS
+[0][Domain:11] release task [3-3]
+[0][Domain:11] sys_execve: path=/tests/new/sys_random, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=29440
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_random
+[sys_random] start
+[sys_random] PASS
+[0][Domain:11] release task [3-3]
+[0][Domain:11] sys_execve: path=/tests/new/sys_time, argc=1, envc=5
+[0][Domain:11] sys_execve: read_exec_all ok, size=25344
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/new/sys_time
+[sys_time] start
+[sys_time] PASS
+[0][Domain:11] release task [3-3]
+[syscall_all] PASS
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/new/syscall_all
+[Init] start /tests/ping
+[0][Domain:11] sys_execve: path=/tests/ping, argc=1, envc=14
+[0][Domain:11] sys_execve: read_exec_all ok, size=33536
+[0][Domain:11] sys_execve: task.do_execve ok: /tests/ping
+Test socket
+Created socket: 3
+socket bind successes!
+Created socket: 4
+socket bind successes!
+Sent data to server: Ok("Hello Server!")
+receive 13 bytes from client 10.0.2.15:20001
+Received data from client: Ok("Hello Server!")
+Test socket successes!
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/ping
+[Init] all tests passed
+[0][Domain:11] sys_execve: path=/bin/sh, argc=1, envc=14
+[0][Domain:11] sys_execve: read_exec_all ok, size=1149392
+[0][Domain:11] sys_execve: task.do_execve ok: /bin/sh
+[1m[32mAlien[0m:[1m[34m/[0m# ash
+[0][Domain:11] sys_execve: path=/bin/ash, argc=1, envc=14
+[0][Domain:11] sys_execve: read_exec_all ok, size=1149392
+[0][Domain:11] sys_execve: task.do_execve ok: /bin/ash
+[1m[32mAlien[0m:[1m[34m/[0m# 

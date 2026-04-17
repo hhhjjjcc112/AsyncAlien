@@ -68,6 +68,7 @@ pub fn cpu_num() -> usize {
 pub fn start_aps() {
     let num_cpus = cpu_num().min(MAX_CPUS).min(CPU_NUM);
     log::info!("Starting {} APs...", num_cpus.saturating_sub(1));
+    println!("[x86_ap] start_aps total={} x2apic={}", num_cpus, is_x2apic());
 
     let apic = unsafe { get_local_apic() };
 
@@ -77,13 +78,18 @@ pub fn start_aps() {
             unsafe { AP_STARTUP_STACKS.as_ptr() } as usize + cpu_id * BOOT_STACK_SIZE;
         setup_startup_page(stack_top);
 
-        log::debug!("Starting CPU {}", cpu_id);
-
         let target_apic_id = if is_x2apic() {
             cpu_id as u32
         } else {
             (cpu_id << 24) as u32
         };
+
+        println!(
+            "[x86_ap] start_aps cpu_id={} stack_top={:#x} apic_id={:#x}",
+            cpu_id,
+            stack_top,
+            target_apic_id,
+        );
 
         unsafe {
             // 发送 INIT IPI。
@@ -117,6 +123,13 @@ pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
     } else {
         (cpu_id << 24) as u32
     };
+
+    println!(
+        "[x86_ap] start_secondary_cpu cpu_id={} stack_top={:#x} apic_id={:#x}",
+        cpu_id,
+        stack_top,
+        target_apic_id,
+    );
 
     unsafe {
         apic.send_init_ipi(target_apic_id);

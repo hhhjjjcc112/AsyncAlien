@@ -24,11 +24,8 @@ pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
         (*now).save_fp_simd();
         (*next).restore_fp_simd();
 
-        (*now).set_fs_base(FsBase::read().as_u64() as usize);
-        (*now).set_gs_base(KernelGsBase::read().as_u64() as usize);
-
-        FsBase::write(VirtAddr::new((*next).fs_base() as u64));
-        KernelGsBase::write(VirtAddr::new((*next).gs_base() as u64));
+        (*now).save_fsgs();
+        (*next).restore_fsgs();
 
         __switch(now, next);
     }
@@ -39,6 +36,7 @@ pub fn set_current_user_fs_base(fs_base: usize) -> AlienResult<()> {
     let task = current_task().ok_or(AlienError::EINVAL)?;
     let mut guard = task.lock();
     guard.task_context().set_fs_base(fs_base);
+    FsBase::write(VirtAddr::new(fs_base as u64));
     Ok(())
 }
 
@@ -54,6 +52,7 @@ pub fn set_current_user_gs_base(gs_base: usize) -> AlienResult<()> {
     let task = current_task().ok_or(AlienError::EINVAL)?;
     let mut guard = task.lock();
     guard.task_context().set_gs_base(gs_base);
+    KernelGsBase::write(VirtAddr::new(gs_base as u64));
     Ok(())
 }
 

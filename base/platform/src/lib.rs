@@ -122,6 +122,11 @@ pub fn platform_init_percpu_primary(cpu_id: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         arch::init_percpu_primary(cpu_id);
+        println!(
+            "[x86_platform] platform_init_percpu_primary cpu_id={} read_back={}",
+            cpu_id,
+            arch::cpu_id(),
+        );
     }
     #[cfg(target_arch = "riscv64")]
     {
@@ -134,6 +139,11 @@ pub fn platform_init_percpu_secondary(cpu_id: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         arch::init_percpu_secondary(cpu_id);
+        println!(
+            "[x86_platform] platform_init_percpu_secondary cpu_id={} read_back={}",
+            cpu_id,
+            arch::cpu_id(),
+        );
     }
     #[cfg(target_arch = "riscv64")]
     {
@@ -148,6 +158,7 @@ pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         use common_x86_64::{apic, time};
+        println!("[x86_platform] platform_init_primary enter cpu_id={}", _cpu_id);
         // 初始化 FPU/SSE，允许用户态浮点运算。
         arch::init_fpu();
         // 初始化 APIC。
@@ -156,6 +167,7 @@ pub fn platform_init_primary(_cpu_id: usize, info_ptr: usize) {
         time::init_time();
         // 初始化 APIC 定时器（依赖 TSC 校准）。
         time::init_primary_apic_timer();
+        println!("[x86_platform] platform_init_primary ready cpu_id={}", _cpu_id);
     }
     Platform::init_boot_info(info_ptr);
     let machine_info = Platform::machine_info();
@@ -167,12 +179,14 @@ pub fn platform_init_secondary(_cpu_id: usize) {
     #[cfg(target_arch = "x86_64")]
     {
         use common_x86_64::{apic, time};
+        println!("[x86_platform] platform_init_secondary enter cpu_id={}", _cpu_id);
         // 初始化从核 FPU/SSE。
         arch::init_fpu();
         // 初始化 APIC。
         apic::init_secondary_apic();
         // 初始化 APIC 定时器（依赖 TSC 校准）。
         time::init_secondary_apic_timer();
+        println!("[x86_platform] platform_init_secondary ready cpu_id={}", _cpu_id);
     }
 }
 

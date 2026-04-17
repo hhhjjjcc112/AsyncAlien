@@ -107,6 +107,7 @@ VDSO_TOOLCHAIN ?= nightly-2026-01-23
 VDSO_VERBOSE ?= 0
 BUILD_CFG ?=  -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem
 BENCH ?= n
+RUN_TIMEOUT ?= 60s
 USER_INITRD_DIR := user/initrd
 USER_INITRAMFS_DIR := $(USER_INITRD_DIR)/initramfs-$(ARCH_KIND)
 USER_INITRD_STAMP := build/.user_initrd_$(ARCH_KIND).stamp
@@ -117,12 +118,6 @@ space:= $(empty) $(empty)
 QEMU_ARGS :=
 
 ifeq ($(ARCH_KIND),x86_64)
-    # x86_64 迁移阶段默认单核启动，避免 AP bring-up 干扰主链路。
-    ifneq ($(origin SMP),command line)
-        ifneq ($(origin SMP),environment)
-            SMP := 1
-        endif
-    endif
     # x86_64 QEMU args
 	QEMU_ARGS += -machine $(X86_MACHINE),accel=$(X86_ACCEL)
     VIRTIO_PCI_OPTS :=
@@ -242,6 +237,7 @@ help:
 	@echo ""
 	@echo "Main Targets:"
 	@echo "  make run                Build and run in QEMU"
+	@echo "  make record_run         Build, run, and tee output to run/run_$(ARCH).txt"
 	@echo "  make ready              Build everything but don't run QEMU"
 	@echo "  make build              Build kernel only"
 	@echo "  make vdso               Build vDSO only (follows ARCH)"
@@ -329,6 +325,16 @@ fake_run:
             $(QEMU_ARGS) \
             -serial mon:stdio
 
+record_run: domains sdcard initrd build
+	@mkdir -p ./run
+	@bash -lc 'set -o pipefail; timeout --foreground $(RUN_TIMEOUT) $(QEMU) \
+            -m $(MEMORY_SIZE) \
+            -smp $(SMP) \
+			-cpu $(X86_CPU) \
+            -kernel $(KERNEL) \
+            $(QEMU_ARGS) \
+            -serial mon:stdio |& tee ./run/run_$(ARCH).txt'
+
 run_uintr: X86_CPU := $(X86_UINTR_CPU)
 run_uintr: run
 
@@ -347,12 +353,22 @@ run: domains sdcard initrd build
 
 fake_run:
 	$(QEMU) \
-            -M virt \
-            -bios default \
-            -kernel $(KERNEL) \
-            $(QEMU_ARGS) \
-            -smp $(SMP) -m $(MEMORY_SIZE) \
-            -serial mon:stdio
+			-M virt \
+			-bios default \
+			-kernel $(KERNEL) \
+			$(QEMU_ARGS) \
+			-smp $(SMP) -m $(MEMORY_SIZE) \
+			-serial mon:stdio
+
+record_run: domains sdcard initrd build
+	@mkdir -p ./run
+	@bash -lc 'set -o pipefail; timeout --foreground $(RUN_TIMEOUT) $(QEMU) \
+			-M virt \
+			-bios default \
+			-kernel $(KERNEL) \
+			$(QEMU_ARGS) \
+			-smp $(SMP) -m $(MEMORY_SIZE) \
+			-serial mon:stdio |& tee ./run/run_$(ARCH).txt'
 endif
 
 check_mtools:
@@ -491,4 +507,4 @@ check:
 	@cargo fmt
 	@cargo clippy -p kernel --target $(TARGET_CONFIG)  -- -D warnings
 
-.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check run_uintr fake_run_uintr vdso
+.PHONY:build domains gdb-client gdb-server img sdcard user mount $(FS) fix initrd check run_uintr fake_run_uintr record_run vdso

@@ -1459,8 +1459,6 @@ dependencies = [
  "gfifo_scheduler",
  "ggoldfish",
  "ghpet",
- "gio_apic",
- "glocal_apic",
  "glogger",
  "gloopback",
  "gmem_block",
@@ -1488,8 +1486,6 @@ dependencies = [
  "gvirtio_net",
  "gxlogger",
  "hpet",
- "io_apic",
- "local_apic",
  "logger",
  "loopback",
  "mem_block",
@@ -2379,19 +2375,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
-name = "gio_apic"
-version = "0.1.0"
-dependencies = [
- "basic",
- "corelib",
- "interface",
- "io_apic",
- "malloc",
- "shared_heap",
- "storage",
-]
-
-[[package]]
 name = "gl_generator"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2407,19 +2390,6 @@ name = "glob"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
-
-[[package]]
-name = "glocal_apic"
-version = "0.1.0"
-dependencies = [
- "basic",
- "corelib",
- "interface",
- "local_apic",
- "malloc",
- "shared_heap",
- "storage",
-]
 
 [[package]]
 name = "glogger"
@@ -3479,15 +3449,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "io_apic"
-version = "0.1.0"
-dependencies = [
- "basic",
- "interface",
- "shared_heap",
-]
-
-[[package]]
 name = "is-terminal"
 version = "0.4.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3862,15 +3823,6 @@ dependencies = [
  "shared_heap",
  "storage",
  "xmas-elf 0.10.0",
-]
-
-[[package]]
-name = "local_apic"
-version = "0.1.0"
-dependencies = [
- "basic",
- "interface",
- "shared_heap",
 ]
 
 [[package]]
@@ -6391,6 +6343,9 @@ dependencies = [
 [[package]]
 name = "task_meta"
 version = "0.1.0"
+dependencies = [
+ "x86_64 0.14.13",
+]
 
 [[package]]
 name = "tempfile"

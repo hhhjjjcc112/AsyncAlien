@@ -1,6 +1,4 @@
 use mem::PhysAddr;
-use x86_64::VirtAddr;
-use x86_64::registers::model_specific::{FsBase, KernelGsBase};
 
 use crate::task_domain;
 
@@ -36,18 +34,6 @@ pub fn prepare_user_return() -> UserTrapResult {
             );
             panic!("x86_64 trap: failed to prepare user return");
         });
-
-    // 统一在用户态返回前同步 TLS 基址，保证 arch_prctl 设置立即生效。
-    let fs_base = task_domain.do_get_fs_base().unwrap_or_else(|err| {
-        error!("x86_64 trap: do_get_fs_base failed: {:?}", err);
-        panic!("x86_64 trap: failed to get fs base");
-    });
-    let gs_base = task_domain.do_get_gs_base().unwrap_or_else(|err| {
-        error!("x86_64 trap: do_get_gs_base failed: {:?}", err);
-        panic!("x86_64 trap: failed to get gs base");
-    });
-    FsBase::write(VirtAddr::new(fs_base as u64));
-    KernelGsBase::write(VirtAddr::new(gs_base as u64));
 
     // 返回用户态前刷新 TSS.rsp0，确保下一次 CPL3->0 入栈落在当前任务 TrapFrame。
     crate::trap::write_tss_rsp0(trap_cx_ptr + X86TrapFrame::USER_CONTEXT_SIZE);

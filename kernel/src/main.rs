@@ -60,6 +60,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
     platform::platform_init_percpu_primary(boot_cpu_id);
     task::init_current_tid();
+    println!("[kernel] primary percpu ready cpu_id={}", boot_cpu_id);
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
     mem::init_memory_system(true);
@@ -77,6 +78,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     
     domain::load_domains().unwrap();
 
+    println!("[kernel] starting secondary cpus expected={}", machine_info.smp.saturating_sub(1));
     platform::start_other_cpu(boot_cpu_id);
 
     let expected_secondary = machine_info.smp.saturating_sub(1);
@@ -85,6 +87,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     }
 
     SECONDARY_RUN_RELEASED.store(true, Ordering::Release);
+    println!("[kernel] secondary cpus released count={}", expected_secondary);
 
     #[cfg(feature = "unwind_test")]
     panic::test_unwind();
@@ -96,23 +99,30 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 /// 从核入口：由平台汇编从核入口直接调用。
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
+    println!("[kernel] secondary_main enter cpu_id={}", cpu_id);
     platform::platform_init_percpu_secondary(cpu_id);
     task::init_current_tid();
+    println!("[kernel] secondary_main percpu ready cpu_id={}", cpu_id);
 
     
     platform::platform_init_secondary(cpu_id);
+    println!("[kernel] secondary_main platform ready cpu_id={}", cpu_id);
 
     mem::init_memory_system(false);
+    println!("[kernel] secondary_main memory ready cpu_id={}", cpu_id);
     trap::init_trap_subsystem();
+    println!("[kernel] secondary_main trap ready cpu_id={}", cpu_id);
     #[cfg(target_arch = "riscv64")]
     arch::allow_access_user_memory();
     println!("CPU {} start...", cpu_id);
 
     SECONDARY_INIT_COUNT.fetch_add(1, Ordering::AcqRel);
+    println!("[kernel] secondary_main announced ready cpu_id={}", cpu_id);
     while !SECONDARY_RUN_RELEASED.load(Ordering::Acquire) {
         spin_loop();
     }
 
+    println!("[kernel] secondary_main released cpu_id={}", cpu_id);
     timer::set_next_trigger();
     task::run_task();
 }
