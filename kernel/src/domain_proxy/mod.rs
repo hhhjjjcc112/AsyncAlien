@@ -3,7 +3,6 @@ mod scheduler;
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::{any::Any, cell::UnsafeCell, fmt::Debug, mem::forget, net::SocketAddrV4, ops::Range};
 
-use arch::cpu_id;
 use config::CPU_NUM;
 use interface::*;
 use ksync::{Mutex, RwLock};
@@ -13,10 +12,11 @@ use pconst::{
     io::{PollEvents, RtcTime, SeekFrom},
     net::*,
 };
-pub use scheduler::SchedulerDomainProxy;
 use shared_heap::{DBox, DVec, SharedData};
 use spin::Once;
 use vfscore::{fstype::FileSystemFlags, inode::InodeAttr, superblock::SuperType, utils::*};
+
+pub use scheduler::SchedulerDomainProxy;
 
 use crate::{
     domain_helper::{FreeShared, free_domain_resource},
@@ -27,6 +27,8 @@ use crate::{
     timer::TimeTick,
     *,
 };
+
+use platform::percpu_impl::cpu_id;
 
 pub trait ProxyBuilder {
     type T;

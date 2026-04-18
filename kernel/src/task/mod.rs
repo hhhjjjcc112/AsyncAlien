@@ -8,15 +8,15 @@ mod x86_64;
 
 use alloc::{sync::Arc, vec::Vec};
 
-use arch::cpu_id;
 use basic::sync::Once;
 use config::CPU_NUM;
 use interface::{SchedulerDomain, TaskDomain};
 use ksync::Mutex;
+use platform::percpu_impl::cpu_id;
 pub use processor::{current_task, current_tid, init_current_tid};
 pub use scheduler::{
-    exit_now, get_task_priority, is_task_exit, remove_task, set_task_priority, wait_now,
-    wake_up_wait_task, yield_now,
+    exit_now, get_cpus_allowed, get_task_priority, is_task_exit, remove_task, set_task_priority,
+    wait_now, wake_up_wait_task, yield_now,
 };
 use task_meta::{TaskMeta, TaskStatus};
 

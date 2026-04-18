@@ -1,19 +1,27 @@
 //! x86_64 从核启动流程。
 
-use core::{arch::global_asm, time::Duration};
+use core::{
+    arch::global_asm,
+    sync::atomic::{AtomicUsize, Ordering},
+    time::Duration,
+};
 
-use config::CPU_NUM;
+use config::{CPU_NUM, LOW_PHYS_MAP_BASE};
 
 use crate::common_x86_64::{
     apic::{get_local_apic, is_x2apic},
-    boot::{BOOT_STACK_SIZE, PHYS_VIRT_OFFSET},
+    boot::BOOT_STACK_SIZE,
     time::busy_wait,
 };
 
-/// AP 启动页索引（0x6000）。
-const AP_START_PAGE_IDX: usize = 6;
+/// AP 启动页索引（0x8000）。
+const AP_START_PAGE_IDX: usize = 8;
 /// AP 启动页物理地址。
 const AP_START_PAGE_ADDR: usize = AP_START_PAGE_IDX * 0x1000;
+/// AP 启动页大小。
+const AP_START_PAGE_SIZE: usize = 0x1000;
+/// 等待从核进入早期入口的最长轮询次数。
+const AP_BOOT_WAIT_RETRIES: usize = 200;
 
 /// 支持的最大 CPU 数。
 const MAX_CPUS: usize = 32;
@@ -21,6 +29,8 @@ const MAX_CPUS: usize = 32;
 /// AP 启动栈区。
 #[unsafe(link_section = ".bss.stack")]
 static mut AP_STARTUP_STACKS: [u8; BOOT_STACK_SIZE * MAX_CPUS] = [0; BOOT_STACK_SIZE * MAX_CPUS];
+/// 从核进入 `secondary_entry` 的计数，BSP 依此判断是否可复写 trampoline 页。
+static AP_EARLY_BOOT_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 // 引入 AP 启动汇编。
 global_asm!(
@@ -35,87 +45,78 @@ unsafe extern "C" {
 }
 
 /// 设置 AP 启动页代码与栈顶。
-fn setup_startup_page(stack_top: usize) {
+fn setup_startup_page(cpu_id: usize, stack_top: usize) {
+    let start_page_vaddr = LOW_PHYS_MAP_BASE + AP_START_PAGE_ADDR;
     let start_page = unsafe {
         core::slice::from_raw_parts_mut(
-            (AP_START_PAGE_ADDR + PHYS_VIRT_OFFSET as usize) as *mut u64,
-            0x1000 / 8,
+            start_page_vaddr as *mut u64,
+            AP_START_PAGE_SIZE / 8,
         )
     };
+    let image_size = ap_end as *const () as usize - ap_start as *const () as usize;
+    assert!(
+        image_size <= AP_START_PAGE_SIZE,
+        "AP trampoline too large: {} bytes",
+        image_size
+    );
+
+    println!(
+        "[x86_ap] prepare trampoline cpu_id={} paddr={:#x} vaddr={:#x} size={:#x}",
+        cpu_id,
+        AP_START_PAGE_ADDR,
+        start_page_vaddr,
+        image_size,
+    );
 
     // 将 AP 启动代码拷到低地址页。
     unsafe {
         core::ptr::copy_nonoverlapping(
             ap_start as *const u8,
             start_page.as_mut_ptr() as *mut u8,
-            ap_end as *const () as usize - ap_start as *const () as usize,
+            image_size,
         )
     }
 
     // 在页尾写入 AP 入口和栈顶。
-    start_page[0x1000 / 8 - 2] = stack_top as u64;
-    start_page[0x1000 / 8 - 1] = ap_entry32 as *const () as usize as u64;
+    start_page[AP_START_PAGE_SIZE / 8 - 2] = stack_top as u64;
+    start_page[AP_START_PAGE_SIZE / 8 - 1] = ap_entry32 as *const () as usize as u64;
 }
 
-/// 获取逻辑 CPU 数量。
-pub fn cpu_num() -> usize {
-    raw_cpuid::CpuId::new()
-        .get_feature_info()
-        .map_or(1, |finfo| finfo.max_logical_processor_ids() as usize)
+/// 从核进入 `secondary_entry` 后尽快上报，避免 BSP 复写仍在使用的 trampoline 页。
+pub fn announce_secondary_cpu_started() {
+    AP_EARLY_BOOT_COUNT.fetch_add(1, Ordering::AcqRel);
 }
 
-/// 启动全部 AP。
-pub fn start_aps() {
-    let num_cpus = cpu_num().min(MAX_CPUS).min(CPU_NUM);
-    log::info!("Starting {} APs...", num_cpus.saturating_sub(1));
-    println!("[x86_ap] start_aps total={} x2apic={}", num_cpus, is_x2apic());
-
-    let apic = unsafe { get_local_apic() };
-
-    for cpu_id in 1..num_cpus {
-        #[allow(static_mut_refs)]
-        let stack_top =
-            unsafe { AP_STARTUP_STACKS.as_ptr() } as usize + cpu_id * BOOT_STACK_SIZE;
-        setup_startup_page(stack_top);
-
-        let target_apic_id = if is_x2apic() {
-            cpu_id as u32
-        } else {
-            (cpu_id << 24) as u32
-        };
-
-        println!(
-            "[x86_ap] start_aps cpu_id={} stack_top={:#x} apic_id={:#x}",
-            cpu_id,
-            stack_top,
-            target_apic_id,
-        );
-
-        unsafe {
-            // 发送 INIT IPI。
-            apic.send_init_ipi(target_apic_id);
-            busy_wait(Duration::from_millis(10)); // 10ms
-
-            // 发送 SIPI（两次提高可靠性）。
-            apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
-            busy_wait(Duration::from_micros(200)); // 200us
-            apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
+fn wait_for_secondary_early_boot(cpu_id: usize, expected_count: usize) -> bool {
+    for _ in 0..AP_BOOT_WAIT_RETRIES {
+        if AP_EARLY_BOOT_COUNT.load(Ordering::Acquire) >= expected_count {
+            println!(
+                "[x86_ap] early boot ack cpu_id={} count={}",
+                cpu_id,
+                expected_count,
+            );
+            return true;
         }
-
-        // 等待 AP 拉起。
-        busy_wait(Duration::from_millis(10));
+        busy_wait(Duration::from_millis(1));
     }
+
+    println!(
+        "[x86_ap] early boot timeout cpu_id={} expect_count={} observed={}",
+        cpu_id,
+        expected_count,
+        AP_EARLY_BOOT_COUNT.load(Ordering::Acquire),
+    );
+    false
 }
 
-/// 启动指定从核。
-pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
+pub fn boot_secondary_cpu(cpu_id: usize) -> bool {
     if cpu_id >= MAX_CPUS || cpu_id >= CPU_NUM {
-        return;
+        return false;
     }
 
     #[allow(static_mut_refs)]
-    let stack_top = unsafe { AP_STARTUP_STACKS.as_ptr() } as usize + cpu_id * BOOT_STACK_SIZE;
-    setup_startup_page(stack_top);
+    let stack_top = unsafe { AP_STARTUP_STACKS.as_ptr() } as usize + (cpu_id + 1) * BOOT_STACK_SIZE;
+    setup_startup_page(cpu_id, stack_top);
 
     let apic = unsafe { get_local_apic() };
     let target_apic_id = if is_x2apic() {
@@ -123,12 +124,14 @@ pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
     } else {
         (cpu_id << 24) as u32
     };
+    let expected_count = AP_EARLY_BOOT_COUNT.load(Ordering::Acquire) + 1;
 
     println!(
-        "[x86_ap] start_secondary_cpu cpu_id={} stack_top={:#x} apic_id={:#x}",
+        "[x86_ap] send INIT/SIPI cpu_id={} stack_top={:#x} apic_id={:#x} expect_count={}",
         cpu_id,
         stack_top,
         target_apic_id,
+        expected_count,
     );
 
     unsafe {
@@ -138,4 +141,6 @@ pub fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
         busy_wait(Duration::from_micros(200));
         apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
     }
+
+    wait_for_secondary_early_boot(cpu_id, expected_count)
 }

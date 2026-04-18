@@ -25,6 +25,7 @@ pub mod console;
 
 /// 平台抽象 trait（参考 ArceOS 风格）。
 pub mod traits;
+pub mod percpu_impl;
 
 // 导出公共 trait 与类型。
 pub use traits::{
@@ -93,6 +94,25 @@ pub fn console_putchar(ch: u8) {
     Platform::putchar(ch);
 }
 
+/// 获取当前 CPU ID。
+#[inline(always)]
+pub fn current_cpu_id() -> usize {
+    percpu_impl::cpu_id()
+}
+
+/// 获取当前 CPU ID。
+#[cfg(target_arch = "x86_64")]
+pub fn cpu_id_early() -> usize {
+    use raw_cpuid::CpuId;
+
+    let cpuid = CpuId::new();
+    cpuid
+        .get_feature_info()
+        .map(|info| info.initial_local_apic_id() as usize)
+        .unwrap()
+}
+
+
 /// 刷新远端 CPU 的指令可见性。
 pub fn flush_cache(cpu_mask: usize, cpu_mask_base: usize) {
     Platform::flush_cache(cpu_mask, cpu_mask_base)
@@ -114,40 +134,6 @@ pub fn clear_bss() {
         core::slice::from_raw_parts_mut(
             sbss as *const () as *mut u8, ebss as *const () as usize - sbss as *const () as usize)
             .fill(0);
-    }
-}
-
-/// BSP在 clear_bss() 后初始化percpu。
-pub fn platform_init_percpu_primary(cpu_id: usize) {
-    #[cfg(target_arch = "x86_64")]
-    {
-        arch::init_percpu_primary(cpu_id);
-        println!(
-            "[x86_platform] platform_init_percpu_primary cpu_id={} read_back={}",
-            cpu_id,
-            arch::cpu_id(),
-        );
-    }
-    #[cfg(target_arch = "riscv64")]
-    {
-        arch::init_percpu_primary(cpu_id);
-    }
-}
-
-/// 从核初始化percpu。
-pub fn platform_init_percpu_secondary(cpu_id: usize) {
-    #[cfg(target_arch = "x86_64")]
-    {
-        arch::init_percpu_secondary(cpu_id);
-        println!(
-            "[x86_platform] platform_init_percpu_secondary cpu_id={} read_back={}",
-            cpu_id,
-            arch::cpu_id(),
-        );
-    }
-    #[cfg(target_arch = "riscv64")]
-    {
-        arch::init_percpu_secondary(cpu_id);
     }
 }
 
@@ -191,26 +177,42 @@ pub fn platform_init_secondary(_cpu_id: usize) {
 }
 
 
-pub fn start_other_cpu(cpu_id: usize) {
+pub fn start_other_cpu(cpu_id: usize) -> usize {
     #[cfg(target_arch = "x86_64")] 
     {
         let total = platform_machine_info().cpu_count();
+        let mut started = 0;
         for i in 0..total {
             if i != cpu_id {
-                Platform::start_secondary_cpu(i, 0, 0);
+                if crate::common_x86_64::ap::boot_secondary_cpu(i) {
+                    started += 1;
+                }
             }
         }
+        started
     }
     #[cfg(target_arch = "riscv64")]
     {
         let start_cpu = if cfg!(plat_vf2) { 1 } else { 0 };
+        let mut started = 0;
         for i in start_cpu..::config::CPU_NUM {
             if i != cpu_id {
-                Platform::start_secondary_cpu(i, _start_secondary as *const () as usize, 0);
+                let start_addr = _start_secondary as *const () as usize;
+                let ret = crate::common_riscv::sbi::hart_start(i, start_addr, 0);
+                println!(
+                    "[riscv_smp] hart_start hart_id={} start_addr={:#x} error={} value={}",
+                    i,
+                    start_addr,
+                    ret.error,
+                    ret.value,
+                );
+                if ret.error == 0 {
+                    started += 1;
+                }
             }
         }
+        started
     }
-    
 }
 
 unsafe extern "Rust" {

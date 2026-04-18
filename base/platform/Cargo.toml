@@ -15,6 +15,7 @@ heapless = "0.8"
 lazyinit = "0.2"
 memory_addr = "0.4"
 bitflags = "2"
+percpu = "0.3"
 
 [features]
 apic_timer_test = []

@@ -34,6 +34,7 @@ use log::warn;
 use self::riscv64::init_device;
 #[cfg(target_arch = "x86_64")]
 use self::x86_64::init_device;
+use crate::domain_proxy::SchedulerDomainProxy;
 use crate::{
     bus::DeviceLocator,
     create_domain,

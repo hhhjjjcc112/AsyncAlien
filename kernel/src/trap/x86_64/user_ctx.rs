@@ -1,8 +1,12 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 use mem::PhysAddr;
 
-use crate::task_domain;
-
 use super::context::X86TrapFrame;
+use crate::{task::current_tid, task_domain};
+use platform::percpu_impl::cpu_id;
+
+static PREPARE_USER_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 #[repr(C)]
 pub struct UserTrapResult {
@@ -36,7 +40,18 @@ pub fn prepare_user_return() -> UserTrapResult {
         });
 
     // 返回用户态前刷新 TSS.rsp0，确保下一次 CPL3->0 入栈落在当前任务 TrapFrame。
-    crate::trap::write_tss_rsp0(trap_cx_ptr + X86TrapFrame::USER_CONTEXT_SIZE);
+    let written_rsp0 = trap_cx_ptr + X86TrapFrame::USER_CONTEXT_SIZE;
+    crate::trap::write_tss_rsp0(written_rsp0);
+    let trace_idx = PREPARE_USER_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if trace_idx < 16 {
+        log::warn!(
+            "[x86 prepare_user_return] cpu={} tid={:?} trap_cx={:#x} rsp0={:#x}",
+            cpu_id(),
+            current_tid(),
+            trap_cx_ptr,
+            written_rsp0,
+        );
+    }
 
     UserTrapResult {
         user_cr3,

@@ -1,9 +1,10 @@
 use core::cell::UnsafeCell;
 
-use arch::cpu_id;
 use config::CPU_NUM;
 use corelib::yield_now;
 use ksync::Mutex;
+
+use platform::percpu_impl::cpu_id;
 
 use crate::{read_once, sync::rcu::synchronize_sched, write_once};
 

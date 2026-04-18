@@ -333,7 +333,7 @@ record_run: domains sdcard initrd build
 			-cpu $(X86_CPU) \
             -kernel $(KERNEL) \
             $(QEMU_ARGS) \
-            -serial mon:stdio |& tee ./run/run_$(ARCH).txt'
+            -serial mon:stdio > ./run/run_$(ARCH).txt 2>&1'
 
 run_uintr: X86_CPU := $(X86_UINTR_CPU)
 run_uintr: run

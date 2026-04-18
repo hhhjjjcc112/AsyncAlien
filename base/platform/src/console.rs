@@ -6,7 +6,7 @@ use crate::console_putchar;
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-        let cpu_id = arch::cpu_id();
+        let cpu_id = $crate::current_cpu_id();
         $crate::console::__print(format_args!("[{}] {}", cpu_id, format_args!($($arg)*)))
     };
 }
@@ -52,6 +52,30 @@ macro_rules! iprint {
         $crate::console::__print(format_args!("{}", format_args!($($arg)*)))
     };
 }
+
+#[macro_export]
+macro_rules! early_print {
+    ($($arg:tt)*) => {
+        #[cfg(target_arch = "x86_64")]
+        {
+            let cpu_id = $crate::cpu_id_early();
+            $crate::console::__print(format_args!("[{}] {}", cpu_id, format_args!($($arg)*)))
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            $crate::print!($($arg)*)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! early_println {
+    () => ($crate::early_print!("\n"));
+    ($fmt:expr) => ($crate::early_print!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => ($crate::early_print!(
+        concat!($fmt, "\n"), $($arg)*));
+}
+
 
 pub struct Stdout;
 

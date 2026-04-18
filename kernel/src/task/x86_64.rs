@@ -2,14 +2,10 @@ use core::arch::global_asm;
 
 use basic::task::TaskContext;
 use x86_64::{
-    VirtAddr,
-    registers::model_specific::{FsBase, KernelGsBase},
+    VirtAddr, registers::model_specific::{FsBase, KernelGsBase}
 };
 
-use crate::{
-    error::{AlienError, AlienResult},
-    task::current_task,
-};
+use crate::{error::{AlienError, AlienResult}, task::current_task};
 
 global_asm!(include_str!("switch_x86_64.asm"));
 
@@ -31,6 +27,7 @@ pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
     }
 }
 
+// 更新fs寄存器和task上下文中的fs
 #[inline]
 pub fn set_current_user_fs_base(fs_base: usize) -> AlienResult<()> {
     let task = current_task().ok_or(AlienError::EINVAL)?;
@@ -40,25 +37,25 @@ pub fn set_current_user_fs_base(fs_base: usize) -> AlienResult<()> {
     Ok(())
 }
 
+// 直接读fs寄存器值就行
 #[inline]
 pub fn current_user_fs_base() -> AlienResult<usize> {
-    let task = current_task().ok_or(AlienError::EINVAL)?;
-    let mut guard = task.lock();
-    Ok(guard.task_context().fs_base())
+    Ok(FsBase::read().as_u64() as usize)
 }
 
+// 更新gs寄存器和task上下文中的gs
 #[inline]
 pub fn set_current_user_gs_base(gs_base: usize) -> AlienResult<()> {
     let task = current_task().ok_or(AlienError::EINVAL)?;
     let mut guard = task.lock();
     guard.task_context().set_gs_base(gs_base);
+    // 因为有swapgs，用户态gs在内核态被换到KernelGsBase里了
     KernelGsBase::write(VirtAddr::new(gs_base as u64));
     Ok(())
 }
 
+// 直接读kernel_gs寄存器值就行
 #[inline]
 pub fn current_user_gs_base() -> AlienResult<usize> {
-    let task = current_task().ok_or(AlienError::EINVAL)?;
-    let mut guard = task.lock();
-    Ok(guard.task_context().gs_base())
+    Ok(KernelGsBase::read().as_u64() as usize)
 }

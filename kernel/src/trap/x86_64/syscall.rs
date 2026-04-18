@@ -1,18 +1,25 @@
-use core::arch::global_asm;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::{
+    arch::global_asm,
+    sync::atomic::{AtomicUsize, Ordering},
+};
+
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
-use x86_64::structures::tss::TaskStateSegment;
 use x86_64::{
-    VirtAddr,
     registers::{
         control::{Efer, EferFlags},
         model_specific::{LStar, SFMask, Star},
         rflags::RFlags,
     },
+    structures::tss::TaskStateSegment,
+    VirtAddr,
 };
 
-use super::context::X86TrapFrame;
-use super::user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult};
+use super::{
+    context::X86TrapFrame,
+    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult},
+};
+use crate::task::current_tid;
+use platform::percpu_impl::cpu_id;
 
 #[unsafe(no_mangle)]
 #[percpu::def_percpu]
@@ -29,10 +36,12 @@ unsafe extern "C" {
 }
 
 static SYSCALL_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+static SYSCALL_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 #[unsafe(no_mangle)]
 pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     let frame = current_trap_frame();
+    let trap_frame_ptr = frame as *mut X86TrapFrame as usize;
 
     let mut parameters = frame.parameters();
     let orig_syscall_id = parameters[0];
@@ -40,9 +49,12 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     parameters[0] = syscall_id;
 
     let trace_idx = SYSCALL_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 64 {
-        log::debug!(
-            "[x86 syscall] orig={:#x}, id={:#x}, args={:#x?}",
+    if trace_idx < 16 {
+        log::warn!(
+            "[x86 syscall] cpu={} tid={:?} trap_cx={:#x} orig={:#x} id={:#x} args={:#x?}",
+            cpu_id(),
+            current_tid(),
+            trap_frame_ptr,
             orig_syscall_id,
             syscall_id,
             &parameters[1..]
@@ -65,7 +77,18 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     });
     frame.update_result(res as usize);
     // SysV ABI 下以 rax/rdx 返回 user_cr3 与 trap_cx_ptr。
-    prepare_user_return()
+    let user_return = prepare_user_return();
+    let return_trace_idx = SYSCALL_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if return_trace_idx < 16 {
+        log::warn!(
+            "[x86 syscall return] cpu={} tid={:?} trap_cx={:#x} user_cr3={:#x}",
+            cpu_id(),
+            current_tid(),
+            user_return.trap_cx_ptr,
+            user_return.user_cr3,
+        );
+    }
+    user_return
 }
 
 /// 处理当前 x86_64 的系统调用入口。
@@ -75,7 +98,9 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
 pub fn handle_legacy_syscall(frame: &mut X86TrapFrame) {
     let result = crate::syscall_domain!().call(
         frame.rax,
-        [frame.rbx, frame.rcx, frame.rdx, frame.rsi, frame.rdi, frame.rbp],
+        [
+            frame.rbx, frame.rcx, frame.rdx, frame.rsi, frame.rdi, frame.rbp,
+        ],
     );
     let res = result.unwrap_or_else(|err| {
         error!("syscall error: {:?}", err);
@@ -90,7 +115,7 @@ pub fn handle_legacy_syscall(frame: &mut X86TrapFrame) {
 pub fn init_syscall() {
     // 将 GS 指向 x86_64 percpu 镜像高地址。
     // 每核槽位大小由 percpu 统一计算，避免手写偏移。
-    let cpu_id = arch::cpu_id();
+    let cpu_id = cpu_id();
     let slot_size = percpu::percpu_area_layout_expected(1).size();
     let gs_mirror = PERCPU_MIRROR_BASE + cpu_id * slot_size;
     unsafe {

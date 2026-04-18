@@ -104,7 +104,7 @@ impl PowerIf for QemuRiscvPlatform {
     }
 
     fn current_cpu_id() -> usize {
-        arch::cpu_id()
+        crate::current_cpu_id()
     }
 
     fn halt() {

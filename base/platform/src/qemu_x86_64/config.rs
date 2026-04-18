@@ -53,8 +53,18 @@ pub const PCI_BUS_END: u8 = 0xff;
 pub const VIRTIO_MMIO_RANGES: &[(usize, usize)] = &[];
 
 /// 保留内存区间（低 1MiB）。
+pub const AP_TRAMPOLINE_PADDR: usize = 0x8000;
+/// AP 启动 trampoline 使用的页大小。
+pub const AP_TRAMPOLINE_SIZE: usize = 0x1000;
+
+/// 保留内存区间（低 1MiB）。
 pub const RESERVED_MEMORY: &[(usize, usize)] = &[
-    (0, 0x100000), // 低 1MiB 预留给传统设备
+    (0, AP_TRAMPOLINE_PADDR), // 低端传统设备与早期固件数据
+    (AP_TRAMPOLINE_PADDR, AP_TRAMPOLINE_SIZE), // AP 启动 trampoline 专用页
+    (
+        AP_TRAMPOLINE_PADDR + AP_TRAMPOLINE_SIZE,
+        0x100000 - (AP_TRAMPOLINE_PADDR + AP_TRAMPOLINE_SIZE),
+    ), // 低 1MiB 剩余保留区
 ];
 
 /// 平台内部的静态 ACPI 兼容设备描述。
@@ -64,4 +74,3 @@ pub const DEVICE_SPACE: &[(&str, usize, usize)] = &[
     ("hpet", 0xfed0_0000, 0x1000),
     ("pci_ecam", 0xb000_0000, 0x1000_0000),
 ];
-

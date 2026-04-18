@@ -131,8 +131,8 @@ impl PowerIf for QemuX86Platform {
         crate::common_x86_64::services::system_shutdown()
     }
 
-    fn start_secondary_cpu(cpu_id: usize, start_addr: usize, opaque: usize) {
-        crate::common_x86_64::services::start_secondary_cpu(cpu_id, start_addr, opaque)
+    fn start_secondary_cpu(cpu_id: usize, _start_addr: usize, _opaque: usize) {
+        crate::common_x86_64::ap::boot_secondary_cpu(cpu_id);
     }
 
     fn cpu_count() -> usize {
@@ -140,7 +140,7 @@ impl PowerIf for QemuX86Platform {
     }
 
     fn current_cpu_id() -> usize {
-        arch::cpu_id()
+        crate::current_cpu_id()
     }
 
     fn halt() {

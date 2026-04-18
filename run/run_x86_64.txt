@@ -5,8 +5,7 @@ iPXE (http://ipxe.org) 00:02.0 CA00 PCI2.10 PnP PMM+7FF90E40+7FEF0E40 CA00
 Press Ctrl-B to configure iPXE (PCI 00:02.0)...                                                                               
 
 
-Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
-[0] [x86_platform] platform_init_percpu_primary cpu_id=0 read_back=0
+Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
 [0] [kernel] primary percpu ready cpu_id=0
 [0] 
      _      _   _
@@ -21,19 +20,19 @@ Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 
 [0] [x86_apic] init ioapic base=0xfec00000
 [0] [x86_apic] init_primary_apic ready
 [0] [x86_platform] platform_init_primary ready cpu_id=0
-[0] Initrd from multiboot: 0xb28000..0xe19bef
+[0] Initrd from multiboot: 0xb28000..0xe16d4f
 [0] Init logger Some("")
 [0] Frame range: 0x10b27000..0x7ffdc000, pages=0x6f4b5
-[0] initrd copy: src=0xb28000, size=3087343, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0x9e1adfed, dst=0x9e1adfed
+[0] initrd copy: src=0xb28000, size=3075407, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xfbfe6846, dst=0xfbfe6846
 [0] Relocate initrd data to 0x10b35000
 [0] Frame allocator init success
 [0] Talloc allocator init success
-[0] kernel text:          0x200000-0x2b3000
-[0] kernel rodata:        0x2b3000-0x2ca000
-[0] kernel init_array:    0x2ca000-0x2ca000
-[0] kernel data:          0x2ca000-0xb0f000
-[0] kernel bss:           0xb0f000-0xb27000
+[0] kernel text:          0x200000-0x2b6000
+[0] kernel rodata:        0x2b6000-0x2ce000
+[0] kernel init_array:    0x2ce000-0x2ce000
+[0] kernel data:          0x2ce000-0xb13000
+[0] kernel bss:           0xb13000-0xb27000
 [0] kernel heap:          0xb27000-0x10b27000
 [0] kernel alloc range:   0x10b27000-0x7ffdc000
 [0] map local_apic: 0xfee00000-0xfee01000
@@ -44,12 +43,13 @@ Booting from ROM..[13835184090829094739] [x86_boot] main_entry magic=0x2badb002 
 [0] Activate paging mode success
 [0] ++++ setup interrupt ++++
 [0] ++++ setup interrupt done, enable:true ++++
+[0] [kernel][sched] set_current_tid cpu=0 tid=18446744073709551615
 [0] Boot CPU 0
 [0] Machine: qemu-x86_64-pc
-SMP:     2 CPUs
+SMP:     4 CPUs
 Memory:  0x100000..0x7ffdc000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb28000..0xe19bef
+Initrd:  0xb28000..0xe16d4f
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] [bus][x86_64][pci] virtio summary: blk=1, net=1, input=0, gpu=0
@@ -83,75 +83,75 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: cmos_rtc
 [0] <register domain>: virtio_net
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 4383 us[0m
+[0] [31m[Load new domain] Time elapsed: 4269 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 903 us[0m
+[0] [31m[Load new domain] Time elapsed: 1560 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 2840 us[0m
+[0] [31m[Load new domain] Time elapsed: 2400 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 1417 us[0m
+[0] [31m[Load new domain] Time elapsed: 1376 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 2298 us[0m
+[0] [31m[Load new domain] Time elapsed: 2242 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 2099 us[0m
+[0] [31m[Load new domain] Time elapsed: 1928 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 2218 us[0m
+[0] [31m[Load new domain] Time elapsed: 2589 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 2146 us[0m
+[0] [31m[Load new domain] Time elapsed: 1915 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 2429 us[0m
+[0] [31m[Load new domain] Time elapsed: 2344 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 1659 us[0m
+[0] [31m[Load new domain] Time elapsed: 1441 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 1371 us[0m
+[0] [31m[Load new domain] Time elapsed: 1178 us[0m
 [0] <attach domain>: task, it's name is task
 [0][Domain:12] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 2840 us[0m
+[0] [31m[Load new domain] Time elapsed: 3114 us[0m
 [0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
 [0][Domain:12] syscall domain init
 [0] <attach domain>: syscall, it's name is syscall
-[0] [31m[Load new domain] Time elapsed: 967 us[0m
+[0] [31m[Load new domain] Time elapsed: 904 us[0m
 [0][Domain:13] APIC domain init
 [0] <attach domain>: apic, it's name is apic
-[0] [31m[Load new domain] Time elapsed: 690 us[0m
+[0] [31m[Load new domain] Time elapsed: 544 us[0m
 [0] <attach domain>: local_apic, it's name is local_apic
-[0] [31m[Load new domain] Time elapsed: 678 us[0m
+[0] [31m[Load new domain] Time elapsed: 499 us[0m
 [0] <attach domain>: io_apic, it's name is io_apic
-[0] [31m[Load new domain] Time elapsed: 975 us[0m
+[0] [31m[Load new domain] Time elapsed: 619 us[0m
 [0] <attach domain>: hpet, it's name is hpet
-[0] [31m[Load new domain] Time elapsed: 640 us[0m
+[0] [31m[Load new domain] Time elapsed: 543 us[0m
 [0][Domain:17] CmosRtc region: 0x70..0x72
 [0] <attach domain>: rtc, it's name is rtc
-[0] [31m[Load new domain] Time elapsed: 901 us[0m
+[0] [31m[Load new domain] Time elapsed: 795 us[0m
 [0][Domain:18] uart_addr: 0x3f8-0x400
 [0][Domain:18] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 1248 us[0m
+[0] [31m[Load new domain] Time elapsed: 1051 us[0m
 [0][Domain:19] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0][Domain:13] APIC enable irq 4
-[0] [31m[Load new domain] Time elapsed: 1082 us[0m
+[0] [31m[Load new domain] Time elapsed: 941 us[0m
 [0][Domain:20] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
 [0][Domain:20] virtio_blk_pci: create blk driver
 [0][Domain:20] virtio_blk_pci: driver ready
 [0] virtio-pci block @ 0000:00:03.0
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
-[0] [31m[Load new domain] Time elapsed: 956 us[0m
+[0] [31m[Load new domain] Time elapsed: 835 us[0m
 [0][Domain:21] virtio_net_pci(legacy): 0000:00:02.0, io=0xc0c0-0xc1c0
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 1220 us[0m
+[0] [31m[Load new domain] Time elapsed: 1085 us[0m
 [0][Domain:22] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 864 us[0m
+[0] [31m[Load new domain] Time elapsed: 772 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 2635 us[0m
+[0] [31m[Load new domain] Time elapsed: 2906 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 740 us[0m
+[0] [31m[Load new domain] Time elapsed: 518 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 602 us[0m
+[0] [31m[Load new domain] Time elapsed: 1211 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -164,7 +164,7 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 1685 us[0m
+[0] [31m[Load new domain] Time elapsed: 1477 us[0m
 [0][Domain:27] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
 [0][Domain:27] ramfs mount success
@@ -176,13 +176,13 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 1728 us[0m
+[0] [31m[Load new domain] Time elapsed: 1403 us[0m
 [0][Domain:28] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
 [0][Domain:28] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 1547 us[0m
+[0] [31m[Load new domain] Time elapsed: 1365 us[0m
 [0][Domain:29] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
 [0][Domain:29] ramfs mount success
@@ -210,14 +210,163 @@ drwxr-xr-x      4KB usr
 [0] load_domains: after vfs init
 [0] Drop initrd data
 [0] load_domains: before task init
-[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13bea000
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13be2000
 [0][Domain:11] task::current_task: no current tid
-[0][Domain:11] Task::from_elf success: name=/tests/init, tid=1, entry=0x4000000, user_sp=0x4059f80, k_sp=0x13cda000, cpu_id=0, cpus_allowed=0x1
+[0][Domain:11] Task::from_elf success: name=/tests/init, tid=1, entry=0x4000000, user_sp=0x4059f80, k_sp=0x13cd2000, cpu_id=0, cpus_allowed=0x1
 [0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
 [0][Domain:11] init_task enqueue init process tid=1
 [0][Domain:11] Init task domain success
 [0] load_domains: after task init
 [0] Load domains done
 [0] Register task domain and syscall domain to trap system
-[0] [kernel] starting secondary cpus expected=1
-[0] line 184, file kernel/src/trap/x86_64/handler.rs: Kernel page fault at RIP=0x2b24e3, fault_addr=0x6000, error=0x2
+[0] [kernel] starting secondary cpus declared_expected=3
+[0] [x86_ap] prepare trampoline cpu_id=1 paddr=0x8000 vaddr=0xffffff0000206000 size=0x1000
+[0] [x86_ap] send INIT/SIPI cpu_id=1 stack_top=0x393000 apic_id=0x1000000 expect_count=1
+[1] [x86_boot] secondary_entry enter early_cpu=1 magic=0x2badb002
+[1] [x86_boot] secondary_entry handoff early_cpu=1
+[17294103305076670291] [kernel] secondary_main enter cpu_id=1
+[0] [x86_ap] early boot ack cpu_id=1 count=1
+[0] [x86_ap] prepare trampoline cpu_id=2 paddr=0x8000 vaddr=0xffffff0000206000 size=0x1000
+[0] [x86_ap] send INIT/SIPI cpu_id=2 stack_top=0x3d3000 apic_id=0x2000000 expect_count=2
+[1] [kernel] secondary_main percpu ready cpu_id=1
+[1] [x86_platform] platform_init_secondary enter cpu_id=1
+[1] [x86_apic] init_secondary_apic cpu_id=1 x2apic=false
+[1] [x86_apic] init_secondary_apic ready cpu_id=1
+[1] [x86_platform] platform_init_secondary ready cpu_id=1
+[1] [kernel] secondary_main platform ready cpu_id=1
+[1] [kernel] secondary_main memory ready cpu_id=1
+[1] ++++ setup interrupt ++++
+[1] ++++ setup interrupt done, enable:true ++++
+[1] [kernel] secondary_main trap ready cpu_id=1
+[1] [kernel][sched] set_current_tid cpu=1 tid=18446744073709551615
+[1] CPU 1 start...
+[1] [kernel] secondary_main announced ready cpu_id=1 ready_count=1
+[2] [x86_boot] secondary_entry enter early_cpu=2 magic=0x2badb002
+[2] [x86_boot] secondary_entry handoff early_cpu=2
+[17294103305076670291] [kernel] secondary_main enter cpu_id=2
+[2] [kernel] secondary_main percpu ready cpu_id=2
+[2] [x86_platform] platform_init_secondary enter cpu_id=2
+[2] [x86_apic] init_secondary_apic cpu_id=2 x2apic=false
+[2] [x86_apic] init_secondary_apic ready cpu_id=2
+[0] [x86_ap] early boot ack cpu_id=2 count=2
+[0] [x86_ap] prepare trampoline cpu_id=3 paddr=0x8000 vaddr=0xffffff0000206000 size=0x1000
+[0] [x86_ap] send INIT/SIPI cpu_id=3 stack_top=0x413000 apic_id=0x3000000 expect_count=3
+[2] [x86_platform] platform_init_secondary ready cpu_id=2
+[2] [kernel] secondary_main platform ready cpu_id=2
+[2] [kernel] secondary_main memory ready cpu_id=2
+[2] ++++ setup interrupt ++++
+[2] ++++ setup interrupt done, enable:true ++++
+[2] [kernel] secondary_main trap ready cpu_id=2
+[2] [kernel][sched] set_current_tid cpu=2 tid=18446744073709551615
+[2] CPU 2 start...
+[2] [kernel] secondary_main announced ready cpu_id=2 ready_count=2
+[3] [x86_boot] secondary_entry enter early_cpu=3 magic=0x2badb002
+[3] [x86_boot] secondary_entry handoff early_cpu=3
+[17294103305076670291] [kernel] secondary_main enter cpu_id=3
+[3] [kernel] secondary_main percpu ready cpu_id=3
+[3] [x86_platform] platform_init_secondary enter cpu_id=3
+[3] [x86_apic] init_secondary_apic cpu_id=3 x2apic=false
+[3] [x86_apic] init_secondary_apic ready cpu_id=3
+[0] [x86_ap] early boot ack cpu_id=3 count=3
+[0] [kernel] secondary cpu launch result started=3 declared_expected=3
+[3] [x86_platform] platform_init_secondary ready cpu_id=3
+[3] [kernel] secondary_main platform ready cpu_id=3
+[3] [kernel] secondary_main memory ready cpu_id=3
+[3] ++++ setup interrupt ++++
+[3] ++++ setup interrupt done, enable:true ++++
+[3] [kernel] secondary_main trap ready cpu_id=3
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[3] CPU 3 start...
+[3] [kernel] secondary_main announced ready cpu_id=3 ready_count=3
+[3] [kernel] secondary_main released cpu_id=3
+[2] [kernel] secondary_main released cpu_id=2
+[2] run_task bootstrap wake 0 tasks
+[0] [kernel] secondary cpus released count=3
+[0] Begin run task...
+[2] [kernel][sched] set_current_tid cpu=2 tid=18446744073709551615
+[1] [kernel] secondary_main released cpu_id=1
+[3] run_task bootstrap wake 0 tasks
+[1] run_task bootstrap wake 0 tasks
+[0] run_task bootstrap wake 0 tasks
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[0] [kernel][sched] set_current_tid cpu=0 tid=18446744073709551615
+[0] [kernel][sched] cpu=0 switch_to tid=1
+[1] [kernel][sched] set_current_tid cpu=1 tid=18446744073709551615
+[2] [kernel][sched] cpu=2 switch_to tid=0
+[2] [kernel][sched] set_current_tid cpu=2 tid=0
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[0] [kernel][sched] set_current_tid cpu=0 tid=1
+[1] [kernel][sched] set_current_tid cpu=1 tid=18446744073709551615
+[3] [kernel][sched] set_current_tid cpu=3 tid=18446744073709551615
+[2][Domain:11] kthread_init start...
+[2] [kernel][Isched]n yiit perocesld_now cpu=2 currents _tid=isSo runmening
+(0) current_task=some[Init] start 
+/tests/n[2] ew/syscall_all[kern
+el][sched] cpu=2 switch_to tid=0
+[2] [kernel][sched] yield_now cpu=2 current_tid=Some(0) current_task=some
+[2] [kernel][sched] cpu=2 switch_to tid=0
+[2] [kernel][sched] yield_now cpu=2 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[3] [kernel][sched] yield_now cpu=3 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[3] [kernel][sched] yield_now cpu=3 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[3] [kernel][sched] yield_now cpu=3 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[3] [kernel][sched] yield_now cpu=3 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[3] [kernel][sched] yield_now cpu=3 current_tid=Some(0) current_task=some
+[3] [kernel][sched] cpu=3 switch_to tid=0
+[1] [kernel][sched] cpu=1 switch_to tid=0
+[1] [kernel][sched] cpu=1 switch_to tid=0
+[1] [kernel][sched] cpu=1 switch_to tid=0
+[2] [kernel][sched] cpu=2 switch_to tid=0
+[2] [kernel][sched] cpu=2 switch_to tid=0
+[2] [kernel][sched] cpu=2 switch_to tid=0
+[syscall_all] start
+[sys_poll] start
+[sys_poll] empty poll ok
+[sys_poll] write ok
+[sys_poll] ready poll ok
+[sys_poll] read ok
+[sys_poll] timeout poll ok
+[sys_poll] invalid fd poll ok
+[sys_poll] PASS
+[0][Domain:11] release task [3-3]
+[sys_fs] start
+[sys_fs] PASS
+[0][Domain:11] release task [3-3]
+[sys_link] start
+[sys_link] PASS
+[0][Domain:11] release task [3-3]
+[sys_proc] start
+[0][Domain:11] release task [4-4]
+[0][Domain:11] release task [4-4]
+[sys_proc] PASS
+[0][Domain:11] release task [3-3]
+[sys_random] start
+[sys_random] PASS
+[0][Domain:11] release task [3-3]
+[sys_time] start
+[sys_time] PASS
+[0][Domain:11] release task [3-3]
+[syscall_all] PASS
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/new/syscall_all
+[Init] start /tests/ping
+Test socket
+Created socket: 3
+socket bind successes!
+Created socket: 4
+socket bind successes!
+Sent data to server: Ok("Hello Server!")
+receive 13 bytes from client 10.0.2.15:20001
+Received data from client: Ok("Hello Server!")
+Test socket successes!
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/ping
+[Init] all tests passed
+[1m[32mAlien[0m:[1m[34m/[0m# qemu-system-x86_64: terminating on signal 15 from pid 488151 (timeout)

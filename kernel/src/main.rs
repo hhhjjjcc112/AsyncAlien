@@ -58,8 +58,8 @@ static SECONDARY_RUN_RELEASED: AtomicBool = AtomicBool::new(false);
 #[unsafe(no_mangle)]
 fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     platform::clear_bss();
-    platform::platform_init_percpu_primary(boot_cpu_id);
-    task::init_current_tid();
+    platform::percpu_impl::init_percpu_primary(boot_cpu_id);
+    
     println!("[kernel] primary percpu ready cpu_id={}", boot_cpu_id);
     platform::platform_init_primary(boot_cpu_id, boot_info_ptr);
 
@@ -68,7 +68,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 
     #[cfg(all(target_arch = "x86_64", feature = "trap_test"))]
     trap::run_trap_test();
-
+task::init_current_tid();
     println!("Boot CPU {}", boot_cpu_id);
     let machine_info = platform::platform_machine_info();
     println!("{:#?}", machine_info);
@@ -78,10 +78,17 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     
     domain::load_domains().unwrap();
 
-    println!("[kernel] starting secondary cpus expected={}", machine_info.smp.saturating_sub(1));
-    platform::start_other_cpu(boot_cpu_id);
-
-    let expected_secondary = machine_info.smp.saturating_sub(1);
+    let declared_secondary = machine_info.smp.saturating_sub(1);
+    println!(
+        "[kernel] starting secondary cpus declared_expected={}",
+        declared_secondary
+    );
+    let expected_secondary = platform::start_other_cpu(boot_cpu_id);
+    println!(
+        "[kernel] secondary cpu launch result started={} declared_expected={}",
+        expected_secondary,
+        declared_secondary,
+    );
     while SECONDARY_INIT_COUNT.load(Ordering::Acquire) < expected_secondary {
         spin_loop();
     }
@@ -100,10 +107,9 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
     println!("[kernel] secondary_main enter cpu_id={}", cpu_id);
-    platform::platform_init_percpu_secondary(cpu_id);
-    task::init_current_tid();
-    println!("[kernel] secondary_main percpu ready cpu_id={}", cpu_id);
 
+    platform::percpu_impl::init_percpu_secondary(cpu_id);
+    println!("[kernel] secondary_main percpu ready cpu_id={}", cpu_id);
     
     platform::platform_init_secondary(cpu_id);
     println!("[kernel] secondary_main platform ready cpu_id={}", cpu_id);
@@ -114,10 +120,17 @@ fn secondary_main(cpu_id: usize) {
     println!("[kernel] secondary_main trap ready cpu_id={}", cpu_id);
     #[cfg(target_arch = "riscv64")]
     arch::allow_access_user_memory();
+
+    task::init_current_tid();
+
     println!("CPU {} start...", cpu_id);
 
-    SECONDARY_INIT_COUNT.fetch_add(1, Ordering::AcqRel);
-    println!("[kernel] secondary_main announced ready cpu_id={}", cpu_id);
+    let ready_count = SECONDARY_INIT_COUNT.fetch_add(1, Ordering::AcqRel) + 1;
+    println!(
+        "[kernel] secondary_main announced ready cpu_id={} ready_count={}",
+        cpu_id,
+        ready_count,
+    );
     while !SECONDARY_RUN_RELEASED.load(Ordering::Acquire) {
         spin_loop();
     }

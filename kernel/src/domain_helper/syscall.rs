@@ -3,8 +3,8 @@ use core::{any::Any, sync::atomic::AtomicBool};
 
 use config::FRAME_BITS;
 use corelib::{
-    CoreFunction,
     domain_info::{DomainDataInfo, DomainFileInfo},
+    CoreFunction,
 };
 use domain_manager::resource::DOMAIN_RESOURCE;
 use interface::*;
@@ -13,6 +13,7 @@ use task_meta::{OperationResult, TaskOperation};
 
 use crate::{
     domain_helper::{DOMAIN_CREATE, DOMAIN_INFO},
+    domain_proxy::SchedulerDomainProxy,
     domain_proxy::*,
     error::{AlienError, AlienResult},
 };
@@ -52,7 +53,7 @@ impl CoreFunction for DomainSyscall {
     }
 
     fn sys_current_cpu_id(&self) -> usize {
-        arch::cpu_id()
+        platform::percpu_impl::cpu_id()
     }
 
     fn sys_backtrace(&self, domain_id: u64) {
@@ -316,6 +317,9 @@ impl CoreFunction for DomainSyscall {
                 Ok(OperationResult::Null)
             }
             TaskOperation::Current => Ok(OperationResult::Current(crate::task::current_tid())),
+            TaskOperation::GetCpusAllowed => {
+                Ok(OperationResult::CpusAllowed(crate::task::get_cpus_allowed()))
+            }
             TaskOperation::ExitOver(tid) => {
                 Ok(OperationResult::ExitOver(crate::task::is_task_exit(tid)))
             }

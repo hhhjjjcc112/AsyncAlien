@@ -1,17 +1,25 @@
 use alloc::sync::Arc;
-use core::hint::spin_loop;
+use core::{
+    hint::spin_loop,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
 use basic::{
-    arch::{cpu_id, CpuLocal},
+    arch::CpuLocal,
     sync::Mutex,
 };
 use config::CPU_NUM;
+use spin::Lazy;
 use task_meta::{TaskContext, TaskStatus};
 
 use crate::task::{
     resource::TaskMetaExt,
     scheduler::{add_task, fetch_task},
 };
+use platform::percpu_impl::cpu_id;
+
+static SCHEDULE_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+static CURRENT_TID_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// 空闲 CPU 的 tid 哨兵值。
 const NO_TID: usize = usize::MAX;
@@ -43,28 +51,21 @@ impl Cpu {
     }
 }
 
-const CPU_ONE: CpuLocal<Cpu> = CpuLocal::new(Cpu::empty());
-static CPUS: [CpuLocal<Cpu>; CPU_NUM] = [CPU_ONE; CPU_NUM];
+static CPUS: Lazy<[CpuLocal<Cpu>; CPU_NUM]> = Lazy::new(|| {
+    core::array::from_fn(|_| CpuLocal::new(Cpu::empty()))
+});
 
-#[derive(Debug, Copy, Clone)]
-#[repr(transparent)]
-struct CurrentTid(usize);
-
-impl CurrentTid {
-    const fn new(tid: usize) -> Self {
-        Self(tid)
-    }
-}
-
-/// 当前 CPU 的 tid，跟随 percpu 存储。
-#[percpu::def_percpu]
-static CURRENT_TID: CurrentTid = CurrentTid::new(NO_TID);
+static CURRENT_TIDS: Lazy<[CpuLocal<usize>; CPU_NUM]> = Lazy::new(|| {
+    core::array::from_fn(|_| CpuLocal::new(NO_TID))
+});
 
 #[inline(always)]
 fn set_current_tid(tid: usize) {
-    unsafe {
-        CURRENT_TID.current_ref_mut_raw().0 = tid;
+    let trace_idx = CURRENT_TID_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+    if trace_idx < 16 {
+        println!("[kernel][sched] set_current_tid cpu={} tid={}", cpu_id(), tid);
     }
+    *CURRENT_TIDS[cpu_id()].as_mut() = tid;
 }
 
 /// 初始化当前 CPU 的 tid 哨兵。
@@ -77,11 +78,13 @@ pub fn current_cpu() -> &'static mut Cpu {
 }
 
 pub fn current_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
-    CPUS[cpu_id()].current()
+    CPUS[cpu_id()]
+        .current()
+        .or_else(|| current_tid().and_then(crate::task::scheduler::find_task))
 }
 
 pub fn current_tid() -> Option<usize> {
-    let tid = unsafe { CURRENT_TID.current_ref_raw().0 };
+    let tid = *CURRENT_TIDS[cpu_id()].get();
     if tid == NO_TID {
         None
     } else {
@@ -124,6 +127,14 @@ pub fn cpu_loop() {
             next_task.lock().set_status(TaskStatus::Running);
             let next_task_ctx_ptr = next_task.lock().get_context_raw_mut_ptr();
             let next_tid = next_task.lock().tid();
+            let trace_idx = SCHEDULE_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+            if trace_idx < 16 {
+                println!(
+                    "[kernel][sched] cpu={} switch_to tid={}",
+                    cpu_id(),
+                    next_tid,
+                );
+            }
             cpu.set_current(next_task);
             set_current_tid(next_tid);
             let cpu_context = cpu.get_idle_task_cx_ptr();

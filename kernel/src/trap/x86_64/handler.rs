@@ -9,12 +9,13 @@ use platform;
 #[cfg(feature = "trap_test")]
 use super::test;
 use super::{
-    context::{X86TrapFrame, X86TrapFrameExt, fault_address},
+    context::{fault_address, X86TrapFrame, X86TrapFrameExt},
     syscall,
-    user_ctx::{UserTrapResult, current_trap_frame, prepare_user_return},
+    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult},
     vectors,
 };
-use crate::{task_domain, timer};
+use crate::{task::current_tid, task_domain, timer};
+use platform::percpu_impl::cpu_id;
 
 unsafe extern "C" {
     fn strampoline();
@@ -129,7 +130,7 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!(
                 "[{}] External interrupt: IRQ {}",
-                arch::cpu_id(),
+                cpu_id(),
                 v - vectors::IRQ_BASE
             );
             let irq = (v - vectors::IRQ_BASE) as usize;
@@ -207,7 +208,7 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
             trace!(
                 "[{}] External interrupt: IRQ {}",
-                arch::cpu_id(),
+                cpu_id(),
                 v - vectors::IRQ_BASE
             );
             let irq = (v - vectors::IRQ_BASE) as usize;
@@ -252,7 +253,9 @@ pub extern "C" fn trap_return() -> ! {
     let trace_idx = USER_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
     if trace_idx < 8 {
         log::warn!(
-            "[x86 trap_return] user_cr3={:#x}, trap_cx={:#x}",
+            "[x86 trap_return] cpu={} tid={:?} user_cr3={:#x} trap_cx={:#x}",
+            cpu_id(),
+            current_tid(),
             user_cr3,
             trap_cx_ptr
         );

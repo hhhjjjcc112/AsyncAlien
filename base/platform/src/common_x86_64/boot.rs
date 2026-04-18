@@ -4,6 +4,8 @@ use core::arch::global_asm;
 
 use x86_64::registers::control::{Cr0Flags, Cr4Flags, EferFlags};
 
+use crate::cpu_id_early;
+
 /// Multiboot 头标志（内存与地址字段）。
 const MULTIBOOT_HEADER_FLAGS: usize = 0x0001_0002;
 /// Multiboot 头魔数。
@@ -55,23 +57,32 @@ global_asm!(
 #[unsafe(no_mangle)]
 fn main_entry(magic: usize, mbi: usize) {
     // 早期启动标记，确认已进入 Rust 入口。
-    println!("[x86_boot] main_entry magic={:#x} mbi={:#x}", magic, mbi);
+    crate::early_print!("[x86_boot] main_entry magic={:#x} mbi={:#x}\n", magic, mbi);
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         // 进入平台初始化。
-        unsafe { crate::main(arch::cpu_id_early(), mbi) };
+        unsafe { crate::main(cpu_id_early(), mbi) };
     } else {
-        println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
+        crate::early_print!("[x86_boot] invalid multiboot magic: {:#x}\n", magic);
     }
 }
 
 /// 从核汇编入口。
 #[unsafe(no_mangle)]
 fn secondary_entry(magic: usize) {
-    println!("[x86_boot] ap boot");
+    crate::early_print!(
+        "[x86_boot] secondary_entry enter early_cpu={} magic={:#x}\n",
+        cpu_id_early(),
+        magic,
+    );
+    crate::common_x86_64::ap::announce_secondary_cpu_started();
+    crate::early_print!(
+        "[x86_boot] secondary_entry handoff early_cpu={}\n",
+        cpu_id_early(),
+    );
     if magic == MULTIBOOT_BOOTLOADER_MAGIC {
         // 进入从核主函数。
-        unsafe { crate::secondary_main(arch::cpu_id_early()) };
+        unsafe { crate::secondary_main(cpu_id_early()) };
     } else {
-        println!("[x86_boot] invalid multiboot magic: {:#x}", magic);
+        crate::early_print!("[x86_boot] invalid multiboot magic: {:#x}\n", magic);
     }
 }

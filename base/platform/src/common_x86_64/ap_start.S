@@ -5,7 +5,7 @@
 .equ stack_ptr, {start_page_paddr} + 0xff0
 .equ entry_ptr, {start_page_paddr} + 0xff8
 
-# 0x6000
+# 0x8000
 .section .text
 .code16
 .p2align 12

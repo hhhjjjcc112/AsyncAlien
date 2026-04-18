@@ -96,7 +96,7 @@ pub fn is_x2apic() -> bool {
 
 /// 获取当前 CPU ID。
 pub fn current_cpu_id() -> usize {
-    arch::cpu_id()
+    crate::current_cpu_id()
 }
 
 /// 发送 APIC EOI。
