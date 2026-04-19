@@ -10,13 +10,12 @@ use spin::Once;
 use task_meta::{TaskSchedulingInfo, TaskStatus};
 
 use super::{
-    processor::{clear_task_last_cpu, schedule},
+    processor::schedule,
     resource::TaskMetaExt,
 };
 use crate::task::processor::current_task;
 type Tid = usize;
 static TASK_MAP: Mutex<BTreeMap<Tid, Arc<Mutex<TaskMetaExt>>>> = Mutex::new(BTreeMap::new());
-static TASK_LOOKUP: Mutex<BTreeMap<Tid, Weak<Mutex<TaskMetaExt>>>> = Mutex::new(BTreeMap::new());
 pub(super) static GLOBAL_SCHEDULER: Once<Arc<dyn SchedulerDomain>> = Once::new();
 
 #[macro_export]
@@ -35,13 +34,12 @@ pub fn add_task(task_meta: Arc<Mutex<TaskMetaExt>>) {
     let scheduling_info = guard.take_scheduling_info();
     let tid = scheduling_info.tid;
     drop(guard);
-    TASK_LOOKUP.lock().insert(tid, Arc::downgrade(&task_meta));
     TASK_MAP.lock().insert(tid, task_meta);
     global_scheduler!().add_task(scheduling_info).unwrap();
 }
 
 pub fn find_task(tid: Tid) -> Option<Arc<Mutex<TaskMetaExt>>> {
-    TASK_LOOKUP.lock().get(&tid).and_then(Weak::upgrade)
+    TASK_MAP.lock().get(&tid).cloned()
 }
 
 pub fn fetch_task() -> Option<Arc<Mutex<TaskMetaExt>>> {
@@ -100,8 +98,6 @@ pub fn exit_now() {
 }
 
 pub fn remove_task(tid: Tid) {
-    TASK_LOOKUP.lock().remove(&tid);
-    clear_task_last_cpu(tid);
     let task = TASK_EXIT_QUEUE.lock().remove(&tid).unwrap();
     let status = task.lock().status();
     assert_eq!(status, TaskStatus::Terminated);

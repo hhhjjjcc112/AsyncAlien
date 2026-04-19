@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-# build_vdso = { git = "https://github.com/rosy233333/vdso_crate_template", package = "build_vdso" }
-build_vdso = { path = "../build_vdso" }
+build_vdso = { git = "https://github.com/rosy233333/vdso_crate_template", package = "build_vdso" }
+# build_vdso = { path = "../build_vdso" }

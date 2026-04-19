@@ -45,24 +45,10 @@ pub fn init_primary_apic() {
         );
     }
 
-    let mut builder = LocalApicBuilder::new();
-    builder
-        .spurious_vector(vectors::APIC_SPURIOUS_VECTOR as _)
-        .timer_vector(vectors::APIC_TIMER_VECTOR as _)
-        .error_vector(vectors::APIC_ERROR_VECTOR as _);
-
-    if is_x2apic {
-        println!("[x86_apic] x2APIC mode enabled");
-    } else {
-        builder.set_xapic_base(unsafe { xapic_base() } + PHYS_VIRT_OFFSET);
-        println!("[x86_apic] xAPIC mode enabled");
-    }
-
-    let mut apic = builder.build().unwrap();
+    let mut apic = build_local_apic();
     unsafe {
         apic.enable();
-        #[allow(static_mut_refs)]
-        LOCAL_APIC.write(apic);
+        *local_apic_slot() = MaybeUninit::new(apic);
     }
 
     // 初始化 I/O APIC。
@@ -82,11 +68,31 @@ pub fn init_secondary_apic() {
     println!("[x86_apic] init_secondary_apic ready cpu_id={}", current_cpu_id());
 }
 
+fn build_local_apic() -> LocalApic {
+    let mut builder = LocalApicBuilder::new();
+    builder
+        .spurious_vector(vectors::APIC_SPURIOUS_VECTOR as _)
+        .timer_vector(vectors::APIC_TIMER_VECTOR as _)
+        .error_vector(vectors::APIC_ERROR_VECTOR as _);
+
+    if is_x2apic() {
+        println!("[x86_apic] x2APIC mode enabled");
+    } else {
+        builder.set_xapic_base(unsafe { xapic_base() } + PHYS_VIRT_OFFSET);
+        println!("[x86_apic] xAPIC mode enabled");
+    }
+
+    builder.build().unwrap()
+}
+
+unsafe fn local_apic_slot() -> *mut MaybeUninit<LocalApic> {
+    core::ptr::addr_of_mut!(LOCAL_APIC)
+}
+
 /// 获取 Local APIC 可变引用。
 /// 必须在 APIC 初始化后调用。
 pub unsafe fn get_local_apic() -> &'static mut LocalApic {
-    #[allow(static_mut_refs)]
-    unsafe { LOCAL_APIC.assume_init_mut() }
+    unsafe { &mut *(*local_apic_slot()).as_mut_ptr() }
 }
 
 /// 是否运行在 x2APIC 模式。

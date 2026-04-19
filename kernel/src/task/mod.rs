@@ -28,10 +28,7 @@ pub use self::x86_64::{
     switch,
 };
 #[cfg(target_arch = "x86_64")]
-pub(crate) use self::x86_64::{
-    should_trace_task, should_trace_tid, trace_current_state, trace_task_context_state,
-    X86StateTrace,
-};
+pub(crate) use self::x86_64::should_trace_tid;
 use crate::{
     error::AlienResult,
     task::{resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},

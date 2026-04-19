@@ -3,8 +3,13 @@ ARCH ?= riscv64
 TARGET_riscv64 := riscv64gc-unknown-none-elf
 TARGET_x86_64 := x86_64-unknown-none
 TARGET := $(TARGET_$(ARCH))
+USERLIB_EXTRA_RUSTFLAGS ?=
+RUSTFLAGS_PREFIX :=
+ifneq ($(strip $(USERLIB_EXTRA_RUSTFLAGS)),)
+RUSTFLAGS_PREFIX := RUSTFLAGS="$$RUSTFLAGS $(USERLIB_EXTRA_RUSTFLAGS)"
+endif
 APPS := $(shell ls -d */)
-compile := cargo build --release --target $(TARGET)
+compile := $(RUSTFLAGS_PREFIX) cargo build --release --target $(TARGET)
 mode := release
 target := ../../target/$(TARGET)/$(mode)/
 APPS_NAME := $(shell ls -d */ | cut -d '/' -f 1)

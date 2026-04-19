@@ -8,7 +8,12 @@ LINKER := $(LINKER_$(ARCH))
 LINKER_ENV_riscv64 := CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER
 LINKER_ENV_x86_64 := CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER
 LINKER_ENV := $(LINKER_ENV_$(ARCH))
-compile := $(LINKER_ENV)=$(LINKER) cargo build --release --target $(TARGET) -Z build-std=core,std,panic_abort
+USERLIB_EXTRA_RUSTFLAGS ?=
+RUSTFLAGS_PREFIX :=
+ifneq ($(strip $(USERLIB_EXTRA_RUSTFLAGS)),)
+RUSTFLAGS_PREFIX := RUSTFLAGS="$$RUSTFLAGS $(USERLIB_EXTRA_RUSTFLAGS)"
+endif
+compile := $(LINKER_ENV)=$(LINKER) $(RUSTFLAGS_PREFIX) cargo build --release --target $(TARGET) -Z build-std=core,std,panic_abort
 mode := release
 target := ../../target/$(TARGET)/$(mode)/
 IMG ?= ../../build/sdcard.img

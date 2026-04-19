@@ -693,6 +693,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "build_vdso"
+version = "0.1.0"
+source = "git+https://github.com/rosy233333/vdso_crate_template#b1bfcbc821c89c7be789ecd6baa4d613046b3d25"
+dependencies = [
+ "regex",
+ "xmas-elf 0.9.1",
+]
+
+[[package]]
 name = "built"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6951,7 +6960,7 @@ dependencies = [
 name = "vdso_builder"
 version = "0.1.0"
 dependencies = [
- "build_vdso",
+ "build_vdso 0.1.0 (git+https://github.com/rosy233333/vdso_crate_template)",
 ]
 
 [[package]]

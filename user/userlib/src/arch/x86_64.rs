@@ -12,6 +12,7 @@ extern "C" fn _start() -> ! {
     }
 }
 
+#[cfg(not(int80_syscall))]
 pub(crate) fn syscall(id: usize, args: [usize; 6]) -> isize {
     let mut ret: isize;
     unsafe {
@@ -28,6 +29,35 @@ pub(crate) fn syscall(id: usize, args: [usize; 6]) -> isize {
             lateout("rcx") _,
             lateout("r11") _,
             options(nostack),
+        );
+    }
+    ret
+}
+
+#[cfg(int80_syscall)]
+pub(crate) fn syscall(id: usize, args: [usize; 6]) -> isize {
+    let mut ret: isize;
+    unsafe {
+        // int 0x80 走 legacy x86 约定：rax=号，rbx/rcx/rdx/rsi/rdi/rbp=参数。
+        asm!(
+            "push rbx",
+            "push rbp",
+            "mov rbx, {arg0}",
+            "mov rcx, {arg1}",
+            "mov rdx, {arg2}",
+            "mov rsi, {arg3}",
+            "mov rdi, {arg4}",
+            "mov rbp, {arg5}",
+            "int 0x80",
+            "pop rbp",
+            "pop rbx",
+            arg0 = in(reg) args[0],
+            arg1 = in(reg) args[1],
+            arg2 = in(reg) args[2],
+            arg3 = in(reg) args[3],
+            arg4 = in(reg) args[4],
+            arg5 = in(reg) args[5],
+            inlateout("rax") id as isize => ret,
         );
     }
     ret

@@ -10,18 +10,16 @@ use super::test;
 use super::{
     context::{fault_address, X86TrapFrame, X86TrapFrameExt},
     syscall,
-    user_ctx::{consume_user_return_trace_budget, current_trap_frame, current_trap_state,
-        prepare_user_return, UserTrapResult},
+    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult},
     vectors,
 };
 use crate::{
     task::{
         current_tid,
-        should_trace_tid, trace_current_state, X86StateTrace,
+        should_trace_tid,
     },
     task_domain, timer,
 };
-use mem::PhysAddr;
 
 unsafe extern "C" {
     fn strampoline();
@@ -80,16 +78,12 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
         vectors::GENERAL_PROTECTION => {
-            trace_current_state("user_general_protection", current_trap_state(frame));
             panic!(
                 "General protection fault at RIP={:#x}, error_code={:#x}",
                 frame.rip, frame.error_code
             );
         }
         vectors::PAGE_FAULT => {
-            if should_trace_tid(current_tid()) {
-                trace_current_state("user_page_fault", current_trap_state(frame));
-            }
             let fault_addr = fault_address();
             match task_domain!().do_load_page_fault(fault_addr) {
                 Ok(()) => {
@@ -260,29 +254,15 @@ pub extern "C" fn trap_return() -> ! {
         user_cr3,
         trap_cx_ptr,
     } = prepare_user_return();
-    let frame = X86TrapFrame::from_raw_phy_ptr(PhysAddr::from(
-        crate::task_domain!().trap_frame_phy_addr().unwrap(),
-    ));
-    if should_trace_tid(current_tid()) {
-        if frame.vector == 0 {
-            syscall::arm_syscall_entry_trace();
-        }
-        if consume_user_return_trace_budget() {
-            let trap_state = current_trap_state(frame);
-            trace_current_state(
-                "trap_return",
-                X86StateTrace::from_frame(
-                    frame,
-                    trap_state.trap_frame_phy,
-                    trap_cx_ptr,
-                    user_cr3,
-                ),
-            );
-        }
-    }
     // 返回代码必须位于 trampoline 共享映射中，避免切到用户 CR3 后取指失败。
     let ret_va = x86_trampoline_return as *const () as usize - strampoline as *const () as usize
         + TRAMPOLINE;
+    
+    let cpuid = cpu_id();
+    println!(
+            "[x86 trap] returning to user mode: cpu={} user_cr3={:#x} trap_cx_ptr={:#x} ret_va={:#x}",
+            cpuid, user_cr3, trap_cx_ptr, ret_va
+        );
     unsafe {
         asm!(
             "jmp {ret}",

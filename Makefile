@@ -65,7 +65,7 @@ NET ?= y
 NET_HOSTFWD ?= y
 NET_FWD_PORT_TCP ?= 55555
 NET_FWD_PORT_UDP ?= 5555
-SMP ?= 2
+SMP ?= 1
 MEMORY_SIZE := 2048M
 X86_MACHINE ?= q35
 X86_ACCEL ?= tcg
@@ -108,12 +108,20 @@ VDSO_VERBOSE ?= 0
 BUILD_CFG ?=  -Z build-std=core,alloc -Z build-std-features=compiler-builtins-mem
 BENCH ?= n
 RUN_TIMEOUT ?= 60s
+USE_INT80_SYSCALL ?= n
 USER_INITRD_DIR := user/initrd
 USER_INITRAMFS_DIR := $(USER_INITRD_DIR)/initramfs-$(ARCH_KIND)
 USER_INITRD_STAMP := build/.user_initrd_$(ARCH_KIND).stamp
 comma:= ,
 empty:=
 space:= $(empty) $(empty)
+USERLIB_EXTRA_RUSTFLAGS :=
+
+ifeq ($(ARCH_KIND),x86_64)
+ifeq ($(USE_INT80_SYSCALL),y)
+USERLIB_EXTRA_RUSTFLAGS := --cfg int80_syscall --check-cfg=cfg(int80_syscall)
+endif
+endif
 
 QEMU_ARGS :=
 
@@ -270,6 +278,7 @@ help:
 	@echo "  DOMAIN_APIC_TEST=y/n    Enable domain_apic_test feature"
 	@echo "  DOMAIN_UART_TEST=y/n    Enable domain_uart_test feature"
 	@echo "  DOMAIN_BLOCK_TEST=y/n   Enable domain_block_test feature"
+	@echo "  USE_INT80_SYSCALL=y/n   Switch x86_64 userlib to int 0x80"
 	@echo "  VF2_SD=y/n              Enable VF2 SD card support (default: n)"
 	@echo "  VDSO_TOOLCHAIN=...      vDSO toolchain (default: nightly-2026-01-23)"
 	@echo "  VDSO_VERBOSE=0/1/2      vDSO build verbosity"
@@ -378,9 +387,9 @@ check_mtools:
 
 user: check_mtools
 	@echo "Building user apps"
-	@make all -C ./user/apps ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
-	@make all -C ./user/tests ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
-	@make all -C ./user/musl ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY)
+	@make all -C ./user/apps ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY) USERLIB_EXTRA_RUSTFLAGS="$(USERLIB_EXTRA_RUSTFLAGS)"
+	@make all -C ./user/tests ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY) USERLIB_EXTRA_RUSTFLAGS="$(USERLIB_EXTRA_RUSTFLAGS)"
+	@make all -C ./user/musl ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY) USERLIB_EXTRA_RUSTFLAGS="$(USERLIB_EXTRA_RUSTFLAGS)"
 	@echo "Building user apps done"
 
 
