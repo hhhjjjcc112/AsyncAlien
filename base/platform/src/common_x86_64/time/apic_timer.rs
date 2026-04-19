@@ -15,14 +15,16 @@ const KERNEL_TICKS_PER_SEC: u64 = 10;
 /// 统计APIC timer编程次数
 #[cfg(feature = "apic_timer_test")]
 static APIC_TIMER_PROGRAM_COUNT: AtomicU64 = AtomicU64::new(0);
+#[cfg(feature = "apic_timer_test")]
+static APIC_TIMER_SET_TRACE_COUNT: AtomicU64 = AtomicU64::new(0);
+
 
 #[inline]
-fn program_disabled_timer(local_apic: &mut x2apic::lapic::LocalApic) {
+fn program_oneshot_timer(local_apic: &mut x2apic::lapic::LocalApic) {
     unsafe {
-        local_apic.disable_timer();
         local_apic.set_timer_divide(TimerDivide::Div1);
         local_apic.set_timer_mode(TimerMode::OneShot);
-        local_apic.set_timer_initial(0);
+        local_apic.enable_timer();
     }
 }
 
@@ -52,7 +54,7 @@ pub fn init_primary_apic_timer() {
 
     let local_apic = unsafe { get_local_apic() };
     if APIC_TIMER_ONESHOT {
-        program_disabled_timer(local_apic);
+        program_oneshot_timer(local_apic);
     } else {
         program_periodic_timer(local_apic);
     }
@@ -61,16 +63,30 @@ pub fn init_primary_apic_timer() {
         if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
         APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
     );
+    #[cfg(feature = "apic_timer_test")]
+    println!(
+        "[apic_timer_test] init_primary cpu={} freq={}Hz mode={}",
+        crate::common_x86_64::apic::current_cpu_id(),
+        APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
+        if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
+    );
 }
 
 /// Initialize APIC timer for secondary CPUs (AP)
 pub fn init_secondary_apic_timer() {
     let local_apic = unsafe { get_local_apic() };
     if APIC_TIMER_ONESHOT {
-        program_disabled_timer(local_apic);
+        program_oneshot_timer(local_apic);
     } else {
         program_periodic_timer(local_apic);
     }
+    #[cfg(feature = "apic_timer_test")]
+    println!(
+        "[apic_timer_test] init_secondary cpu={} freq={}Hz mode={}",
+        crate::common_x86_64::apic::current_cpu_id(),
+        APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
+        if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
+    );
 }
 
 /// Calibrate APIC timer frequency using TSC
@@ -97,6 +113,13 @@ fn calibrate_apic_timer() {
         log::warn!("APIC timer calibration returned 0, use fallback 1 Hz");
     }
     APIC_TIMER_FREQUENCY.store(frequency, Ordering::SeqCst);
+    #[cfg(feature = "apic_timer_test")]
+    println!(
+        "[apic_timer_test] calibrate cpu={} elapsed={} freq={}Hz",
+        crate::common_x86_64::apic::current_cpu_id(),
+        elapsed,
+        frequency,
+    );
 
     // Stop the timer
     unsafe {
@@ -131,10 +154,22 @@ pub fn set_apic_timer(deadline_ns: u64) {
 
     let local_apic = unsafe { get_local_apic() };
     unsafe {
-        local_apic.enable_timer();
-        local_apic.set_timer_divide(TimerDivide::Div1);
-        local_apic.set_timer_mode(TimerMode::OneShot);
         local_apic.set_timer_initial(ticks);
+    }
+    #[cfg(feature = "apic_timer_test")]
+    {
+        let trace_idx = APIC_TIMER_SET_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
+        if trace_idx < 8 {
+            let current = unsafe { local_apic.timer_current() };
+            println!(
+                "[apic_timer_test] set cpu={} deadline_ns={} freq={} ticks={} current={}",
+                crate::common_x86_64::apic::current_cpu_id(),
+                deadline_ns,
+                freq,
+                ticks,
+                current,
+            );
+        }
     }
 }
 
@@ -149,18 +184,11 @@ pub fn set_timer_at_tsc(deadline_tsc: u64) {
     let current_tsc = super::tsc::current_ticks();
     if deadline_tsc <= current_tsc {
         // Deadline passed, fire immediately
-        set_apic_timer(0);
+        set_apic_timer(1);
         return;
     }
 
     let delta_tsc = deadline_tsc - current_tsc;
     let delta_ns = super::tsc::ticks_to_nanos(delta_tsc);
     set_apic_timer(delta_ns);
-}
-
-/// Disable APIC timer
-#[allow(dead_code)]
-pub fn disable_apic_timer() {
-    let local_apic = unsafe { get_local_apic() };
-    program_disabled_timer(local_apic);
 }

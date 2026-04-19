@@ -26,5 +26,6 @@
     ],
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-proc-macro"
-    ]
+    ],
+    "window.zoomLevel": 0
 }

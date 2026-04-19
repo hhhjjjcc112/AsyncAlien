@@ -317,9 +317,6 @@ impl CoreFunction for DomainSyscall {
                 Ok(OperationResult::Null)
             }
             TaskOperation::Current => Ok(OperationResult::Current(crate::task::current_tid())),
-            TaskOperation::GetCpusAllowed => {
-                Ok(OperationResult::CpusAllowed(crate::task::get_cpus_allowed()))
-            }
             TaskOperation::ExitOver(tid) => {
                 Ok(OperationResult::ExitOver(crate::task::is_task_exit(tid)))
             }

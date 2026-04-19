@@ -1,35 +1,41 @@
 use core::{
     arch::asm,
-    sync::atomic::{AtomicUsize, Ordering},
 };
 
 use config::TRAMPOLINE;
-use platform;
+use platform::{self, percpu_impl::cpu_id};
 
 #[cfg(feature = "trap_test")]
 use super::test;
 use super::{
     context::{fault_address, X86TrapFrame, X86TrapFrameExt},
     syscall,
-    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult},
+    user_ctx::{consume_user_return_trace_budget, current_trap_frame, current_trap_state,
+        prepare_user_return, UserTrapResult},
     vectors,
 };
-use crate::{task::current_tid, task_domain, timer};
-use platform::percpu_impl::cpu_id;
+use crate::{
+    task::{
+        current_tid,
+        should_trace_tid, trace_current_state, X86StateTrace,
+    },
+    task_domain, timer,
+};
+use mem::PhysAddr;
 
 unsafe extern "C" {
     fn strampoline();
     fn x86_trampoline_return(user_cr3: usize, trap_cx_ptr: usize) -> !;
 }
 
-static USER_TRAP_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
-static USER_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 /// 统计用户态APIC timer中断触发次数
 #[cfg(feature = "apic_timer_test")]
-static APIC_TIMER_USER_TRAP_COUNT: AtomicUsize = AtomicUsize::new(0);
+static APIC_TIMER_USER_TRAP_COUNT: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
 /// 统计内核态APIC timer中断触发次数
 #[cfg(feature = "apic_timer_test")]
-static APIC_TIMER_KERNEL_TRAP_COUNT: AtomicUsize = AtomicUsize::new(0);
+static APIC_TIMER_KERNEL_TRAP_COUNT: core::sync::atomic::AtomicUsize =
+    core::sync::atomic::AtomicUsize::new(0);
 
 /// 内核态 trap 处理函数
 /// 由 trampoline.asm 中的 .Ltrap_common 直接调用
@@ -37,6 +43,7 @@ static APIC_TIMER_KERNEL_TRAP_COUNT: AtomicUsize = AtomicUsize::new(0);
 /// 返回后汇编自动 ret，继续执行恢复寄存器并 iretq
 #[unsafe(no_mangle)]
 pub extern "C" fn kernel_trap_handler(frame: &mut X86TrapFrame) {
+    println!("trap_from_kernel");
     if frame.is_user() {
         panic!("kernel_trap_handler: received user-mode trap");
     }
@@ -60,15 +67,6 @@ pub extern "C" fn user_trap_vector() -> UserTrapResult {
 
 fn handle_user_trap(frame: &mut X86TrapFrame) {
     let vec = frame.vector as u8;
-    let trace_idx = USER_TRAP_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 16 {
-        log::warn!(
-            "[x86 user trap] vec={}, rip={:#x}, err={:#x}",
-            vec,
-            frame.rip,
-            frame.error_code
-        );
-    }
 
     match vec {
         vectors::DIVIDE_ERROR => panic!("Divide error at RIP={:#x}", frame.rip),
@@ -82,20 +80,29 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
         vectors::INVALID_OPCODE => panic!("Invalid opcode at RIP={:#x}", frame.rip),
         vectors::GENERAL_PROTECTION => {
+            trace_current_state("user_general_protection", current_trap_state(frame));
             panic!(
                 "General protection fault at RIP={:#x}, error_code={:#x}",
                 frame.rip, frame.error_code
             );
         }
         vectors::PAGE_FAULT => {
+            if should_trace_tid(current_tid()) {
+                trace_current_state("user_page_fault", current_trap_state(frame));
+            }
             let fault_addr = fault_address();
             match task_domain!().do_load_page_fault(fault_addr) {
                 Ok(()) => {
-                    log::debug!(
-                        "Page fault handled: addr={:#x}, RIP={:#x}",
-                        fault_addr,
-                        frame.rip
-                    );
+                    if should_trace_tid(current_tid()) {
+                        println!(
+                            "[x86 page fault handled] cpu={} tid={:?} addr={:#x} rip={:#x} err={:#x}",
+                            cpu_id(),
+                            current_tid(),
+                            fault_addr,
+                            frame.rip,
+                            frame.error_code,
+                        );
+                    }
                 }
                 Err(err) => {
                     panic!(
@@ -110,7 +117,8 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         vectors::APIC_TIMER => {
             #[cfg(feature = "apic_timer_test")]
             {
-                let count = APIC_TIMER_USER_TRAP_COUNT.fetch_add(1, Ordering::Relaxed);
+                let count = APIC_TIMER_USER_TRAP_COUNT
+                    .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
                 if count % 10 == 0 {
                     println!("[apic_timer_test] 用户态中断触发 count={}", count);
                 }
@@ -118,8 +126,9 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
             if platform::config::APIC_TIMER_ONESHOT {
                 timer::set_next_trigger();
             }
-            crate::task::yield_now();
+            // 先在本核完成中断收尾，避免任务切走甚至迁移后再向错误 LAPIC 发送 EOI。
             send_apic_eoi();
+            crate::task::yield_now();
         }
 
         vectors::SYSCALL => {
@@ -192,7 +201,8 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::APIC_TIMER => {
             #[cfg(feature = "apic_timer_test")]
             {
-                let count = APIC_TIMER_KERNEL_TRAP_COUNT.fetch_add(1, Ordering::Relaxed);
+                let count = APIC_TIMER_KERNEL_TRAP_COUNT
+                    .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
                 if count % 10 == 0 {
                     println!("[apic_timer_test] 内核态中断触发 count={}", count);
                 }
@@ -250,15 +260,25 @@ pub extern "C" fn trap_return() -> ! {
         user_cr3,
         trap_cx_ptr,
     } = prepare_user_return();
-    let trace_idx = USER_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 8 {
-        log::warn!(
-            "[x86 trap_return] cpu={} tid={:?} user_cr3={:#x} trap_cx={:#x}",
-            cpu_id(),
-            current_tid(),
-            user_cr3,
-            trap_cx_ptr
-        );
+    let frame = X86TrapFrame::from_raw_phy_ptr(PhysAddr::from(
+        crate::task_domain!().trap_frame_phy_addr().unwrap(),
+    ));
+    if should_trace_tid(current_tid()) {
+        if frame.vector == 0 {
+            syscall::arm_syscall_entry_trace();
+        }
+        if consume_user_return_trace_budget() {
+            let trap_state = current_trap_state(frame);
+            trace_current_state(
+                "trap_return",
+                X86StateTrace::from_frame(
+                    frame,
+                    trap_state.trap_frame_phy,
+                    trap_cx_ptr,
+                    user_cr3,
+                ),
+            );
+        }
     }
     // 返回代码必须位于 trampoline 共享映射中，避免切到用户 CR3 后取指失败。
     let ret_va = x86_trampoline_return as *const () as usize - strampoline as *const () as usize

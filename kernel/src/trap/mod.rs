@@ -29,6 +29,8 @@ use platform::println;
 pub use riscv64::*;
 #[cfg(target_arch = "x86_64")]
 pub use x86_64::*;
+#[cfg(target_arch = "x86_64")]
+pub(crate) use x86_64::{arm_user_return_trace, drain_syscall_entry_trace};
 
 #[cfg(target_arch = "riscv64")]
 global_asm!(include_str!("./riscv64/kernel_v.asm"));

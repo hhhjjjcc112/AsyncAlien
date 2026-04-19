@@ -14,6 +14,8 @@ pub use handler::{trap_return, user_trap_vector};
 pub use test::run as run_trap_test;
 use idt::init_idt;
 
+pub(crate) use user_ctx::arm_user_return_trace;
+pub(crate) use syscall::drain_syscall_entry_trace;
 use crate::trap::x86_64::syscall::init_syscall;
 
 #[inline]

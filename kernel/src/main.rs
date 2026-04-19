@@ -68,7 +68,7 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 
     #[cfg(all(target_arch = "x86_64", feature = "trap_test"))]
     trap::run_trap_test();
-task::init_current_tid();
+    task::init_current_tid();
     println!("Boot CPU {}", boot_cpu_id);
     let machine_info = platform::platform_machine_info();
     println!("{:#?}", machine_info);

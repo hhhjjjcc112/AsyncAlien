@@ -15,8 +15,8 @@ use ksync::Mutex;
 use platform::percpu_impl::cpu_id;
 pub use processor::{current_task, current_tid, init_current_tid};
 pub use scheduler::{
-    exit_now, get_cpus_allowed, get_task_priority, is_task_exit, remove_task, set_task_priority,
-    wait_now, wake_up_wait_task, yield_now,
+    exit_now, get_task_priority, is_task_exit, remove_task, set_task_priority, wait_now,
+    wake_up_wait_task, yield_now,
 };
 use task_meta::{TaskMeta, TaskStatus};
 
@@ -26,6 +26,11 @@ pub use self::riscv64::switch;
 pub use self::x86_64::{
     current_user_fs_base, current_user_gs_base, set_current_user_fs_base, set_current_user_gs_base,
     switch,
+};
+#[cfg(target_arch = "x86_64")]
+pub(crate) use self::x86_64::{
+    should_trace_task, should_trace_tid, trace_current_state, trace_task_context_state,
+    X86StateTrace,
 };
 use crate::{
     error::AlienResult,

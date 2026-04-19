@@ -1,5 +1,7 @@
-use alloc::{collections::BTreeMap, sync::{Arc, Weak}};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::{
+    collections::BTreeMap,
+    sync::{Arc, Weak},
+};
 
 use basic::sync::Mutex;
 use interface::SchedulerDomain;
@@ -7,14 +9,15 @@ use shared_heap::DBox;
 use spin::Once;
 use task_meta::{TaskSchedulingInfo, TaskStatus};
 
-use super::{processor::{current_tid, schedule}, resource::TaskMetaExt};
+use super::{
+    processor::{clear_task_last_cpu, schedule},
+    resource::TaskMetaExt,
+};
 use crate::task::processor::current_task;
-use platform::percpu_impl::cpu_id;
 type Tid = usize;
 static TASK_MAP: Mutex<BTreeMap<Tid, Arc<Mutex<TaskMetaExt>>>> = Mutex::new(BTreeMap::new());
 static TASK_LOOKUP: Mutex<BTreeMap<Tid, Weak<Mutex<TaskMetaExt>>>> = Mutex::new(BTreeMap::new());
 pub(super) static GLOBAL_SCHEDULER: Once<Arc<dyn SchedulerDomain>> = Once::new();
-static YIELD_NONE_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 #[macro_export]
 macro_rules! global_scheduler {
@@ -62,6 +65,7 @@ pub fn wait_now() {
     let task = current_task().unwrap();
     task.lock().set_status(TaskStatus::Waiting);
     let tid = task.lock().tid();
+    println!("[kernel][sched] wait_now tid={}", tid);
     TASK_WAIT_QUEUE.lock().insert(tid, task);
     schedule();
 }
@@ -69,32 +73,19 @@ pub fn wait_now() {
 pub fn wake_up_wait_task(tid: Tid) {
     let task = TASK_WAIT_QUEUE.lock().remove(&tid);
     if let Some(task) = task {
+        println!("[kernel][sched] wake_up_wait_task tid={}", tid);
         // put the task into the global task queue
         task.lock().set_status(TaskStatus::Ready);
         add_task(task);
+    } else {
+        println!("[kernel][sched] wake_up_wait_task miss tid={}", tid);
     }
 }
 
 pub fn yield_now() {
     let Some(task) = current_task() else {
-        let trace_idx = YIELD_NONE_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-        if trace_idx < 8 {
-            println!(
-                "[kernel][sched] yield_now without current task cpu={} current_tid={:?}",
-                cpu_id(),
-                current_tid(),
-            );
-        }
         return;
     };
-    let trace_idx = YIELD_NONE_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 8 {
-        println!(
-            "[kernel][sched] yield_now cpu={} current_tid={:?} current_task=some",
-            cpu_id(),
-            current_tid(),
-        );
-    }
     task.lock().set_status(TaskStatus::Ready);
     schedule();
 }
@@ -103,12 +94,14 @@ pub fn exit_now() {
     let task = current_task().unwrap();
     let tid = task.lock().tid();
     task.lock().set_status(TaskStatus::Zombie);
+    println!("[kernel][sched] exit_now tid={}", tid);
     TASK_EXIT_QUEUE.lock().insert(tid, task);
     schedule();
 }
 
 pub fn remove_task(tid: Tid) {
     TASK_LOOKUP.lock().remove(&tid);
+    clear_task_last_cpu(tid);
     let task = TASK_EXIT_QUEUE.lock().remove(&tid).unwrap();
     let status = task.lock().status();
     assert_eq!(status, TaskStatus::Terminated);
@@ -137,10 +130,4 @@ pub fn get_task_priority() -> i8 {
     let task = current_task().unwrap();
     let guard = task.lock();
     guard.scheduling_info.as_ref().unwrap().nice()
-}
-
-pub fn get_cpus_allowed() -> usize {
-    let task = current_task().unwrap();
-    let guard = task.lock();
-    guard.scheduling_info.as_ref().unwrap().cpus_allowed
 }

@@ -6,7 +6,12 @@
 # syscall 入口仅依赖这两个 percpu 符号：用户 rsp 暂存 + TSS.rsp0 读取。
 .extern __PERCPU_USER_RSP
 .extern __PERCPU_TSS
+.extern __PERCPU_SYSCALL_TRACE_ARMED
+.extern __PERCPU_SYSCALL_TRACE_STAGE
+.extern __PERCPU_SYSCALL_TRACE_RIP
+.extern __PERCPU_SYSCALL_TRACE_RSP0
 .extern x86_syscall_handler
+.extern x86_syscall_entry_stage2
 
 # TrapFrame 槽位偏移（单位：字节）
 .equ TF_VECTOR, 136
@@ -15,6 +20,8 @@
 # syscall handler 的地址也存储在 trampoline 中
 syscall_handler_ptr:
     .quad x86_syscall_handler
+syscall_stage2_ptr:
+    .quad x86_syscall_entry_stage2
 
 
 .align 8
@@ -28,6 +35,13 @@ syscall_entry:
 
     # 从 per-cpu TSS 读取 rsp0（TrapContext 末尾）。
     mov rsp, qword ptr gs:[offset __PERCPU_TSS + {tss_rsp0_offset}]
+
+    cmp qword ptr gs:[offset __PERCPU_SYSCALL_TRACE_ARMED], 0
+    je .Lskip_syscall_trace_stage1
+    mov qword ptr gs:[offset __PERCPU_SYSCALL_TRACE_STAGE], 1
+    mov qword ptr gs:[offset __PERCPU_SYSCALL_TRACE_RIP], rcx
+    mov qword ptr gs:[offset __PERCPU_SYSCALL_TRACE_RSP0], rsp
+.Lskip_syscall_trace_stage1:
 
     # 使用 push 直接构造 TrapContext。
     # 跳过不需要的槽位：ss/cs/error_code/vector。
@@ -62,6 +76,12 @@ syscall_entry:
     mov cr3, r13
     # 此处进入内核地址空间
     mov rsp, r14
+
+    mov rdi, rcx
+    mov rsi, r14
+    mov rdx, r13
+    mov r15, [syscall_stage2_ptr]
+    call r15
 
     # 调用 syscall handler
     mov r15, [syscall_handler_ptr]

@@ -1,13 +1,14 @@
 use core::{
     arch::global_asm,
-    sync::atomic::{AtomicUsize, Ordering},
 };
 
 use config::{PERCPU_MIRROR_BASE, TRAMPOLINE};
+use percpu::read_percpu_reg;
+use platform::percpu_impl::cpu_id;
 use x86_64::{
     registers::{
         control::{Efer, EferFlags},
-        model_specific::{LStar, SFMask, Star},
+        model_specific::{GsBase, KernelGsBase, LStar, SFMask, Star},
         rflags::RFlags,
     },
     structures::tss::TaskStateSegment,
@@ -16,14 +17,30 @@ use x86_64::{
 
 use super::{
     context::X86TrapFrame,
-    user_ctx::{current_trap_frame, prepare_user_return, UserTrapResult},
+    user_ctx::{current_trap_frame, current_trap_state, prepare_user_return, UserTrapResult},
 };
-use crate::task::current_tid;
-use platform::percpu_impl::cpu_id;
+use crate::task::{
+    current_tid,
+    should_trace_tid, trace_current_state,
+};
 
 #[unsafe(no_mangle)]
 #[percpu::def_percpu]
 static USER_RSP: usize = 0;
+#[unsafe(no_mangle)]
+#[percpu::def_percpu]
+static SYSCALL_TRACE_ARMED: usize = 0;
+#[unsafe(no_mangle)]
+#[percpu::def_percpu]
+static SYSCALL_TRACE_STAGE: usize = 0;
+#[unsafe(no_mangle)]
+#[percpu::def_percpu]
+static SYSCALL_TRACE_RIP: usize = 0;
+#[unsafe(no_mangle)]
+#[percpu::def_percpu]
+static SYSCALL_TRACE_RSP0: usize = 0;
+#[percpu::def_percpu]
+static SYSCALL_TRACE_BUDGET: usize = 0;
 
 global_asm!(
     include_str!("syscall.asm"),
@@ -35,26 +52,99 @@ unsafe extern "C" {
     fn syscall_entry();
 }
 
-static SYSCALL_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
-static SYSCALL_RETURN_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+#[inline]
+fn syscall_trace_armed() -> bool {
+    SYSCALL_TRACE_ARMED.read_current() != 0
+}
+
+pub fn arm_syscall_entry_trace() {
+    SYSCALL_TRACE_ARMED.write_current(1);
+    SYSCALL_TRACE_STAGE.write_current(0);
+    SYSCALL_TRACE_RIP.write_current(0);
+    SYSCALL_TRACE_RSP0.write_current(0);
+    SYSCALL_TRACE_BUDGET.write_current(4);
+}
+
+#[inline]
+fn consume_syscall_trace_budget() -> bool {
+    let budget = SYSCALL_TRACE_BUDGET.read_current();
+    if budget == 0 {
+        return false;
+    }
+    SYSCALL_TRACE_BUDGET.write_current(budget - 1);
+    true
+}
+
+pub fn drain_syscall_entry_trace(label: &str) {
+    if !syscall_trace_armed() {
+        return;
+    }
+
+    let stage = SYSCALL_TRACE_STAGE.read_current();
+    if stage != 1 {
+        return;
+    }
+
+    let rip = SYSCALL_TRACE_RIP.read_current();
+    let rsp0 = SYSCALL_TRACE_RSP0.read_current();
+    println!(
+        "[x86 syscall early] label={} stage=asm_only cpu={} tid={:?} rip={:#x} rsp0={:#x} gs={:#x} kgs={:#x} percpu={:#x}",
+        label,
+        cpu_id(),
+        current_tid(),
+        rip,
+        rsp0,
+        GsBase::read().as_u64() as usize,
+        KernelGsBase::read().as_u64() as usize,
+        read_percpu_reg(),
+    );
+
+    SYSCALL_TRACE_ARMED.write_current(0);
+    SYSCALL_TRACE_STAGE.write_current(0);
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn x86_syscall_entry_stage2(user_rip: usize, kernel_rsp: usize, kernel_cr3: usize) {
+    if !syscall_trace_armed() {
+        return;
+    }
+
+    SYSCALL_TRACE_STAGE.write_current(2);
+    SYSCALL_TRACE_RIP.write_current(user_rip);
+    SYSCALL_TRACE_RSP0.write_current(kernel_rsp);
+
+    println!(
+        "[x86 syscall early] label=stage2 cpu={} tid={:?} rip={:#x} rsp0={:#x} kernel_rsp={:#x} kernel_cr3={:#x} gs={:#x} kgs={:#x} percpu={:#x}",
+        cpu_id(),
+        current_tid(),
+        user_rip,
+        kernel_rsp,
+        kernel_rsp,
+        kernel_cr3,
+        GsBase::read().as_u64() as usize,
+        KernelGsBase::read().as_u64() as usize,
+        read_percpu_reg(),
+    );
+
+    SYSCALL_TRACE_ARMED.write_current(0);
+    SYSCALL_TRACE_STAGE.write_current(0);
+}
 
 #[unsafe(no_mangle)]
 pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
     let frame = current_trap_frame();
-    let trap_frame_ptr = frame as *mut X86TrapFrame as usize;
 
     let mut parameters = frame.parameters();
     let orig_syscall_id = parameters[0];
     let syscall_id = orig_syscall_id;
     parameters[0] = syscall_id;
 
-    let trace_idx = SYSCALL_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 16 {
-        log::warn!(
-            "[x86 syscall] cpu={} tid={:?} trap_cx={:#x} orig={:#x} id={:#x} args={:#x?}",
+    if should_trace_tid(current_tid()) && consume_syscall_trace_budget() {
+        trace_current_state("syscall_entry", current_trap_state(frame));
+        println!(
+            "[x86 syscall args] cpu={} tid={:?} orig={:#x} id={:#x} args={:#x?}",
             cpu_id(),
             current_tid(),
-            trap_frame_ptr,
             orig_syscall_id,
             syscall_id,
             &parameters[1..]
@@ -76,18 +166,18 @@ pub extern "C" fn x86_syscall_handler() -> UserTrapResult {
         err as isize
     });
     frame.update_result(res as usize);
-    // SysV ABI 下以 rax/rdx 返回 user_cr3 与 trap_cx_ptr。
-    let user_return = prepare_user_return();
-    let return_trace_idx = SYSCALL_RETURN_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if return_trace_idx < 16 {
-        log::warn!(
-            "[x86 syscall return] cpu={} tid={:?} trap_cx={:#x} user_cr3={:#x}",
+    if should_trace_tid(current_tid()) && consume_syscall_trace_budget() {
+        trace_current_state("syscall_return", current_trap_state(frame));
+        println!(
+            "[x86 syscall result] cpu={} tid={:?} id={:#x} result={}",
             cpu_id(),
             current_tid(),
-            user_return.trap_cx_ptr,
-            user_return.user_cr3,
+            syscall_id,
+            res,
         );
     }
+    // SysV ABI 下以 rax/rdx 返回 user_cr3 与 trap_cx_ptr。
+    let user_return = prepare_user_return();
     user_return
 }
 

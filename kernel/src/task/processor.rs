@@ -1,14 +1,9 @@
-use alloc::sync::Arc;
-use core::{
-    hint::spin_loop,
-    sync::atomic::{AtomicUsize, Ordering},
-};
+use alloc::{collections::BTreeMap, sync::Arc};
+use core::hint::spin_loop;
 
-use basic::{
-    arch::CpuLocal,
-    sync::Mutex,
-};
+use basic::{arch::CpuLocal, sync::Mutex};
 use config::CPU_NUM;
+use platform::percpu_impl::cpu_id;
 use spin::Lazy;
 use task_meta::{TaskContext, TaskStatus};
 
@@ -16,10 +11,8 @@ use crate::task::{
     resource::TaskMetaExt,
     scheduler::{add_task, fetch_task},
 };
-use platform::percpu_impl::cpu_id;
-
-static SCHEDULE_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
-static CURRENT_TID_TRACE_COUNT: AtomicUsize = AtomicUsize::new(0);
+#[cfg(target_arch = "x86_64")]
+use crate::task::{should_trace_task, trace_task_context_state};
 
 /// 空闲 CPU 的 tid 哨兵值。
 const NO_TID: usize = usize::MAX;
@@ -51,20 +44,17 @@ impl Cpu {
     }
 }
 
-static CPUS: Lazy<[CpuLocal<Cpu>; CPU_NUM]> = Lazy::new(|| {
-    core::array::from_fn(|_| CpuLocal::new(Cpu::empty()))
-});
+static CPUS: Lazy<[CpuLocal<Cpu>; CPU_NUM]> =
+    Lazy::new(|| core::array::from_fn(|_| CpuLocal::new(Cpu::empty())));
 
-static CURRENT_TIDS: Lazy<[CpuLocal<usize>; CPU_NUM]> = Lazy::new(|| {
-    core::array::from_fn(|_| CpuLocal::new(NO_TID))
-});
+static CURRENT_TIDS: Lazy<[CpuLocal<usize>; CPU_NUM]> =
+    Lazy::new(|| core::array::from_fn(|_| CpuLocal::new(NO_TID)));
+
+static LAST_TASK_CPU: Lazy<Mutex<BTreeMap<usize, usize>>> =
+    Lazy::new(|| Mutex::new(BTreeMap::new()));
 
 #[inline(always)]
 fn set_current_tid(tid: usize) {
-    let trace_idx = CURRENT_TID_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-    if trace_idx < 16 {
-        println!("[kernel][sched] set_current_tid cpu={} tid={}", cpu_id(), tid);
-    }
     *CURRENT_TIDS[cpu_id()].as_mut() = tid;
 }
 
@@ -92,6 +82,41 @@ pub fn current_tid() -> Option<usize> {
     }
 }
 
+pub fn clear_task_last_cpu(tid: usize) {
+    LAST_TASK_CPU.lock().remove(&tid);
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum TaskCpuEvent {
+    Stable,
+    FirstRun,
+    Migration(usize),
+}
+
+fn trace_task_cpu(next_tid: usize) -> TaskCpuEvent {
+    let cpu = cpu_id();
+    let mut guard = LAST_TASK_CPU.lock();
+    #[cfg(target_arch = "x86_64")]
+    let trace_this = should_trace_task(next_tid);
+    #[cfg(not(target_arch = "x86_64"))]
+    let trace_this = true;
+    match guard.insert(next_tid, cpu) {
+        Some(prev_cpu) if prev_cpu != cpu => {
+            if trace_this {
+                println!("[kernel][sched] migration tid={} {}->{}", next_tid, prev_cpu, cpu);
+            }
+            TaskCpuEvent::Migration(prev_cpu)
+        }
+        None => {
+            if trace_this {
+                println!("[kernel][sched] first_run tid={} cpu={}", next_tid, cpu);
+            }
+            TaskCpuEvent::FirstRun
+        }
+        _ => TaskCpuEvent::Stable,
+    }
+}
+
 pub fn schedule() {
     let cpu = current_cpu();
     let current_task = current_task().unwrap();
@@ -106,9 +131,13 @@ pub fn cpu_loop() {
         let cpu = current_cpu();
         let current_task = cpu.take_current();
         set_current_tid(NO_TID);
-        let _tid = match current_task {
+        let prev_tid = match current_task {
             Some(task) => {
                 let tid = task.lock().tid();
+                #[cfg(target_arch = "x86_64")]
+                if should_trace_task(tid) {
+                    crate::trap::drain_syscall_entry_trace("cpu_loop_prev");
+                }
                 let status = task.lock().status();
                 match status {
                     TaskStatus::Ready => {
@@ -123,18 +152,27 @@ pub fn cpu_loop() {
             }
             None => None,
         };
+        #[cfg(target_arch = "x86_64")]
+        if prev_tid.is_none() {
+            crate::trap::drain_syscall_entry_trace("cpu_loop_idle");
+        }
         if let Some(next_task) = fetch_task() {
-            next_task.lock().set_status(TaskStatus::Running);
-            let next_task_ctx_ptr = next_task.lock().get_context_raw_mut_ptr();
-            let next_tid = next_task.lock().tid();
-            let trace_idx = SCHEDULE_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-            if trace_idx < 16 {
-                println!(
-                    "[kernel][sched] cpu={} switch_to tid={}",
-                    cpu_id(),
-                    next_tid,
-                );
+            let mut next_guard = next_task.lock();
+            next_guard.set_status(TaskStatus::Running);
+            let next_tid = next_guard.tid();
+            let event = trace_task_cpu(next_tid);
+            #[cfg(target_arch = "x86_64")]
+            if should_trace_task(next_tid) && event != TaskCpuEvent::Stable {
+                crate::trap::arm_user_return_trace(6);
+                let label = match event {
+                    TaskCpuEvent::FirstRun => "child_first_run",
+                    TaskCpuEvent::Migration(_) => "child_migration",
+                    TaskCpuEvent::Stable => unreachable!(),
+                };
+                trace_task_context_state(label, next_tid, next_guard.task_context());
             }
+            let next_task_ctx_ptr = next_guard.get_context_raw_mut_ptr();
+            drop(next_guard);
             cpu.set_current(next_task);
             set_current_tid(next_tid);
             let cpu_context = cpu.get_idle_task_cx_ptr();
