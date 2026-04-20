@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-vdso_helper = { git = "https://github.com/rosy233333/vdso_crate_template", package = "vdso_helper" }
+vdso_helper = { path = "../../vdso_crate_template/vdso_helper", package = "vdso_helper" }
