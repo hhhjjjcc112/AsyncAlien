@@ -24,6 +24,7 @@ const TESTS: &[&str] = &[
     "/tests/new/sys_proc\0",
     "/tests/new/sys_random\0",
     "/tests/new/sys_time\0",
+    "/tests/new/sys_vdso_time_compare\0",
 ];
 
 #[unsafe(no_mangle)]

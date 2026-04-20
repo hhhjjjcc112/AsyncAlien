@@ -32,6 +32,7 @@ build:
 
 BUILD_CRATES := \
 	new/sys_time \
+	new/sys_vdso_time_compare \
 	new/sys_fs \
 	new/sys_link \
 	new/sys_proc \

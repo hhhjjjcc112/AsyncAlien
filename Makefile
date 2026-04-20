@@ -247,7 +247,7 @@ help:
 	@echo "  make run                Build and run in QEMU"
 	@echo "  make record_run         Build, run, and tee output to run/run_$(ARCH).txt"
 	@echo "  make ready              Build everything but don't run QEMU"
-	@echo "  make build              Build kernel only"
+	@echo "  make build              Build kernel and vDSO"
 	@echo "  make vdso               Build vDSO only (follows ARCH)"
 	@echo "  make vf2                Build and deploy to VF2 via TFTP"
 	@echo "  make domains            Build all domains"
@@ -293,7 +293,7 @@ help:
 ready: domains sdcard initrd build
 	@echo "Build complete. Ready to run with 'make fake_run' or 'make run'"
 
-build:
+build: vdso
 	@echo "Building..."
 	@echo "ARCH: $(ARCH)"
 	@echo "PLATFORM: $(PLATFORM)"
@@ -385,7 +385,7 @@ check_mtools:
 	@command -v $(MTOOLS_MMD) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MMD)，请安装 mtools"; exit 1; }
 	@command -v $(MTOOLS_MDIR) >/dev/null 2>&1 || { echo "[ERR] 未找到 $(MTOOLS_MDIR)，请安装 mtools"; exit 1; }
 
-user: check_mtools
+user: vdso check_mtools
 	@echo "Building user apps"
 	@make all -C ./user/apps ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY) USERLIB_EXTRA_RUSTFLAGS="$(USERLIB_EXTRA_RUSTFLAGS)"
 	@make all -C ./user/tests ARCH=$(ARCH_KIND) IMG=$(abspath $(IMG)) MTOOLS_MCOPY=$(MTOOLS_MCOPY) USERLIB_EXTRA_RUSTFLAGS="$(USERLIB_EXTRA_RUSTFLAGS)"

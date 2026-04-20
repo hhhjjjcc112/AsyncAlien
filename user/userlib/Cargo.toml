@@ -13,6 +13,7 @@ talc = "4"
 embedded-graphics = { version = "0.8", optional = true }
 pconst = { path = "../../utils/pconst" }
 domain-info = { path = "../apps/domain-info" }
+vdso_api = { path = "../../build/vdso/vdso_api" }
 
 [features]
 gui = ["embedded-graphics"]

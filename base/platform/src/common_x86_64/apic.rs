@@ -48,7 +48,8 @@ pub fn init_primary_apic() {
     let mut apic = build_local_apic();
     unsafe {
         apic.enable();
-        *local_apic_slot() = MaybeUninit::new(apic);
+        #[allow(static_mut_refs)]
+        LOCAL_APIC.write(apic);
     }
 
     // 初始化 I/O APIC。
@@ -85,14 +86,11 @@ fn build_local_apic() -> LocalApic {
     builder.build().unwrap()
 }
 
-unsafe fn local_apic_slot() -> *mut MaybeUninit<LocalApic> {
-    core::ptr::addr_of_mut!(LOCAL_APIC)
-}
-
 /// 获取 Local APIC 可变引用。
 /// 必须在 APIC 初始化后调用。
 pub unsafe fn get_local_apic() -> &'static mut LocalApic {
-    unsafe { &mut *(*local_apic_slot()).as_mut_ptr() }
+    #[allow(static_mut_refs)]
+    unsafe { LOCAL_APIC.assume_init_mut() }
 }
 
 /// 是否运行在 x2APIC 模式。

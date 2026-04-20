@@ -29,6 +29,7 @@ mod sys;
 mod syscall;
 pub mod thread;
 pub mod time;
+pub mod vdso;
 
 pub mod domain;
 #[cfg(feature = "gui")]
@@ -37,12 +38,19 @@ pub mod sync;
 
 #[unsafe(no_mangle)]
 fn _start_rust(argc_ptr: usize) {
-    let argc = unsafe { (argc_ptr as *const usize).read_volatile() };
-    let argv = argc_ptr + core::mem::size_of::<usize>();
     init_heap();
 
-    let argv = parse_args(argc, argv); //todo!(env)
+    let (argc, argv) = parse_start_stack(argc_ptr);
+    vdso::init_from_stack(argc_ptr);
     exit(unsafe { main(argc, argv) });
+}
+
+fn parse_start_stack(argc_ptr: usize) -> (usize, Vec<String>) {
+    let argc = unsafe { (argc_ptr as *const usize).read_volatile() };
+    let argv = argc_ptr + core::mem::size_of::<usize>();
+
+    let argv = parse_args(argc, argv);
+    (argc, argv)
 }
 
 fn parse_args(argc: usize, argv: usize) -> Vec<String> {

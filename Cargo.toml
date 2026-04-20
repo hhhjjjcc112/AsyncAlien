@@ -26,9 +26,10 @@ members = [
     "user/tests/new/sys_proc",
     "user/tests/new/sys_poll",
     "user/tests/new/sys_random",
+    "user/tests/new/sys_vdso_time_compare",
     "user/tests/new/syscall_all",
 ]
-exclude = ["build/vdso"]
+exclude = ["build/vdso", "vdso_crate_template"]
 resolver = "2"
 
 [workspace.dependencies]
