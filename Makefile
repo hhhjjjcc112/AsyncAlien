@@ -377,7 +377,7 @@ record_run: domains sdcard initrd build
 			-kernel $(KERNEL) \
 			$(QEMU_ARGS) \
 			-smp $(SMP) -m $(MEMORY_SIZE) \
-			-serial mon:stdio |& tee ./run/run_$(ARCH).txt'
+			-serial mon:stdio > ./run/run_$(ARCH).txt 2>&1'
 endif
 
 check_mtools:

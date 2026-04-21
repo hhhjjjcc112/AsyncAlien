@@ -62,52 +62,6 @@ pub fn collect_virtio_devices() -> Vec<CommonDeviceType> {
 }
 
 #[cfg(target_arch = "x86_64")]
-/// 函数说明：执行对应的总线处理步骤。
-pub fn log_virtio_summary() {
-    // 步骤1：统计 virtio 设备数量。
-    let bus = PCI_BUS.lock();
-    let mut blk = 0usize;
-    let mut net = 0usize;
-    let mut input = 0usize;
-    let mut gpu = 0usize;
-
-    // 步骤2：逐个输出设备明细，便于启动日志排查。
-    for endpoint in bus.endpoint_devices().iter() {
-        match endpoint.virtio_kind() {
-            Some("virtio-blk") => blk += 1,
-            Some("virtio-net") => net += 1,
-            Some("virtio-gpu") => gpu += 1,
-            Some("virtio-input") => input += 1,
-            _ => {}
-        }
-    }
-
-    println!(
-        "[bus][x86_64][pci] virtio summary: blk={}, net={}, input={}, gpu={}",
-        blk,
-        net,
-        input,
-        gpu
-    );
-
-    for endpoint in bus.endpoint_devices().iter() {
-        let Some(kind) = endpoint.virtio_kind() else {
-            continue;
-        };
-        let addr = endpoint.address();
-        println!(
-            "[bus][x86_64][pci] {} @ {:04x}:{:02x}:{:02x}.{} (vendor={:04x}, device={:04x})",
-            kind,
-            addr.segment(),
-            addr.bus(),
-            addr.device(),
-            addr.function(),
-            endpoint.vendor_id(),
-            endpoint.device_id()
-        );
-    }
-}
-
 #[macro_export]
 macro_rules! pci_bus {
     () => {

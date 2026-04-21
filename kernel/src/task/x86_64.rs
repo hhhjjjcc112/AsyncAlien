@@ -17,11 +17,6 @@ unsafe extern "C" {
     fn __switch(now: *mut TaskContext, next: *const TaskContext);
 }
 
-#[inline]
-pub fn should_trace_tid(tid: Option<usize>) -> bool {
-    matches!(tid, Some(2 | 3 | 4))
-}
-
 #[inline(always)]
 pub fn switch(now: *mut TaskContext, next: *const TaskContext) {
     unsafe {

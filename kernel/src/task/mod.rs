@@ -27,8 +27,6 @@ pub use self::x86_64::{
     current_user_fs_base, current_user_gs_base, set_current_user_fs_base, set_current_user_gs_base,
     switch,
 };
-#[cfg(target_arch = "x86_64")]
-pub(crate) use self::x86_64::should_trace_tid;
 use crate::{
     error::AlienResult,
     task::{resource::TaskMetaExt, scheduler::TASK_WAIT_QUEUE},

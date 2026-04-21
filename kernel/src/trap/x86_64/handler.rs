@@ -14,10 +14,6 @@ use super::{
     vectors,
 };
 use crate::{
-    task::{
-        current_tid,
-        should_trace_tid,
-    },
     task_domain, timer,
 };
 
@@ -41,7 +37,6 @@ static APIC_TIMER_KERNEL_TRAP_COUNT: core::sync::atomic::AtomicUsize =
 /// 返回后汇编自动 ret，继续执行恢复寄存器并 iretq
 #[unsafe(no_mangle)]
 pub extern "C" fn kernel_trap_handler(frame: &mut X86TrapFrame) {
-    println!("trap_from_kernel");
     if frame.is_user() {
         panic!("kernel_trap_handler: received user-mode trap");
     }
@@ -86,18 +81,7 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         vectors::PAGE_FAULT => {
             let fault_addr = fault_address();
             match task_domain!().do_load_page_fault(fault_addr) {
-                Ok(()) => {
-                    if should_trace_tid(current_tid()) {
-                        println!(
-                            "[x86 page fault handled] cpu={} tid={:?} addr={:#x} rip={:#x} err={:#x}",
-                            cpu_id(),
-                            current_tid(),
-                            fault_addr,
-                            frame.rip,
-                            frame.error_code,
-                        );
-                    }
-                }
+                Ok(()) => {}
                 Err(err) => {
                     panic!(
                         "do_load_page_fault failed: addr={:#x}, rip={:#x}, rsp={:#x}, err_code={:#x}, err={:?}",
@@ -111,11 +95,8 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         vectors::APIC_TIMER => {
             #[cfg(feature = "apic_timer_test")]
             {
-                let count = APIC_TIMER_USER_TRAP_COUNT
+                let _ = APIC_TIMER_USER_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
-                if count % 10 == 0 {
-                    println!("[apic_timer_test] 用户态中断触发 count={}", count);
-                }
             }
             if platform::config::APIC_TIMER_ONESHOT {
                 timer::set_next_trigger();
@@ -131,27 +112,18 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
-            trace!(
-                "[{}] External interrupt: IRQ {}",
-                cpu_id(),
-                v - vectors::IRQ_BASE
-            );
             let irq = (v - vectors::IRQ_BASE) as usize;
             if let Some(apic) = crate::trap::INTERRUPT_CONTROLLER_DOMAIN.get() {
                 apic.handle_irq(irq).expect("handle_irq failed");
-            } else {
-                log::warn!("APIC domain not ready, drop irq {}", irq);
             }
             send_apic_eoi();
         }
 
         vectors::APIC_ERROR => {
-            log::warn!("APIC error interrupt");
             send_apic_eoi();
         }
 
         vectors::APIC_SPURIOUS => {
-            log::warn!("Spurious APIC interrupt");
         }
 
         _ => {
@@ -195,11 +167,8 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::APIC_TIMER => {
             #[cfg(feature = "apic_timer_test")]
             {
-                let count = APIC_TIMER_KERNEL_TRAP_COUNT
+                let _ = APIC_TIMER_KERNEL_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
-                if count % 10 == 0 {
-                    println!("[apic_timer_test] 内核态中断触发 count={}", count);
-                }
             }
             if platform::config::APIC_TIMER_ONESHOT {
                 timer::set_next_trigger();
@@ -210,27 +179,18 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         vectors::SYSCALL => panic!("syscall from kernel mode"),
 
         v if (vectors::IRQ_BASE..vectors::APIC_TIMER).contains(&v) => {
-            trace!(
-                "[{}] External interrupt: IRQ {}",
-                cpu_id(),
-                v - vectors::IRQ_BASE
-            );
             let irq = (v - vectors::IRQ_BASE) as usize;
             if let Some(apic) = crate::trap::INTERRUPT_CONTROLLER_DOMAIN.get() {
                 apic.handle_irq(irq).expect("handle_irq failed");
-            } else {
-                log::warn!("APIC domain not ready, drop irq {}", irq);
             }
             send_apic_eoi();
         }
 
         vectors::APIC_ERROR => {
-            log::warn!("APIC error interrupt");
             send_apic_eoi();
         }
 
         vectors::APIC_SPURIOUS => {
-            log::warn!("Spurious APIC interrupt");
         }
 
         _ => {
@@ -257,12 +217,6 @@ pub extern "C" fn trap_return() -> ! {
     // 返回代码必须位于 trampoline 共享映射中，避免切到用户 CR3 后取指失败。
     let ret_va = x86_trampoline_return as *const () as usize - strampoline as *const () as usize
         + TRAMPOLINE;
-    
-    let cpuid = cpu_id();
-    println!(
-            "[x86 trap] returning to user mode: cpu={} user_cr3={:#x} trap_cx_ptr={:#x} ret_va={:#x}",
-            cpuid, user_cr3, trap_cx_ptr, ret_va
-        );
     unsafe {
         asm!(
             "jmp {ret}",

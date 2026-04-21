@@ -45,7 +45,7 @@ unsafe extern "C" {
 }
 
 /// 设置 AP 启动页代码与栈顶。
-fn setup_startup_page(cpu_id: usize, stack_top: usize) {
+fn setup_startup_page(_cpu_id: usize, stack_top: usize) {
     let start_page_vaddr = LOW_PHYS_MAP_BASE + AP_START_PAGE_ADDR;
     let start_page = unsafe {
         core::slice::from_raw_parts_mut(
@@ -58,14 +58,6 @@ fn setup_startup_page(cpu_id: usize, stack_top: usize) {
         image_size <= AP_START_PAGE_SIZE,
         "AP trampoline too large: {} bytes",
         image_size
-    );
-
-    println!(
-        "[x86_ap] prepare trampoline cpu_id={} paddr={:#x} vaddr={:#x} size={:#x}",
-        cpu_id,
-        AP_START_PAGE_ADDR,
-        start_page_vaddr,
-        image_size,
     );
 
     // 将 AP 启动代码拷到低地址页。
@@ -87,25 +79,13 @@ pub fn announce_secondary_cpu_started() {
     AP_EARLY_BOOT_COUNT.fetch_add(1, Ordering::AcqRel);
 }
 
-fn wait_for_secondary_early_boot(cpu_id: usize, expected_count: usize) -> bool {
+fn wait_for_secondary_early_boot(_cpu_id: usize, expected_count: usize) -> bool {
     for _ in 0..AP_BOOT_WAIT_RETRIES {
         if AP_EARLY_BOOT_COUNT.load(Ordering::Acquire) >= expected_count {
-            println!(
-                "[x86_ap] early boot ack cpu_id={} count={}",
-                cpu_id,
-                expected_count,
-            );
             return true;
         }
         busy_wait(Duration::from_millis(1));
     }
-
-    println!(
-        "[x86_ap] early boot timeout cpu_id={} expect_count={} observed={}",
-        cpu_id,
-        expected_count,
-        AP_EARLY_BOOT_COUNT.load(Ordering::Acquire),
-    );
     false
 }
 
@@ -125,14 +105,6 @@ pub fn boot_secondary_cpu(cpu_id: usize) -> bool {
         (cpu_id << 24) as u32
     };
     let expected_count = AP_EARLY_BOOT_COUNT.load(Ordering::Acquire) + 1;
-
-    println!(
-        "[x86_ap] send INIT/SIPI cpu_id={} stack_top={:#x} apic_id={:#x} expect_count={}",
-        cpu_id,
-        stack_top,
-        target_apic_id,
-        expected_count,
-    );
 
     unsafe {
         apic.send_init_ipi(target_apic_id);

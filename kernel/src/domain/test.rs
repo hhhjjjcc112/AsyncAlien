@@ -15,12 +15,12 @@ use crate::{domain_helper, error::AlienError};
 
 #[inline]
 fn mark_pass(prefix: &str, name: &str) {
-    platform::println!("[{}] pass: {}", prefix, name);
+    let _ = (prefix, name);
 }
 
 #[inline]
 fn mark_skip(prefix: &str, name: &str, reason: &str) {
-    platform::println!("[{}] skip: {} ({})", prefix, name, reason);
+    let _ = (prefix, name, reason);
 }
 
 #[inline]
@@ -30,7 +30,7 @@ fn mark_fail(prefix: &str, name: &str, reason: &str) {
 
 #[inline]
 fn mark_step(prefix: &str, step: &str, detail: &str) {
-    platform::println!("[{}] step: {} ({})", prefix, step, detail);
+    let _ = (prefix, step, detail);
 }
 
 fn expect_domain(prefix: &str, name: &str) -> AlienResult<DomainType> {

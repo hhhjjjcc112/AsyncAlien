@@ -10,6 +10,7 @@ mod vectors;
 
 use gdt::init_gdt;
 pub use handler::{trap_return, user_trap_vector};
+pub use context::X86TrapFrame;
 #[cfg(feature = "trap_test")]
 pub use test::run as run_trap_test;
 use idt::init_idt;

@@ -80,7 +80,7 @@ impl TrapHandler for Trap {
                 crate::task::yield_now();
             }
             Trap::Interrupt(Interrupt::SupervisorExternal) => {
-                trace!("[{}] <do_user_handle> external interrupt", crate::percpu_impl::cpu_id());
+                trace!("[{}] <do_user_handle> external interrupt", platform::percpu_impl::cpu_id());
                 interrupt_controller_domain!()
                     .handle_irq()
                     .expect("handle_irq failed");

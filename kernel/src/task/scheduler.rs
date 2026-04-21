@@ -1,6 +1,6 @@
 use alloc::{
     collections::BTreeMap,
-    sync::{Arc, Weak},
+    sync::Arc,
 };
 
 use basic::sync::Mutex;
@@ -63,7 +63,6 @@ pub fn wait_now() {
     let task = current_task().unwrap();
     task.lock().set_status(TaskStatus::Waiting);
     let tid = task.lock().tid();
-    println!("[kernel][sched] wait_now tid={}", tid);
     TASK_WAIT_QUEUE.lock().insert(tid, task);
     schedule();
 }
@@ -71,12 +70,9 @@ pub fn wait_now() {
 pub fn wake_up_wait_task(tid: Tid) {
     let task = TASK_WAIT_QUEUE.lock().remove(&tid);
     if let Some(task) = task {
-        println!("[kernel][sched] wake_up_wait_task tid={}", tid);
         // put the task into the global task queue
         task.lock().set_status(TaskStatus::Ready);
         add_task(task);
-    } else {
-        println!("[kernel][sched] wake_up_wait_task miss tid={}", tid);
     }
 }
 
@@ -92,7 +88,6 @@ pub fn exit_now() {
     let task = current_task().unwrap();
     let tid = task.lock().tid();
     task.lock().set_status(TaskStatus::Zombie);
-    println!("[kernel][sched] exit_now tid={}", tid);
     TASK_EXIT_QUEUE.lock().insert(tid, task);
     schedule();
 }

@@ -35,9 +35,6 @@ pub fn prepare_user_return() -> UserTrapResult {
             panic!("x86_64 trap: failed to prepare user return");
         });
 
-    // 返回用户态前刷新 TSS.rsp0，确保下一次 CPL3->0 入栈落在当前任务 TrapFrame。
-    let written_rsp0 = trap_cx_ptr + X86TrapFrame::USER_CONTEXT_SIZE;
-    crate::trap::write_tss_rsp0(written_rsp0);
     UserTrapResult {
         user_cr3,
         trap_cx_ptr,

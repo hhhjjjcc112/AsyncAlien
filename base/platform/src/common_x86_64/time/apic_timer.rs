@@ -58,18 +58,6 @@ pub fn init_primary_apic_timer() {
     } else {
         program_periodic_timer(local_apic);
     }
-    log::info!(
-        "APIC Timer initialized, mode={}, frequency: {} Hz",
-        if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
-        APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
-    );
-    #[cfg(feature = "apic_timer_test")]
-    println!(
-        "[apic_timer_test] init_primary cpu={} freq={}Hz mode={}",
-        crate::common_x86_64::apic::current_cpu_id(),
-        APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
-        if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
-    );
 }
 
 /// Initialize APIC timer for secondary CPUs (AP)
@@ -80,13 +68,6 @@ pub fn init_secondary_apic_timer() {
     } else {
         program_periodic_timer(local_apic);
     }
-    #[cfg(feature = "apic_timer_test")]
-    println!(
-        "[apic_timer_test] init_secondary cpu={} freq={}Hz mode={}",
-        crate::common_x86_64::apic::current_cpu_id(),
-        APIC_TIMER_FREQUENCY.load(Ordering::Relaxed),
-        if APIC_TIMER_ONESHOT { "oneshot" } else { "periodic" },
-    );
 }
 
 /// Calibrate APIC timer frequency using TSC
@@ -109,17 +90,7 @@ fn calibrate_apic_timer() {
 
     // Calculate frequency: ticks_per_10ms * 100 = ticks_per_second
     let frequency = ((elapsed as u64) * 100).max(1);
-    if elapsed == 0 {
-        log::warn!("APIC timer calibration returned 0, use fallback 1 Hz");
-    }
     APIC_TIMER_FREQUENCY.store(frequency, Ordering::SeqCst);
-    #[cfg(feature = "apic_timer_test")]
-    println!(
-        "[apic_timer_test] calibrate cpu={} elapsed={} freq={}Hz",
-        crate::common_x86_64::apic::current_cpu_id(),
-        elapsed,
-        frequency,
-    );
 
     // Stop the timer
     unsafe {
@@ -137,39 +108,16 @@ pub fn set_apic_timer(deadline_ns: u64) {
 
     let freq = APIC_TIMER_FREQUENCY.load(Ordering::Relaxed);
     if freq == 0 {
-        log::warn!("APIC timer frequency not ready");
         return;
     }
 
     // Convert nanoseconds to APIC timer ticks
     // ticks = deadline_ns * freq / 1e9
     let ticks = ((deadline_ns as u128 * freq as u128 / 1_000_000_000) as u32).max(1);
-    #[cfg(feature = "apic_timer_test")]
-    {
-        let count = APIC_TIMER_PROGRAM_COUNT.fetch_add(1, Ordering::Relaxed);
-        if count % 10 == 0 {
-            println!("[apic_timer_test] 编程计时器 count={} ticks={}", count, ticks);
-        }
-    }
 
     let local_apic = unsafe { get_local_apic() };
     unsafe {
         local_apic.set_timer_initial(ticks);
-    }
-    #[cfg(feature = "apic_timer_test")]
-    {
-        let trace_idx = APIC_TIMER_SET_TRACE_COUNT.fetch_add(1, Ordering::Relaxed);
-        if trace_idx < 8 {
-            let current = unsafe { local_apic.timer_current() };
-            println!(
-                "[apic_timer_test] set cpu={} deadline_ns={} freq={} ticks={} current={}",
-                crate::common_x86_64::apic::current_cpu_id(),
-                deadline_ns,
-                freq,
-                ticks,
-                current,
-            );
-        }
     }
 }
 

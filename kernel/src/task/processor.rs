@@ -11,9 +11,23 @@ use crate::task::{
     resource::TaskMetaExt,
     scheduler::{add_task, fetch_task},
 };
-#[cfg(target_arch = "x86_64")]
 /// 空闲 CPU 的 tid 哨兵值。
 const NO_TID: usize = usize::MAX;
+
+#[cfg(target_arch = "x86_64")]
+#[inline(always)]
+fn refresh_current_tss_rsp0(next_tid: usize) {
+    let (_, trap_frame_virt_addr) = crate::task_domain!()
+        .page_table_token_with_trap_frame_virt_addr()
+        .unwrap_or_else(|err| {
+            panic!(
+                "x86_64 cpu_loop: failed to get trap frame for tid {}: {:?}",
+                next_tid, err
+            );
+        });
+    let rsp0 = trap_frame_virt_addr + crate::trap::X86TrapFrame::USER_CONTEXT_SIZE;
+    crate::trap::write_tss_rsp0(rsp0);
+}
 
 #[derive(Debug, Clone)]
 pub struct Cpu {
@@ -117,6 +131,8 @@ pub fn cpu_loop() {
             drop(next_guard);
             cpu.set_current(next_task);
             set_current_tid(next_tid);
+            #[cfg(target_arch = "x86_64")]
+            refresh_current_tss_rsp0(next_tid);
             let cpu_context = cpu.get_idle_task_cx_ptr();
             crate::task::switch(cpu_context, next_task_ctx_ptr)
         } else {

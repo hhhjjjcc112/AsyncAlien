@@ -26,7 +26,6 @@ fn cpu_has_x2apic() -> bool {
 
 /// 初始化主核（BSP）的 Local APIC。
 pub fn init_primary_apic() {
-    println!("[x86_apic] init_primary_apic enter");
     let is_x2apic = cpu_has_x2apic();
     unsafe {
         IS_X2APIC = is_x2apic;
@@ -54,19 +53,15 @@ pub fn init_primary_apic() {
 
     // 初始化 I/O APIC。
     let io_apic_base = crate::qemu_x86_64::config::DEVICE_SPACE[1].1;
-    println!("[x86_apic] init ioapic base={:#x}", io_apic_base);
     let io_apic = unsafe { IoApic::new((io_apic_base as u64) + (PHYS_VIRT_OFFSET as u64)) };
     IO_APIC.call_once(|| Mutex::new(io_apic));
-    println!("[x86_apic] init_primary_apic ready");
 }
 
 /// 初始化从核（AP）的 APIC。
 pub fn init_secondary_apic() {
-    println!("[x86_apic] init_secondary_apic cpu_id={} x2apic={}", current_cpu_id(), is_x2apic());
     unsafe {
         get_local_apic().enable();
     }
-    println!("[x86_apic] init_secondary_apic ready cpu_id={}", current_cpu_id());
 }
 
 fn build_local_apic() -> LocalApic {
@@ -77,10 +72,8 @@ fn build_local_apic() -> LocalApic {
         .error_vector(vectors::APIC_ERROR_VECTOR as _);
 
     if is_x2apic() {
-        println!("[x86_apic] x2APIC mode enabled");
     } else {
         builder.set_xapic_base(unsafe { xapic_base() } + PHYS_VIRT_OFFSET);
-        println!("[x86_apic] xAPIC mode enabled");
     }
 
     builder.build().unwrap()
