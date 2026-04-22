@@ -697,6 +697,7 @@ dependencies = [
 [[package]]
 name = "build_vdso"
 version = "0.1.0"
+source = "git+https://github.com/rosy233333/vdso_crate_template#dd5e5c5c3eaf55687b3ce5d4285483bb1dea9bbb"
 dependencies = [
  "regex",
  "xmas-elf 0.9.1",
@@ -3821,18 +3822,18 @@ dependencies = [
 
 [[package]]
 name = "linkme"
-version = "0.3.35"
+version = "0.3.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e3283ed2d0e50c06dd8602e0ab319bb048b6325d0bba739db64ed8205179898"
+checksum = "e83272d46373fb8decca684579ac3e7c8f3d71d4cc3aa693df8759e260ae41cf"
 dependencies = [
  "linkme-impl",
 ]
 
 [[package]]
 name = "linkme-impl"
-version = "0.3.35"
+version = "0.3.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5cec0ec4228b4853bb129c84dbf093a27e6c7a20526da046defc334a1b017f7"
+checksum = "32d59e20403c7d08fe62b4376edfe5c7fb2ef1e6b1465379686d0f21c8df444b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7025,6 +7026,7 @@ dependencies = [
 [[package]]
 name = "vdso_helper"
 version = "0.1.0"
+source = "git+https://github.com/rosy233333/vdso_crate_template#dd5e5c5c3eaf55687b3ce5d4285483bb1dea9bbb"
 dependencies = [
  "lazyinit",
  "paste",
