@@ -193,6 +193,9 @@ pub fn start_other_cpu(cpu_id: usize) -> usize {
     }
     #[cfg(target_arch = "riscv64")]
     {
+        unsafe extern "C" {
+            fn _start_secondary();
+        }
         let start_cpu = if cfg!(plat_vf2) { 1 } else { 0 };
         let mut started = 0;
         for i in start_cpu..::config::CPU_NUM {
@@ -218,8 +221,6 @@ pub fn start_other_cpu(cpu_id: usize) -> usize {
 unsafe extern "Rust" {
     fn main(cpu_id: usize, info_ptr: usize);
     fn secondary_main(cpu_id: usize);
-    #[cfg(target_arch = "riscv64")]
-    fn _start_secondary();
 }
 
 pub fn platform_boot_info_ptr() -> usize {

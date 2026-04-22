@@ -21,11 +21,11 @@ extern "C" fn _start() {
     add sp, sp, t0
     mv a0, tp
     mv a1, gp
-    call {platform_init}
+    call {main_entry}
     ",
     stack_size_bits = const STACK_SIZE_BITS,
     boot_stack = sym STACK,
-    platform_init = sym crate::main,
+    main_entry = sym crate::main,
     );
 }
 
@@ -41,9 +41,10 @@ extern "C" fn _start_secondary() {
     add sp, sp, t0
     mv a0, tp
     mv a1, gp
-    call secondary_main
+    call {secondary_entry}
     ",
     stack_size_bits = const STACK_SIZE_BITS,
     boot_stack = sym STACK,
+    secondary_entry = sym crate::secondary_main,
     );
 }

@@ -106,11 +106,11 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
 /// 从核入口：由平台汇编从核入口直接调用。
 #[unsafe(no_mangle)]
 fn secondary_main(cpu_id: usize) {
-    println!("[kernel] secondary_main enter cpu_id={}", cpu_id);
-
     platform::percpu_impl::init_percpu_secondary(cpu_id);
+
+    println!("[kernel] secondary_main enter cpu_id={}", cpu_id);
     println!("[kernel] secondary_main percpu ready cpu_id={}", cpu_id);
-    
+
     platform::platform_init_secondary(cpu_id);
     println!("[kernel] secondary_main platform ready cpu_id={}", cpu_id);
 
