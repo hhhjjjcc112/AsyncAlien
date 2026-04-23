@@ -24,6 +24,23 @@ fn init_x86_rtc_domain() -> AlienResult<()> {
     Ok(())
 }
 
+fn register_platform_owned_empty_device(device_name: &str) -> AlienResult<()> {
+    // 这些设备由 base/platform 直接管理，域层只保留名字占位。
+    let (empty_dev, domain_file_info) = create_domain!(
+        EmptyDeviceDomainProxy,
+        DomainTypeRaw::EmptyDeviceDomain,
+        "null"
+    )?;
+    empty_dev.init_by_box(Box::new(()))?;
+    register_domain!(
+        device_name,
+        domain_file_info,
+        DomainType::EmptyDeviceDomain(empty_dev),
+        true
+    );
+    Ok(())
+}
+
 pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
     let platform_bus = platform_bus!();
     let mut has_nic = false;
@@ -116,23 +133,27 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     true
                 );
             }
+            "loopback" => {
+                let loopback_range =
+                    require_mmio_range_or_einval("x86_64", "loopback", device.locator())?;
+                let (loopback, domain_file_info) = create_domain!(
+                    NetDeviceDomainProxy,
+                    DomainTypeRaw::NetDeviceDomain,
+                    "loopback"
+                )?;
+                loopback.init_by_box(Box::new(VirtioInitInfo::mmio(loopback_range, irq)))?;
+                register_domain!(
+                    "loopback",
+                    domain_file_info,
+                    DomainType::NetDeviceDomain(loopback),
+                    false
+                );
+            }
             "pci_ecam" => {
                 // x86_64 的 virtio PCI 统一在平台设备遍历后处理，这里保留分支用于兼容旧日志路径。
             }
             "local_apic" | "io_apic" | "hpet" => {
-                // 迁移阶段先复用稳定的 null 空设备域占位，避免专用域引入额外不稳定性。
-                let (empty_dev, domain_file_info) = create_domain!(
-                    EmptyDeviceDomainProxy,
-                    DomainTypeRaw::EmptyDeviceDomain,
-                    "null"
-                )?;
-                empty_dev.init_by_box(Box::new(()))?;
-                register_domain!(
-                    device.name(),
-                    domain_file_info,
-                    DomainType::EmptyDeviceDomain(empty_dev),
-                    true
-                );
+                register_platform_owned_empty_device(device.name())?;
             }
             _ => {
                 warn!("unknown device: {}", device.name());
@@ -142,7 +163,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
 
     // x86_64 不依赖 platform_bus 是否暴露 pci_ecam，统一按 PCI endpoint 绑定 virtio 域。
     let (blk_ep, net_ep, input_eps, gpu_ep) = {
-        let bus = pci_bus!().lock();
+        let bus = pci_bus!().read();
         let blk_ep = bus
             .endpoint_devices()
             .iter()

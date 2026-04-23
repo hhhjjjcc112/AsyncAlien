@@ -5,13 +5,13 @@ use alloc::{format, vec::Vec};
 
 use basic::io::SafeIORegion;
 use device::PciBus;
-use ksync::Mutex;
+use ksync::RwLock;
 
 use crate::bus::{CommonDeviceInfo, CommonDeviceType};
 
 use self::device::PciCommonDevice;
 
-pub static PCI_BUS: Mutex<PciBus> = Mutex::new(PciBus::new());
+pub static PCI_BUS: RwLock<PciBus> = RwLock::new(PciBus::new());
 
 /// 把 PCI ECAM 区域统一封装成总线层设备描述，供不同架构的发现入口复用。
 /// 这里不做具体枚举，只把“可访问的配置空间”交给后面的 `PciBus`。
@@ -30,14 +30,14 @@ pub fn pci_init(pci_info: CommonDeviceInfo) {
     let io_region = SafeIORegion::new(pci_info.address_range.clone());
     // 步骤2：注册到 PCI 总线统一管理。
     let pci_device = PciCommonDevice::new(io_region, pci_info);
-    PCI_BUS.lock().register_common_device(pci_device);
+    PCI_BUS.write().register_common_device(pci_device);
 }
 
 #[cfg(target_arch = "x86_64")]
 /// 函数说明：执行对应的总线处理步骤。
 pub fn collect_virtio_devices() -> Vec<CommonDeviceType> {
     // 步骤1：遍历 PCI 端点，筛选 virtio 设备。
-    let bus = PCI_BUS.lock();
+    let bus = PCI_BUS.read();
     let mut devices = Vec::new();
 
     for endpoint in bus.endpoint_devices().iter() {

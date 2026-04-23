@@ -1,5 +1,5 @@
 use crate::arch::hart_id;
-use crate::mutex::Mutex;
+use crate::mutex::MutexNoIrq;
 use crate::println;
 use alloc::collections::BTreeMap;
 use alloc::sync::Arc;
@@ -7,8 +7,8 @@ use plic::{Mode, PLIC};
 use spin::Once;
 
 pub static PLIC: Once<PLIC<1>> = Once::new();
-pub static DEVICE_TABLE: Mutex<BTreeMap<usize, Arc<Mutex<dyn DeviceBase>>>> =
-    Mutex::new(BTreeMap::new());
+pub static DEVICE_TABLE: MutexNoIrq<BTreeMap<usize, Arc<MutexNoIrq<dyn DeviceBase>>>> =
+    MutexNoIrq::new(BTreeMap::new());
 
 pub fn init_plic(plic_addr: usize) {
     let privileges = [2; 1];
@@ -18,7 +18,7 @@ pub fn init_plic(plic_addr: usize) {
 }
 
 /// Register a device to PLIC.
-pub fn register_device_to_plic(irq: usize, device: Arc<Mutex<dyn DeviceBase>>) {
+pub fn register_device_to_plic(irq: usize, device: Arc<MutexNoIrq<dyn DeviceBase>>) {
     let hard_id = hart_id();
     let mut table = DEVICE_TABLE.lock();
     table.insert(irq, device);

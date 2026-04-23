@@ -21,6 +21,10 @@ pub enum CommonDeviceType {
     Uart(CommonDeviceInfo),
     Rtc(CommonDeviceInfo),
     Pci(CommonDeviceInfo),
+    #[cfg(feature = "bench")]
+    Ramdisk(CommonDeviceInfo),
+    #[cfg(feature = "domain_net_test")]
+    LoopBack(CommonDeviceInfo),
     // x86_64 的 virtio 通过 PCI transport 访问，bus 侧只记录枚举结果。
     Virtio(String),
 }
@@ -141,6 +145,40 @@ fn from_common_device(ty: CommonDeviceType) -> DiscoveredDevice {
                 fw_source: FirmwareSource::PciScan,
             }
         }
+        #[cfg(feature = "bench")]
+        CommonDeviceType::Ramdisk(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::Ramdisk,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Synthetic,
+            }
+        }
+        #[cfg(feature = "domain_net_test")]
+        CommonDeviceType::LoopBack(info) => {
+            let CommonDeviceInfo {
+                locator,
+                irq,
+                compatible,
+                ..
+            } = info;
+            DiscoveredDevice {
+                class: DeviceClass::LoopBack,
+                locator,
+                transport: DeviceTransport::Platform,
+                irq,
+                compatible,
+                fw_source: FirmwareSource::Synthetic,
+            }
+        }
     }
 }
 
@@ -196,6 +234,18 @@ fn register_discovered_devices(devices: alloc::vec::Vec<DiscoveredDevice>) {
                 pci::pci_init(info);
             }
         }
+        #[cfg(feature = "bench")]
+        DeviceClass::Ramdisk => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "ramdisk");
+            }
+        }
+        #[cfg(feature = "domain_net_test")]
+        DeviceClass::LoopBack => {
+            if let Some(info) = locator_to_info(&dev.locator, dev.irq, dev.compatible) {
+                platform::register_platform_device(info, "loopback");
+            }
+        }
         DeviceClass::VirtioPci => {}
         _ => {}
     });
@@ -234,6 +284,37 @@ pub fn init_with_acpi() -> AlienResult<()> {
 
     fallback_with_aml(&mut base_devices);
 
+    #[cfg(feature = "bench")]
+    {
+        let ramdisk_start = RAMDISK.as_ptr() as usize;
+        let len = RAMDISK.len();
+        base_devices.push(CommonDeviceType::Ramdisk(CommonDeviceInfo {
+            address_range: mem::PhysAddr::from(ramdisk_start)
+                ..mem::PhysAddr::from(ramdisk_start + len),
+            locator: DeviceLocator::Mmio(
+                mem::PhysAddr::from(ramdisk_start)..mem::PhysAddr::from(ramdisk_start + len),
+            ),
+            irq: None,
+            compatible: None,
+        }));
+    }
+
+    #[cfg(feature = "domain_net_test")]
+    {
+        let loopback_base = 0x1_0000_0000usize;
+        let loopback_size = 0x1000usize;
+        base_devices.push(CommonDeviceType::LoopBack(CommonDeviceInfo {
+            address_range: mem::PhysAddr::from(loopback_base)
+                ..mem::PhysAddr::from(loopback_base + loopback_size),
+            locator: DeviceLocator::Mmio(
+                mem::PhysAddr::from(loopback_base)
+                    ..mem::PhysAddr::from(loopback_base + loopback_size),
+            ),
+            irq: None,
+            compatible: None,
+        }));
+    }
+
     base_devices.extend(acpi::enumerate_pci_devices());
 
     let discovered_base = base_devices
@@ -253,3 +334,6 @@ pub fn init_with_acpi() -> AlienResult<()> {
 
     Ok(())
 }
+
+#[cfg(feature = "bench")]
+static RAMDISK: &'static [u8] = include_bytes!("../../../../build/sdcard.img");
