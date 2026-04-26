@@ -41,6 +41,32 @@ fn register_platform_owned_empty_device(device_name: &str) -> AlienResult<()> {
     Ok(())
 }
 
+fn bind_irq_to_apic(
+    apic: &Arc<APICDomainProxy>,
+    irq: Option<u32>,
+    domain_name: &str,
+    device_desc: &str,
+) -> AlienResult<()> {
+    let Some(irq) = irq else {
+        warn!("{} has no irq line, skip APIC bind", device_desc);
+        return Ok(());
+    };
+
+    if irq > u8::MAX as u32 {
+        warn!(
+            "{} irq {} exceeds IOAPIC vector setup range, skip APIC bind",
+            device_desc, irq
+        );
+        return Ok(());
+    }
+
+    let vector = 32u8.saturating_add(irq as u8);
+    platform::apic::configure_irq(irq as u8, vector, 0);
+    platform::apic::set_irq_enable(irq as usize, true);
+    apic.register_irq(irq as _, &DVec::from_slice(domain_name.as_bytes()))?;
+    Ok(())
+}
+
 pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
     let platform_bus = platform_bus!();
     let mut has_nic = false;
@@ -101,12 +127,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     true
                 );
 
-                if let Some(irq) = irq {
-                    let vector = 32u8.saturating_add(irq as u8);
-                    platform::apic::configure_irq(irq as u8, vector, 0);
-                    platform::apic::set_irq_enable(irq as usize, true);
-                    apic.register_irq(irq as _, &DVec::from_slice(buf_uart_name.as_bytes()))?;
-                }
+                bind_irq_to_apic(&apic, irq, &buf_uart_name, "uart")?;
             }
             "rtc" => {
                 init_x86_rtc_domain()?;
@@ -265,22 +286,18 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 false
             );
             register_domain!("block", domain_file_info, blk_domain, false);
-
-            if let Some(irq) = pci_irq {
-                log::debug!(
-                    "virtio-blk irq {} detected, defer APIC route until trap domain is ready (domain={})",
-                    irq,
-                    virtio_blk_name
-                );
-            } else {
-                warn!(
-                    "virtio-blk @ {:04x}:{:02x}:{:02x}.{} has no irq line",
+            bind_irq_to_apic(
+                &apic,
+                pci_irq,
+                &virtio_blk_name,
+                &alloc::format!(
+                    "virtio-blk @ {:04x}:{:02x}:{:02x}.{}",
                     bdf.segment(),
                     bdf.bus(),
                     bdf.device(),
                     bdf.function()
-                );
-            }
+                ),
+            )?;
 
             has_block = true;
         } else {
@@ -327,13 +344,25 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             )?;
             net_driver.init_by_box(Box::new(init_info))?;
             let net_domain = DomainType::NetDeviceDomain(net_driver.clone());
-            register_domain!(
+            let virtio_net_name = register_domain!(
                 "virtio_net",
                 domain_file_info.clone(),
                 net_domain.clone(),
                 false
             );
             register_domain!("nic", domain_file_info, net_domain, false);
+            bind_irq_to_apic(
+                &apic,
+                ep.interrupt_line().map(|irq| irq as u32),
+                &virtio_net_name,
+                &alloc::format!(
+                    "virtio-net @ {:04x}:{:02x}:{:02x}.{}",
+                    bdf.segment(),
+                    bdf.bus(),
+                    bdf.device(),
+                    bdf.function()
+                ),
+            )?;
             has_nic = true;
         } else {
             warn!(
@@ -381,6 +410,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 DomainType::InputDomain(input_driver),
                 false
             );
+            let input_name_for_irq = input_name.clone();
             let (buf_input, domain_file_info) = create_domain!(
                 BufInputDomainProxy,
                 DomainTypeRaw::BufInputDomain,
@@ -404,6 +434,18 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             } else if input_alias_count == 1 {
                 register_domain!("mouse", domain_file_info, buf_input_domain, true);
             }
+            bind_irq_to_apic(
+                &apic,
+                ep.interrupt_line().map(|irq| irq as u32),
+                &input_name_for_irq,
+                &alloc::format!(
+                    "virtio-input @ {:04x}:{:02x}:{:02x}.{}",
+                    bdf.segment(),
+                    bdf.bus(),
+                    bdf.device(),
+                    bdf.function()
+                ),
+            )?;
             input_alias_count += 1;
         } else {
             warn!(
@@ -446,7 +488,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
             gpu_driver.init_by_box(Box::new(init_info))?;
             let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
-            register_domain!(
+            let virtio_gpu_name = register_domain!(
                 "virtio_gpu",
                 domain_file_info.clone(),
                 gpu_domain.clone(),
@@ -456,6 +498,18 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 register_domain!("gpu", domain_file_info, gpu_domain, true);
                 has_gpu_alias = true;
             }
+            bind_irq_to_apic(
+                &apic,
+                ep.interrupt_line().map(|irq| irq as u32),
+                &virtio_gpu_name,
+                &alloc::format!(
+                    "virtio-gpu @ {:04x}:{:02x}:{:02x}.{}",
+                    bdf.segment(),
+                    bdf.bus(),
+                    bdf.device(),
+                    bdf.function()
+                ),
+            )?;
         } else {
             warn!(
                 "virtio-gpu @ {:04x}:{:02x}:{:02x}.{} has no usable transport (legacy/modern), skip",
@@ -492,7 +546,8 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     net_domain.clone(),
                     false
                 );
-                register_domain!("nic", domain_file_info, net_domain, false);
+                let nic_name = register_domain!("nic", domain_file_info, net_domain, false);
+                bind_irq_to_apic(&apic, device.irq(), &nic_name, "virtio-mmio net")?;
                 has_nic = true;
             }
             VirtioMmioDeviceType::Block => {
@@ -506,7 +561,8 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     blk_domain.clone(),
                     false
                 );
-                register_domain!("block", domain_file_info, blk_domain, false);
+                let block_name = register_domain!("block", domain_file_info, blk_domain, false);
+                bind_irq_to_apic(&apic, device.irq(), &block_name, "virtio-mmio block")?;
                 has_block = true;
             }
             VirtioMmioDeviceType::Input => {
@@ -545,6 +601,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 } else if input_alias_count == 1 {
                     register_domain!("mouse", domain_file_info, buf_input_domain, true);
                 }
+                bind_irq_to_apic(&apic, device.irq(), &buf_input_name, "virtio-mmio input")?;
                 input_alias_count += 1;
             }
             VirtioMmioDeviceType::GPU => {
@@ -552,12 +609,13 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
                 gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
-                register_domain!(
+                let virtio_gpu_name = register_domain!(
                     "virtio_gpu",
                     domain_file_info.clone(),
                     gpu_domain.clone(),
                     false
                 );
+                bind_irq_to_apic(&apic, device.irq(), &virtio_gpu_name, "virtio-mmio gpu")?;
                 if !has_gpu_alias {
                     register_domain!("gpu", domain_file_info, gpu_domain, true);
                     has_gpu_alias = true;

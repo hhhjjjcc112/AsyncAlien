@@ -6,7 +6,7 @@ Press Ctrl-B to configure iPXE (PCI 00:02.0)...
 
 
 Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
-[0] percpu use 0x140 mem
+[0] percpu use 0x100 mem
 [0] [kernel] primary percpu ready cpu_id=0
 [0] 
      _      _   _
@@ -17,21 +17,21 @@ Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
 
 [0] [x86_platform] platform_init_primary enter cpu_id=0
 [0] [x86_platform] platform_init_primary ready cpu_id=0
-[0] Initrd from multiboot: 0xb29000..0xe25500
+[0] Initrd from multiboot: 0xb26000..0xe2224b
 [0] Init logger Some("")
-[0] Frame range: 0x10b28000..0x7ffdc000, pages=0x6f4b4
-[0] initrd copy: src=0xb29000, size=3130624, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0x967aa9f5, dst=0x967aa9f5
-[0] Relocate initrd data to 0x10b36000
+[0] Frame range: 0x10b25000..0x7ffdc000, pages=0x6f4b7
+[0] initrd copy: src=0xb26000, size=3129931, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0x241b3496, dst=0x241b3496
+[0] Relocate initrd data to 0x10b33000
 [0] Frame allocator init success
 [0] Talloc allocator init success
-[0] kernel text:          0x200000-0x2b4000
-[0] kernel rodata:        0x2b4000-0x2cb000
-[0] kernel init_array:    0x2cb000-0x2cb000
-[0] kernel data:          0x2cb000-0xb10000
-[0] kernel bss:           0xb10000-0xb28000
-[0] kernel heap:          0xb28000-0x10b28000
-[0] kernel alloc range:   0x10b28000-0x7ffdc000
+[0] kernel text:          0x200000-0x2b5000
+[0] kernel rodata:        0x2b5000-0x2cc000
+[0] kernel init_array:    0x2cc000-0x2cc000
+[0] kernel data:          0x2cc000-0xb11000
+[0] kernel bss:           0xb11000-0xb25000
+[0] kernel heap:          0xb25000-0x10b25000
+[0] kernel alloc range:   0x10b25000-0x7ffdc000
 [0] map local_apic: 0xfee00000-0xfee01000
 [0] map io_apic: 0xfec00000-0xfec01000
 [0] map hpet: 0xfed00000-0xfed01000
@@ -45,7 +45,7 @@ Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
 SMP:     4 CPUs
 Memory:  0x100000..0x7ffdc000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb29000..0xe25500
+Initrd:  0xb26000..0xe2224b
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] <register domain>: buf_uart
@@ -73,76 +73,104 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: cmos_rtc
 [0] <register domain>: virtio_net
 [0] <register domain>: loopback
+[0] [domain_loader] loaded DomainLoader { entry: 2149435472, phy_start: 2149433344, ident: "fifo_scheduler", text_section: 2149433344..2149490688 }
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 4517 us[0m
+[0] [31m[Load new domain] Time elapsed: 5209 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 921 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2149558352, phy_start: 2149556224, ident: "logger", text_section: 2149556224..2149609472 }
+[0] [31m[Load new domain] Time elapsed: 1124 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 3354 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2149673040, phy_start: 2149670912, ident: "fatfs", text_section: 2149670912..2149949440 }
+[0] [31m[Load new domain] Time elapsed: 2705 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 1463 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2150107216, phy_start: 2150105088, ident: "ramfs", text_section: 2150105088..2150313984 }
+[0] [31m[Load new domain] Time elapsed: 1631 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 2430 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2150463568, phy_start: 2150461440, ident: "devfs", text_section: 2150461440..2150682624 }
+[0] [31m[Load new domain] Time elapsed: 2542 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 2888 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2150852688, phy_start: 2150850560, ident: "procfs", text_section: 2150850560..2151055360 }
+[0] [31m[Load new domain] Time elapsed: 3062 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 1911 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2151213136, phy_start: 2151211008, ident: "sysfs", text_section: 2151211008..2151403520 }
+[0] [31m[Load new domain] Time elapsed: 2063 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 1990 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2151540816, phy_start: 2151538688, ident: "pipefs", text_section: 2151538688..2151731200 }
+[0] [31m[Load new domain] Time elapsed: 2114 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 2333 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2151868528, phy_start: 2151866368, ident: "domainfs", text_section: 2151866368..2152071168 }
+[0] [31m[Load new domain] Time elapsed: 2543 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 1512 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2152220752, phy_start: 2152218624, ident: "vfs", text_section: 2152218624..2152525824 }
+[0] [31m[Load new domain] Time elapsed: 1700 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 1271 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2152736848, phy_start: 2152734720, ident: "task", text_section: 2152734720..2152984576 }
+[0] [31m[Load new domain] Time elapsed: 1452 us[0m
 [0] <attach domain>: task, it's name is task
+[0] [domain_loader] loaded DomainLoader { entry: 2153138288, phy_start: 2153136128, ident: "syscall", text_section: 2153136128..2153259008 }
 [0][Domain:12] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 3482 us[0m
+[0] [31m[Load new domain] Time elapsed: 3503 us[0m
 [0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
 [0][Domain:12] syscall domain init
 [0] <attach domain>: syscall, it's name is syscall
-[0] [31m[Load new domain] Time elapsed: 940 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153347152, phy_start: 2153345024, ident: "apic", text_section: 2153345024..2153414656 }
+[0] [31m[Load new domain] Time elapsed: 1142 us[0m
 [0][Domain:13] APIC domain init
 [0] <attach domain>: apic, it's name is apic
-[0] [31m[Load new domain] Time elapsed: 579 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153486416, phy_start: 2153484288, ident: "null", text_section: 2153484288..2153533440 }
+[0] [31m[Load new domain] Time elapsed: 804 us[0m
 [0] <attach domain>: local_apic, it's name is local_apic
-[0] [31m[Load new domain] Time elapsed: 521 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153597008, phy_start: 2153594880, ident: "null", text_section: 2153594880..2153644032 }
+[0] [31m[Load new domain] Time elapsed: 710 us[0m
 [0] <attach domain>: io_apic, it's name is io_apic
-[0] [31m[Load new domain] Time elapsed: 674 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153707600, phy_start: 2153705472, ident: "null", text_section: 2153705472..2153754624 }
+[0] [31m[Load new domain] Time elapsed: 875 us[0m
 [0] <attach domain>: hpet, it's name is hpet
-[0] [31m[Load new domain] Time elapsed: 546 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153818192, phy_start: 2153816064, ident: "cmos_rtc", text_section: 2153816064..2153869312 }
+[0] [31m[Load new domain] Time elapsed: 820 us[0m
 [0][Domain:17] CmosRtc region: 0x70..0x72
 [0] <attach domain>: rtc, it's name is rtc
-[0] [31m[Load new domain] Time elapsed: 941 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2153932880, phy_start: 2153930752, ident: "uart16550", text_section: 2153930752..2153979904 }
+[0] [31m[Load new domain] Time elapsed: 1070 us[0m
 [0][Domain:18] uart_addr: 0x3f8-0x400
 [0][Domain:18] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 1133 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2154043472, phy_start: 2154041344, ident: "buf_uart", text_section: 2154041344..2154098688 }
+[0] [31m[Load new domain] Time elapsed: 1341 us[0m
 [0][Domain:19] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0][Domain:13] APIC enable irq 4
-[0] [31m[Load new domain] Time elapsed: 964 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2154166352, phy_start: 2154164224, ident: "virtio_blk", text_section: 2154164224..2154246144 }
+[0] [31m[Load new domain] Time elapsed: 1207 us[0m
 [0][Domain:20] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
 [0][Domain:20] virtio_blk_pci: create blk driver
 [0][Domain:20] virtio_blk_pci: driver ready
 [0] virtio-pci block @ 0000:00:03.0
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
-[0] [31m[Load new domain] Time elapsed: 925 us[0m
+[0][Domain:13] APIC enable irq 11
+[0] [domain_loader] loaded DomainLoader { entry: 2154322000, phy_start: 2154319872, ident: "virtio_net", text_section: 2154319872..2154401792 }
+[0] [31m[Load new domain] Time elapsed: 1047 us[0m
 [0][Domain:21] virtio_net_pci(legacy): 0000:00:02.0, io=0xc0c0-0xc1c0
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 1119 us[0m
+[0][Domain:13] APIC enable irq 11
+[0] [domain_loader] loaded DomainLoader { entry: 2154477680, phy_start: 2154475520, ident: "net_stack", text_section: 2154475520..2154602496 }
+[0] [31m[Load new domain] Time elapsed: 1271 us[0m
 [0][Domain:22] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 831 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2154694736, phy_start: 2154692608, ident: "shadow_blk", text_section: 2154692608..2154749952 }
+[0] [31m[Load new domain] Time elapsed: 1133 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 3398 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2154825808, phy_start: 2154823680, ident: "cache_blk", text_section: 2154823680..2154893312 }
+[0] [31m[Load new domain] Time elapsed: 3275 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 1427 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2154969168, phy_start: 2154967040, ident: "null", text_section: 2154967040..2155016192 }
+[0] [31m[Load new domain] Time elapsed: 1530 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 542 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2155079760, phy_start: 2155077632, ident: "random", text_section: 2155077632..2155126784 }
+[0] [31m[Load new domain] Time elapsed: 722 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -155,7 +183,8 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 1631 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2155190352, phy_start: 2155188224, ident: "ramfs", text_section: 2155188224..2155397120 }
+[0] [31m[Load new domain] Time elapsed: 1762 us[0m
 [0][Domain:27] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
 [0][Domain:27] ramfs mount success
@@ -167,13 +196,15 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 1481 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2155546704, phy_start: 2155544576, ident: "ramfs", text_section: 2155544576..2155753472 }
+[0] [31m[Load new domain] Time elapsed: 1590 us[0m
 [0][Domain:28] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
 [0][Domain:28] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 1420 us[0m
+[0] [domain_loader] loaded DomainLoader { entry: 2155903056, phy_start: 2155900928, ident: "ramfs", text_section: 2155900928..2156109824 }
+[0] [31m[Load new domain] Time elapsed: 1596 us[0m
 [0][Domain:29] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
 [0][Domain:29] ramfs mount success
@@ -201,7 +232,7 @@ drwxr-xr-x      4KB usr
 [0] load_domains: after vfs init
 [0] Drop initrd data
 [0] load_domains: before task init
-[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13c3a000
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13c37000
 [0][Domain:11] task::current_task: no current tid
 [0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
 [0][Domain:11] init_task enqueue init process tid=1
@@ -243,23 +274,23 @@ drwxr-xr-x      4KB usr
 [3] [x86_platform] platform_init_secondary enter cpu_id=3
 [3] [x86_platform] platform_init_secondary ready cpu_id=3
 [3] [kernel] secondary_main platform ready cpu_id=3
+[0] [kernel] secondary cpu launch result started=3 declared_expected=3
 [3] [kernel] secondary_main memory ready cpu_id=3
 [3] ++++ setup interrupt ++++
 [3] ++++ setup interrupt done, enable:true ++++
 [3] [kernel] secondary_main trap ready cpu_id=3
 [3] CPU 3 start...
-[0] [kernel] secondary cpu launch result started=3 declared_expected=3
-[0] [kernel] secondary cpus released count=3
 [3] [kernel] secondary_main announced ready cpu_id=3 ready_count=3
 [3] [kernel] secondary_main released cpu_id=3
-[2] [kernel] secondary_main released cpu_id=2
+[0] [kernel] secondary cpus released count=3
+[0] Begin run task...
+[0] run_task bootstrap wake 0 tasks
+[3] run_task bootstrap wake 0 tasks
 [1] [kernel] secondary_main released cpu_id=1
 [1] run_task bootstrap wake 0 tasks
-[3] run_task bootstrap wake 0 tasks
-[0] Begin run task...
+[2] [kernel] secondary_main released cpu_id=2
 [2] run_task bootstrap wake 0 tasks
-[0] run_task bootstrap wake 0 tasks
-[1][Domain:11] kthread_init start...
+[0][Domain:11] kthread_init start...
 Init process is running
 [Init] start /tests/new/syscall_all
 [syscall_all] start
@@ -274,18 +305,45 @@ Init process is running
 [1][Domain:11] release task [3-3]
 [sys_fs] start
 [sys_fs] PASS
-[1][Domain:11] release task [3-3]
+[2][Domain:11] release task [3-3]
 [sys_link] start
 [sys_link] PASS
-[3][Domain:11] release task [3-3]
+[1][Domain:11] release task [3-3]
 [sys_proc] start
 [2][Domain:11] release task [4-4]
-[2][Domain:11] release task [4-4]
+[1][Domain:11] release task [4-4]
 [sys_proc] PASS
 [2][Domain:11] release task [3-3]
 [sys_random] start
 [sys_random] PASS
 [3][Domain:11] release task [3-3]
 [sys_time] start
-[3] line 86, file kernel/src/trap/x86_64/handler.rs: do_load_page_fault failed: addr=0x0, rip=0x10001f3a0, rsp=0x4059d08, err_code=0x4, err=EINVAL
-qemu-system-x86_64: terminating on signal 15 from pid 85775 (timeout)
+[sys_time] realtime=2s 155416742ns
+[sys_time] monotonic=2s 155416761ns
+[sys_time] monotonic_tick=2s 155416761ns
+[sys_time] monotonic_tick=2s 155416761ns
+[sys_time] monotonic_tick=2s 155416761ns
+[sys_time] monotonic_tick=2s 155416761ns
+[sys_time] PASS
+[1][Domain:11] release task [3-3]
+[sys_vdso_time_compare] start
+[sys_vdso_time_compare] vdso=12s 327285584ns raw=12s 327840843ns delta=555259ns
+[sys_vdso_time_compare] PASS
+[2][Domain:11] release task [3-3]
+[syscall_all] PASS
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/new/syscall_all
+[Init] start /tests/ping
+Test socket
+Created socket: 3
+socket bind successes!
+Created socket: 4
+socket bind successes!
+Sent data to server: Ok("Hello Server!")
+receive 13 bytes from client 10.0.2.15:20001
+Received data from client: Ok("Hello Server!")
+Test socket successes!
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/ping
+[Init] all tests passed
+[1m[32mAlien[0m:[1m[34m/[0m# qemu-system-x86_64: terminating on signal 15 from pid 173189 (timeout)

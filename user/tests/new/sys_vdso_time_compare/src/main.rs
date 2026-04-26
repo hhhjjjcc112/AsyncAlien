@@ -3,15 +3,17 @@
 
 extern crate alloc;
 
-use Mstd::{println, time::{clock_gettime_raw, clock_gettime_vdso}};
+use Mstd::{println, time::{clock_gettime_raw, clock_gettime_vdso, sleep}};
 use pconst::time::TimeSpec;
 
 const CLOCK_MONOTONIC: usize = 1;
-const MAX_DELTA_NS: u128 = 10_000_000; // 10ms
+const MAX_DELTA_NS: u128 = 1_000_000; // 1ms
 
 #[unsafe(no_mangle)]
 fn main() -> i32 {
     println!("[sys_vdso_time_compare] start");
+
+    sleep(10000);
 
     let mut vdso_ts = TimeSpec::default();
     let mut raw_ts = TimeSpec::default();

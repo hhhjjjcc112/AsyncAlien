@@ -101,6 +101,7 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
             if platform::config::APIC_TIMER_ONESHOT {
                 timer::set_next_trigger();
             }
+            let _ = task_domain!().vdso_update_time_snapshot();
             // 先在本核完成中断收尾，避免任务切走甚至迁移后再向错误 LAPIC 发送 EOI。
             send_apic_eoi();
             crate::task::yield_now();
@@ -173,6 +174,7 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
             if platform::config::APIC_TIMER_ONESHOT {
                 timer::set_next_trigger();
             }
+            let _ = task_domain!().vdso_update_time_snapshot();
             send_apic_eoi();
         }
 
