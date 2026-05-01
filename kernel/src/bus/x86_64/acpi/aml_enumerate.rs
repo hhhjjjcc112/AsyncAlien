@@ -99,8 +99,8 @@ fn classify_aml_device(ctx: &mut AmlContext, path: &AmlName) -> Option<CommonDev
 fn should_enumerate_by_sta(path: &AmlName, sta: Option<Option<StatusObject>>) -> bool {
     match sta {
         None => {
-            trace!(
-                "[bus][x86_64][acpi][aml] {} _STA missing, use default(enumerate=true)",
+            warn!(
+                "[bus][x86_64][acpi][aml] {} _STA missing, fallback to enumerate=true",
                 path
             );
             true
@@ -159,6 +159,14 @@ fn classify_uart_device(
     let (fallback_base, fallback_irq) = uart_hint
         .map(|(_, base, irq)| (base, irq))
         .unwrap_or((0x3f8usize, Some(4)));
+    if uart_hint.is_none() {
+        warn!(
+            "[bus][x86_64][acpi][aml] {} use generic UART fallback COM1 base={:#x}, irq={:?}",
+            path,
+            fallback_base,
+            fallback_irq
+        );
+    }
 
     let (address, size, irq) = if let Some(value) = crs {
         let address = descriptor_parser::first_io_port_base(ctx, value);

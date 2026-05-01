@@ -168,7 +168,7 @@ pub fn create_domain<T: ?Sized>(
         drop(time_tick);
         return None;
     }
-    platform::println!("[domain_loader] loaded {:?}", domain_loader);
+    // platform::println!("[domain_loader] loaded {:?}", domain_loader);
     let id = alloc_domain_id();
     let domain = domain_loader.call_main(id, use_old_id);
     drop(time_tick);

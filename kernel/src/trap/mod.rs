@@ -20,7 +20,10 @@ use core::arch::global_asm;
 
 use basic::sync::Once;
 #[cfg(target_arch = "x86_64")]
-use interface::APICDomain as InterruptControllerDomain;
+use interface::{
+    IoAPICDomain as InterruptControllerDomain, IoAPICDomain as IoAPICDomainTrait,
+    LocalAPICDomain as LocalAPICDomainTrait,
+};
 #[cfg(target_arch = "riscv64")]
 use interface::PLICDomain as InterruptControllerDomain;
 use interface::SysCallDomain;
@@ -41,6 +44,10 @@ global_asm!(include_str!("./x86_64/trampoline.asm"));
 pub static SYSCALL_DOMAIN: Once<Arc<dyn SysCallDomain>> = Once::new();
 /// 当前架构唯一可见的中断控制器域。
 pub static INTERRUPT_CONTROLLER_DOMAIN: Once<Arc<dyn InterruptControllerDomain>> = Once::new();
+#[cfg(target_arch = "x86_64")]
+pub static LOCAL_APIC_DOMAIN: Once<Arc<dyn LocalAPICDomainTrait>> = Once::new();
+#[cfg(target_arch = "x86_64")]
+pub static IO_APIC_DOMAIN: Once<Arc<dyn IoAPICDomainTrait>> = Once::new();
 
 #[macro_export]
 macro_rules! syscall_domain {
@@ -66,8 +73,19 @@ pub fn register_interrupt_controller_domain(
     INTERRUPT_CONTROLLER_DOMAIN.call_once(|| interrupt_controller_domain);
 }
 
+#[cfg(target_arch = "x86_64")]
+pub fn register_local_apic_domain(local_apic_domain: Arc<dyn LocalAPICDomainTrait>) {
+    LOCAL_APIC_DOMAIN.call_once(|| local_apic_domain);
+}
+
+#[cfg(target_arch = "x86_64")]
+pub fn register_io_apic_domain(io_apic_domain: Arc<dyn IoAPICDomainTrait>) {
+    IO_APIC_DOMAIN.call_once(|| io_apic_domain);
+}
+
 pub fn init_trap_subsystem() {
-    println!("++++ setup interrupt ++++");
+    // println!(\"++++ setup interrupt +++\");
+    // 只保留中断控制器注册逻辑，不打印
     // 架构相关的trap初始化
     init_trap();
 
@@ -77,5 +95,5 @@ pub fn init_trap_subsystem() {
     arch::interrupt_enable();
 
     let enable = arch::is_interrupt_enable();
-    println!("++++ setup interrupt done, enable:{:?} ++++", enable);
+    // println!(\"++++ setup interrupt done, enable:{:?} +++\", enable);
 }

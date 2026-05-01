@@ -1,18 +1,25 @@
-use alloc::{boxed::Box, string::ToString, sync::Arc};
+use alloc::{boxed::Box, string::ToString, sync::Arc, vec::Vec};
 
 use basic::bus::mmio::VirtioMmioDeviceType;
 use corelib::AlienResult;
 use interface::*;
 use log::warn;
 use shared_heap::DVec;
+use platform::MemIf;
 
 use super::{
-    InterruptControllerDomain, require_mmio_range_or_einval, try_virtio_mmio_range_or_skip,
+    require_mmio_range_or_einval, try_virtio_mmio_range_or_skip,
 };
 use crate::{
     bus::DeviceLocator, create_domain, domain_proxy::*, mmio_bus, pci_bus, platform_bus,
     register_domain,
 };
+
+#[derive(Debug)]
+pub(super) struct X86ApicDomains {
+    pub local_apic: Arc<dyn LocalAPICDomain>,
+    pub io_apic: Arc<dyn IoAPICDomain>,
+}
 
 fn init_x86_rtc_domain() -> AlienResult<()> {
     // x86 CMOS RTC 使用固定端口，最小实现只提供读时间能力。
@@ -41,55 +48,118 @@ fn register_platform_owned_empty_device(device_name: &str) -> AlienResult<()> {
     Ok(())
 }
 
-fn bind_irq_to_apic(
-    apic: &Arc<APICDomainProxy>,
-    irq: Option<u32>,
-    domain_name: &str,
-    device_desc: &str,
-) -> AlienResult<()> {
-    let Some(irq) = irq else {
-        warn!("{} has no irq line, skip APIC bind", device_desc);
-        return Ok(());
+pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
+    let platform_devices = {
+        let platform_bus = platform_bus!();
+        platform_bus
+            .common_devices()
+            .iter()
+            .map(|device| {
+                (
+                    device.name().to_string(),
+                    device.irq(),
+                    device.compatible().map(ToString::to_string),
+                    device.locator().clone(),
+                )
+            })
+            .collect::<Vec<_>>()
     };
-
-    if irq > u8::MAX as u32 {
-        warn!(
-            "{} irq {} exceeds IOAPIC vector setup range, skip APIC bind",
-            device_desc, irq
-        );
-        return Ok(());
-    }
-
-    let vector = 32u8.saturating_add(irq as u8);
-    platform::apic::configure_irq(irq as u8, vector, 0);
-    platform::apic::set_irq_enable(irq as usize, true);
-    apic.register_irq(irq as _, &DVec::from_slice(domain_name.as_bytes()))?;
-    Ok(())
-}
-
-pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
-    let platform_bus = platform_bus!();
     let mut has_nic = false;
     let mut has_block = false;
     let mut has_gpu_alias = false;
     let mut input_alias_count = 0usize;
 
-    let (apic, domain_file_info) =
-        create_domain!(APICDomainProxy, DomainTypeRaw::APICDomain, "apic")?;
-    apic.init_by_box(Box::new(()))?;
-    register_domain!(
-        "apic",
-        domain_file_info,
-        DomainType::APICDomain(apic.clone()),
-        true
+    let mut local_apic_base = None;
+    let mut io_apic_base = None;
+
+    for (device_name, _, _, locator) in &platform_devices {
+        match device_name.as_str() {
+            "local_apic" => {
+                let local_apic_range = require_mmio_range_or_einval(
+                    "x86_64",
+                    "local_apic",
+                    locator,
+                )?;
+                local_apic_base = Some(<platform::Platform as MemIf>::phys_to_virt(
+                    local_apic_range.start,
+                ));
+            }
+            "io_apic" => {
+                let io_apic_range =
+                    require_mmio_range_or_einval("x86_64", "io_apic", locator)?;
+                io_apic_base = Some(<platform::Platform as MemIf>::phys_to_virt(
+                    io_apic_range.start,
+                ));
+            }
+            _ => {}
+        }
+    }
+
+    let local_apic_base = local_apic_base.ok_or_else(|| {
+        log::error!("x86_64 local_apic device is missing from platform bus");
+        crate::error::AlienError::EINVAL
+    })?;
+    let io_apic_base = io_apic_base.ok_or_else(|| {
+        log::error!("x86_64 io_apic device is missing from platform bus");
+        crate::error::AlienError::EINVAL
+    })?;
+
+    log::info!(
+        "[x86_64][apic] mapped local_apic_base={:#x}, io_apic_base={:#x}",
+        local_apic_base,
+        io_apic_base
     );
 
-    for device in platform_bus.common_devices().iter() {
-        let irq = device.irq();
+    let (local_apic, domain_file_info) = create_domain!(
+        LocalAPICDomainProxy,
+        DomainTypeRaw::LocalAPICDomain,
+        "local_apic"
+    )?;
+    // platform::println!(
+    //     "[x86_64][local_apic] init_by_box begin base={:#x}",
+    //     local_apic_base
+    // );
+    local_apic.init_by_box(Box::new(LocalAPICHooks {
+        xapic_base: local_apic_base,
+    }))?;
+    // platform::println!("[x86_64][local_apic] init_by_box ok");
+    register_domain!(
+        "local_apic",
+        domain_file_info,
+        DomainType::LocalAPICDomain(local_apic.clone()),
+        true
+    );
+    // platform::println!("[x86_64][local_apic] register_domain ok");
 
-        match device.name() {
+    let (io_apic, domain_file_info) = create_domain!(
+        IoAPICDomainProxy,
+        DomainTypeRaw::IoAPICDomain,
+        "io_apic"
+    )?;
+    // platform::println!("[x86_64][io_apic] before init_by_box");
+    io_apic.init_by_box(Box::new(IoAPICHooks {
+        ioapic_base: io_apic_base,
+    }))?;
+    // platform::println!("[x86_64][io_apic] after init_by_box");
+    // platform::println!("[x86_64][io_apic] before register_domain");
+    register_domain!(
+        "io_apic",
+        domain_file_info,
+        DomainType::IoAPICDomain(io_apic.clone()),
+        true
+    );
+    platform::println!("[x86_64][io_apic] after register_domain");
+
+    let max_entries = io_apic.ioapic_max_entries()?;
+    platform::println!("[x86_64][io_apic] max_entries={}", max_entries);
+
+    for (device_name, irq, compatible, locator) in platform_devices {
+        log::info!("[x86_64][device] visiting name={}", device_name);
+        log::info!("[x86_64][device] irq for {} = {:?}", device_name, irq);
+
+        match device_name.as_str() {
             "uart" => {
-                let compatible = device.compatible().ok_or_else(|| {
+                let compatible = compatible.as_deref().ok_or_else(|| {
                     log::error!("uart device missing compatible property");
                     crate::error::AlienError::EINVAL
                 })?;
@@ -106,7 +176,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     }
                 };
 
-                let uart_range = match device.locator() {
+                let uart_range = match locator {
                     DeviceLocator::Pio(range) => usize::from(range.start)..usize::from(range.end),
                     other => {
                         log::error!("x86_64 uart locator must be PIO, got {:?}", other);
@@ -119,22 +189,41 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
 
                 let (buf_uart, domain_file_info) =
                     create_domain!(BufUartDomainProxy, DomainTypeRaw::BufUartDomain, "buf_uart")?;
+                platform::println!("[x86_64][buf_uart] before init_by_box");
                 buf_uart.init_by_box(Box::new("uart".to_string()))?;
+                platform::println!("[x86_64][buf_uart] after init_by_box");
+                platform::println!("[x86_64][buf_uart] before register_domain");
                 let buf_uart_name = register_domain!(
                     "buf_uart",
                     domain_file_info,
                     DomainType::BufUartDomain(buf_uart),
                     true
                 );
+                platform::println!("[x86_64][buf_uart] after register_domain name={}", buf_uart_name);
 
-                bind_irq_to_apic(&apic, irq, &buf_uart_name, "uart")?;
+                platform::println!("[x86_64][apic] uart irq branch enter irq={:?}", irq);
+
+                if let Some(irq) = irq {
+                    let vector = 32u8.saturating_add(irq as u8);
+                    platform::println!(
+                        "[x86_64][apic] uart irq setup begin irq={}, vector={:#x}",
+                        irq,
+                        vector
+                    );
+                    io_apic.configure_irq(irq as u8, vector, 0)?;
+                    platform::println!("[x86_64][apic] uart irq configure ok irq={}", irq);
+                    io_apic.set_irq_enable(irq as usize, true)?;
+                    platform::println!("[x86_64][apic] uart irq enable ok irq={}", irq);
+                    io_apic.register_irq(irq as _, &DVec::from_slice(buf_uart_name.as_bytes()))?;
+                    platform::println!("[x86_64][apic] uart irq register ok irq={}", irq);
+                }
             }
             "rtc" => {
                 init_x86_rtc_domain()?;
             }
             "ramdisk" => {
                 let ramdisk_range =
-                    require_mmio_range_or_einval("x86_64", "ramdisk", device.locator())?;
+                    require_mmio_range_or_einval("x86_64", "ramdisk", &locator)?;
                 let (ramdisk, domain_file_info) =
                     create_domain!(BlkDomainProxy, DomainTypeRaw::BlkDeviceDomain, "mem_block")?;
                 ramdisk.init_by_box(Box::new(VirtioInitInfo::mmio(ramdisk_range, irq)))?;
@@ -156,7 +245,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             }
             "loopback" => {
                 let loopback_range =
-                    require_mmio_range_or_einval("x86_64", "loopback", device.locator())?;
+                    require_mmio_range_or_einval("x86_64", "loopback", &locator)?;
                 let (loopback, domain_file_info) = create_domain!(
                     NetDeviceDomainProxy,
                     DomainTypeRaw::NetDeviceDomain,
@@ -173,11 +262,12 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             "pci_ecam" => {
                 // x86_64 的 virtio PCI 统一在平台设备遍历后处理，这里保留分支用于兼容旧日志路径。
             }
-            "local_apic" | "io_apic" | "hpet" => {
-                register_platform_owned_empty_device(device.name())?;
+            "hpet" => {
+                register_platform_owned_empty_device(&device_name)?;
             }
+            "local_apic" | "io_apic" => {}
             _ => {
-                warn!("unknown device: {}", device.name());
+                warn!("unknown device: {}", device_name);
             }
         }
     }
@@ -286,18 +376,22 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 false
             );
             register_domain!("block", domain_file_info, blk_domain, false);
-            bind_irq_to_apic(
-                &apic,
-                pci_irq,
-                &virtio_blk_name,
-                &alloc::format!(
-                    "virtio-blk @ {:04x}:{:02x}:{:02x}.{}",
+
+            if let Some(irq) = pci_irq {
+                log::debug!(
+                    "virtio-blk irq {} detected, defer APIC route until trap domain is ready (domain={})",
+                    irq,
+                    virtio_blk_name
+                );
+            } else {
+                warn!(
+                    "virtio-blk @ {:04x}:{:02x}:{:02x}.{} has no irq line",
                     bdf.segment(),
                     bdf.bus(),
                     bdf.device(),
                     bdf.function()
-                ),
-            )?;
+                );
+            }
 
             has_block = true;
         } else {
@@ -344,25 +438,13 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             )?;
             net_driver.init_by_box(Box::new(init_info))?;
             let net_domain = DomainType::NetDeviceDomain(net_driver.clone());
-            let virtio_net_name = register_domain!(
+            register_domain!(
                 "virtio_net",
                 domain_file_info.clone(),
                 net_domain.clone(),
                 false
             );
             register_domain!("nic", domain_file_info, net_domain, false);
-            bind_irq_to_apic(
-                &apic,
-                ep.interrupt_line().map(|irq| irq as u32),
-                &virtio_net_name,
-                &alloc::format!(
-                    "virtio-net @ {:04x}:{:02x}:{:02x}.{}",
-                    bdf.segment(),
-                    bdf.bus(),
-                    bdf.device(),
-                    bdf.function()
-                ),
-            )?;
             has_nic = true;
         } else {
             warn!(
@@ -410,7 +492,6 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 DomainType::InputDomain(input_driver),
                 false
             );
-            let input_name_for_irq = input_name.clone();
             let (buf_input, domain_file_info) = create_domain!(
                 BufInputDomainProxy,
                 DomainTypeRaw::BufInputDomain,
@@ -434,18 +515,6 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
             } else if input_alias_count == 1 {
                 register_domain!("mouse", domain_file_info, buf_input_domain, true);
             }
-            bind_irq_to_apic(
-                &apic,
-                ep.interrupt_line().map(|irq| irq as u32),
-                &input_name_for_irq,
-                &alloc::format!(
-                    "virtio-input @ {:04x}:{:02x}:{:02x}.{}",
-                    bdf.segment(),
-                    bdf.bus(),
-                    bdf.device(),
-                    bdf.function()
-                ),
-            )?;
             input_alias_count += 1;
         } else {
             warn!(
@@ -488,7 +557,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
             gpu_driver.init_by_box(Box::new(init_info))?;
             let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
-            let virtio_gpu_name = register_domain!(
+            register_domain!(
                 "virtio_gpu",
                 domain_file_info.clone(),
                 gpu_domain.clone(),
@@ -498,18 +567,6 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 register_domain!("gpu", domain_file_info, gpu_domain, true);
                 has_gpu_alias = true;
             }
-            bind_irq_to_apic(
-                &apic,
-                ep.interrupt_line().map(|irq| irq as u32),
-                &virtio_gpu_name,
-                &alloc::format!(
-                    "virtio-gpu @ {:04x}:{:02x}:{:02x}.{}",
-                    bdf.segment(),
-                    bdf.bus(),
-                    bdf.device(),
-                    bdf.function()
-                ),
-            )?;
         } else {
             warn!(
                 "virtio-gpu @ {:04x}:{:02x}:{:02x}.{} has no usable transport (legacy/modern), skip",
@@ -546,8 +603,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     net_domain.clone(),
                     false
                 );
-                let nic_name = register_domain!("nic", domain_file_info, net_domain, false);
-                bind_irq_to_apic(&apic, device.irq(), &nic_name, "virtio-mmio net")?;
+                register_domain!("nic", domain_file_info, net_domain, false);
                 has_nic = true;
             }
             VirtioMmioDeviceType::Block => {
@@ -561,8 +617,7 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     blk_domain.clone(),
                     false
                 );
-                let block_name = register_domain!("block", domain_file_info, blk_domain, false);
-                bind_irq_to_apic(&apic, device.irq(), &block_name, "virtio-mmio block")?;
+                register_domain!("block", domain_file_info, blk_domain, false);
                 has_block = true;
             }
             VirtioMmioDeviceType::Input => {
@@ -601,7 +656,6 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                 } else if input_alias_count == 1 {
                     register_domain!("mouse", domain_file_info, buf_input_domain, true);
                 }
-                bind_irq_to_apic(&apic, device.irq(), &buf_input_name, "virtio-mmio input")?;
                 input_alias_count += 1;
             }
             VirtioMmioDeviceType::GPU => {
@@ -609,13 +663,12 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
                     create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
                 gpu_driver.init_by_box(Box::new(VirtioInitInfo::mmio(mmio_range, device.irq())))?;
                 let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
-                let virtio_gpu_name = register_domain!(
+                register_domain!(
                     "virtio_gpu",
                     domain_file_info.clone(),
                     gpu_domain.clone(),
                     false
                 );
-                bind_irq_to_apic(&apic, device.irq(), &virtio_gpu_name, "virtio-mmio gpu")?;
                 if !has_gpu_alias {
                     register_domain!("gpu", domain_file_info, gpu_domain, true);
                     has_gpu_alias = true;
@@ -697,5 +750,8 @@ pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
         true
     );
 
-    Ok(apic)
+    Ok(X86ApicDomains {
+        local_apic,
+        io_apic,
+    })
 }

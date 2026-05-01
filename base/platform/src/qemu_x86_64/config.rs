@@ -6,10 +6,6 @@ pub const CLOCK_FREQ: usize = 4_000_000_000;
 /// 定时器中断向量。
 pub const TIMER_IRQ: u8 = 0xf0;
 
-/// APIC timer 模式开关：默认 one-shot。
-/// 若改为 `false`，将启用 periodic 模式（需配合 trap 分支）。
-pub const APIC_TIMER_ONESHOT: bool = true;
-
 /// APIC 伪中断向量。
 pub const APIC_SPURIOUS_VECTOR: u8 = 0xf1;
 

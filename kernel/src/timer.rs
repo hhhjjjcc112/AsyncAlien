@@ -7,9 +7,14 @@ pub fn read_timer() -> usize {
 }
 
 #[inline]
-pub fn set_next_trigger() {
+pub fn next_trigger_deadline() -> usize {
     const TICKS_PER_SEC: usize = 10;
-    let next = read_timer() + CLOCK_FREQ / TICKS_PER_SEC;
+    read_timer() + CLOCK_FREQ / TICKS_PER_SEC
+}
+
+#[inline]
+pub fn set_next_trigger() {
+    let next = next_trigger_deadline();
     assert!(next > read_timer());
     platform::set_timer(next);
 }

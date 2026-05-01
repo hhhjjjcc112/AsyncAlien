@@ -172,29 +172,24 @@ fn test_task() -> AlienResult<()> {
 #[cfg(feature = "domain_apic_test")]
 fn test_apic() -> AlienResult<()> {
     let prefix = "domain_apic_test";
-    mark_step(prefix, "resolve", "query apic domain");
-    let apic = match expect_domain(prefix, "apic")? {
-        DomainType::APICDomain(apic) => apic,
+    mark_step(prefix, "resolve", "query io_apic domain");
+    let io_apic = match expect_domain(prefix, "io_apic")? {
+        DomainType::IoAPICDomain(io_apic) => io_apic,
         _ => {
-            mark_fail(prefix, "apic", "domain type mismatch");
+            mark_fail(prefix, "io_apic", "domain type mismatch");
             return Err(AlienError::EINVAL);
         }
     };
-
-    let domain_id = apic.domain_id();
+    let domain_id = io_apic.domain_id();
     if domain_id == 0 {
-        mark_fail(prefix, "apic", "invalid domain id");
+        mark_fail(prefix, "io_apic", "invalid domain id");
         return Err(AlienError::EINVAL);
     }
-    mark_step(
-        prefix,
-        "probe",
-        &format!("apic domain_id={}", domain_id),
-    );
+    mark_step(prefix, "probe", &format!("io_apic domain_id={}", domain_id));
 
-    let info = apic.irq_info(DVec::new(0, 512))?;
+    let info = io_apic.irq_info(DVec::new(0, 512))?;
     if info.is_empty() {
-        mark_fail(prefix, "apic", "irq_info is empty");
+        mark_fail(prefix, "io_apic", "irq_info is empty");
         return Err(AlienError::EINVAL);
     }
     let preview_len = min(32, info.len());
@@ -205,7 +200,48 @@ fn test_apic() -> AlienResult<()> {
         &format!("irq_info_len={}, preview={:?}", info.len(), preview),
     );
 
-    mark_pass(prefix, "apic");
+    #[cfg(target_arch = "x86_64")]
+    {
+        mark_step(prefix, "resolve", "query local_apic domain");
+        let local_apic = match expect_domain(prefix, "local_apic")? {
+            DomainType::LocalAPICDomain(local_apic) => local_apic,
+            _ => {
+                mark_fail(prefix, "local_apic", "domain type mismatch");
+                return Err(AlienError::EINVAL);
+            }
+        };
+        let local_apic_domain_id = local_apic.domain_id();
+        if local_apic_domain_id == 0 {
+            mark_fail(prefix, "local_apic", "invalid domain id");
+            return Err(AlienError::EINVAL);
+        }
+        mark_step(
+            prefix,
+            "probe",
+            &format!("local_apic domain_id={}", local_apic_domain_id),
+        );
+
+        mark_step(prefix, "resolve", "query io_apic domain");
+        let io_apic = match expect_domain(prefix, "io_apic")? {
+            DomainType::IoAPICDomain(io_apic) => io_apic,
+            _ => {
+                mark_fail(prefix, "io_apic", "domain type mismatch");
+                return Err(AlienError::EINVAL);
+            }
+        };
+        let io_apic_domain_id = io_apic.domain_id();
+        if io_apic_domain_id == 0 {
+            mark_fail(prefix, "io_apic", "invalid domain id");
+            return Err(AlienError::EINVAL);
+        }
+        mark_step(
+            prefix,
+            "probe",
+            &format!("io_apic domain_id={}", io_apic_domain_id),
+        );
+    }
+
+    mark_pass(prefix, "io_apic");
     Ok(())
 }
 

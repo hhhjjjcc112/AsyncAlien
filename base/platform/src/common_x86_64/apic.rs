@@ -1,9 +1,7 @@
-//! x86_64 的 Local APIC 与 I/O APIC 管理。
+//! x86_64 的 Local APIC 早期初始化与底层访问。
 
 use core::mem::MaybeUninit;
 
-use spin::{Mutex, Once};
-use x2apic::ioapic::IoApic;
 use x2apic::lapic::{xapic_base, LocalApic, LocalApicBuilder};
 
 use crate::common_x86_64::boot::PHYS_VIRT_OFFSET;
@@ -16,7 +14,6 @@ pub mod vectors {
 
 static mut LOCAL_APIC: MaybeUninit<LocalApic> = MaybeUninit::uninit();
 static mut IS_X2APIC: bool = false;
-static IO_APIC: Once<Mutex<IoApic>> = Once::new();
 
 fn cpu_has_x2apic() -> bool {
     raw_cpuid::CpuId::new()
@@ -51,10 +48,6 @@ pub fn init_primary_apic() {
         LOCAL_APIC.write(apic);
     }
 
-    // 初始化 I/O APIC。
-    let io_apic_base = crate::qemu_x86_64::config::DEVICE_SPACE[1].1;
-    let io_apic = unsafe { IoApic::new((io_apic_base as u64) + (PHYS_VIRT_OFFSET as u64)) };
-    IO_APIC.call_once(|| Mutex::new(io_apic));
 }
 
 /// 初始化从核（AP）的 APIC。
@@ -91,94 +84,4 @@ pub fn is_x2apic() -> bool {
     unsafe { IS_X2APIC }
 }
 
-/// 获取当前 CPU ID。
-pub fn current_cpu_id() -> usize {
-    crate::current_cpu_id()
-}
 
-/// 发送 APIC EOI。
-pub fn eoi() {
-    unsafe {
-        get_local_apic().end_of_interrupt();
-    }
-}
-
-/// 开关 I/O APIC 的 IRQ 路由。
-pub fn set_irq_enable(vector: usize, enabled: bool) {
-    // 不影响 Local APIC 自身中断。
-    if vector < vectors::APIC_TIMER_VECTOR as usize {
-        if let Some(ioapic) = IO_APIC.get() {
-            let mut ioapic = ioapic.lock();
-            unsafe {
-                if enabled {
-                    ioapic.enable_irq(vector as u8);
-                } else {
-                    ioapic.disable_irq(vector as u8);
-                }
-            }
-        }
-    }
-}
-
-/// 获取用于 IPI 目标的原始 APIC ID。
-pub fn raw_apic_id(cpu_id: u8) -> u32 {
-    if is_x2apic() {
-        cpu_id as u32
-    } else {
-        (cpu_id as u32) << 24
-    }
-}
-
-/// 向指定 CPU 发送 IPI。
-pub fn send_ipi(target_cpu: usize, vector: u8) {
-    let apic_id = raw_apic_id(target_cpu as u8);
-    unsafe {
-        get_local_apic().send_ipi(vector, apic_id);
-    }
-}
-
-/// 向自身发送 IPI。
-pub fn send_ipi_self(vector: u8) {
-    unsafe {
-        get_local_apic().send_ipi_self(vector);
-    }
-}
-
-/// 向除自身外的所有 CPU 发送 IPI。
-pub fn send_ipi_all_excluding_self(vector: u8) {
-    use x2apic::lapic::IpiAllShorthand;
-    unsafe {
-        get_local_apic().send_ipi_all(vector, IpiAllShorthand::AllExcludingSelf);
-    }
-}
-
-/// 获取 I/O APIC 最大重定向项数。
-pub fn ioapic_max_entries() -> u8 {
-    if let Some(ioapic) = IO_APIC.get() {
-        let mut ioapic = ioapic.lock();
-        unsafe { ioapic.max_table_entry() + 1 }
-    } else {
-        0
-    }
-}
-
-/// 配置 I/O APIC 重定向项。
-pub fn configure_irq(irq: u8, vector: u8, dest_cpu: u8) {
-    if let Some(ioapic) = IO_APIC.get() {
-        let mut ioapic = ioapic.lock();
-        unsafe {
-            // 配置重定向项。
-            let mut entry = ioapic.table_entry(irq);
-            entry.set_vector(vector);
-            entry.set_dest(dest_cpu);
-            // 投递模式为 Fixed，物理目标。
-            entry.set_mode(x2apic::ioapic::IrqMode::Fixed);
-            entry.set_flags(
-                x2apic::ioapic::IrqFlags::LEVEL_TRIGGERED 
-                | x2apic::ioapic::IrqFlags::LOW_ACTIVE 
-                | x2apic::ioapic::IrqFlags::MASKED
-            );
-            ioapic.set_table_entry(irq, entry);
-        }
-    }
-}

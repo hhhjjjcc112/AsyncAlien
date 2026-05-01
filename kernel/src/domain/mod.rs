@@ -34,6 +34,8 @@ use log::warn;
 use self::riscv64::init_device;
 #[cfg(target_arch = "x86_64")]
 use self::x86_64::init_device;
+#[cfg(target_arch = "x86_64")]
+use self::x86_64::X86ApicDomains;
 use crate::domain_proxy::SchedulerDomainProxy;
 use crate::{
     bus::DeviceLocator,
@@ -45,12 +47,6 @@ use crate::{
     domain_proxy::*,
     register_domain,
 };
-
-// 共享层只保留当前架构可见的中断控制器类型别名。
-#[cfg(target_arch = "riscv64")]
-type InterruptControllerDomain = dyn PLICDomain;
-#[cfg(target_arch = "x86_64")]
-type InterruptControllerDomain = dyn APICDomain;
 
 /// set the kernel to the specific domain
 fn init_kernel_domain() {
@@ -229,6 +225,12 @@ pub fn load_domains() -> AlienResult<()> {
 
     // we need to register vfs and task domain before init device, because we need to use vfs and task domain in some
     // device init function
+    #[cfg(target_arch = "x86_64")]
+    let X86ApicDomains {
+        local_apic,
+        io_apic: interrupt_controller,
+    } = init_device()?;
+    #[cfg(target_arch = "riscv64")]
     let interrupt_controller = init_device()?;
 
     #[cfg(all(
@@ -283,6 +285,10 @@ pub fn load_domains() -> AlienResult<()> {
     crate::task::register_task_domain(task);
     crate::trap::register_syscall_domain(syscall);
     crate::trap::register_interrupt_controller_domain(interrupt_controller);
+    #[cfg(target_arch = "x86_64")]
+    {
+        crate::trap::register_local_apic_domain(local_apic);
+    }
     platform::println!("Register task domain and syscall domain to trap system");
     Ok(())
 }

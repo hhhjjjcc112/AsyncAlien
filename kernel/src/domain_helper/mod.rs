@@ -99,11 +99,31 @@ pub fn register_domain(
     domain: DomainType,
     unique: bool,
 ) -> String {
+    // platform::println!(
+    //     "[domain_helper][register_domain] enter ident={}, unique={}",
+    //     identifier,
+    //     unique
+    // );
     let domain_id = domain.domain_id();
+    // platform::println!(
+    //     "[domain_helper][register_domain] domain_id={}, ident={}",
+    //     domain_id,
+    //     identifier
+    // );
     let ty = domain.to_raw();
+    // platform::println!(
+    //     "[domain_helper][register_domain] ty={:?}, ident={}",
+    //     ty,
+    //     identifier
+    // );
     let res = DOMAIN_CONTAINER
         .lock()
         .insert(identifier.to_string(), domain, unique);
+    // platform::println!(
+    //     "[domain_helper][register_domain] container insert ok name={}, ident={}",
+    //     res,
+    //     identifier
+    // );
     let domain_data = DomainDataInfo {
         name: res.clone(),
         ty,
@@ -115,6 +135,11 @@ pub fn register_domain(
         .lock()
         .domain_list
         .insert(domain_id, domain_data);
+    // platform::println!(
+    //     "[domain_helper][register_domain] domain info insert ok name={}, ident={}",
+    //     res,
+    //     identifier
+    // );
     res
 }
 

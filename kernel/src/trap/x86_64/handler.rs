@@ -3,7 +3,6 @@ use core::{
 };
 
 use config::TRAMPOLINE;
-use platform::{self, percpu_impl::cpu_id};
 
 #[cfg(feature = "trap_test")]
 use super::test;
@@ -98,12 +97,8 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
                 let _ = APIC_TIMER_USER_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
             }
-            if platform::config::APIC_TIMER_ONESHOT {
-                timer::set_next_trigger();
-            }
             let _ = task_domain!().vdso_update_time_snapshot();
-            // 先在本核完成中断收尾，避免任务切走甚至迁移后再向错误 LAPIC 发送 EOI。
-            send_apic_eoi();
+            handle_local_apic_timer(timer::next_trigger_deadline());
             crate::task::yield_now();
         }
 
@@ -121,10 +116,26 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
         }
 
         vectors::APIC_ERROR => {
-            send_apic_eoi();
+            let local_apic = crate::trap::LOCAL_APIC_DOMAIN
+                .get()
+                .expect("local_apic domain not registered");
+            let error_status = local_apic
+                .get_error_status()
+                .unwrap_or(0);
+            panic!(
+                "APIC Error (user mode): error_status={:#x} (send_checksum={} recv_checksum={} send_accept={} recv_accept={} illegal_vector={})",
+                error_status,
+                (error_status & 0x01) != 0,
+                (error_status & 0x02) != 0,
+                (error_status & 0x04) != 0,
+                (error_status & 0x08) != 0,
+                (error_status & 0x80) != 0
+            );
         }
 
         vectors::APIC_SPURIOUS => {
+            // Per Intel SDM, spurious interrupts should be ignored and NOT serviced.
+            // No EOI needed; CPU will auto-deassert the interrupt signal.
         }
 
         _ => {
@@ -171,11 +182,8 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
                 let _ = APIC_TIMER_KERNEL_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
             }
-            if platform::config::APIC_TIMER_ONESHOT {
-                timer::set_next_trigger();
-            }
             let _ = task_domain!().vdso_update_time_snapshot();
-            send_apic_eoi();
+            handle_local_apic_timer(timer::next_trigger_deadline());
         }
 
         vectors::SYSCALL => panic!("syscall from kernel mode"),
@@ -189,10 +197,26 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
         }
 
         vectors::APIC_ERROR => {
-            send_apic_eoi();
+            let local_apic = crate::trap::LOCAL_APIC_DOMAIN
+                .get()
+                .expect("local_apic domain not registered");
+            let error_status = local_apic
+                .get_error_status()
+                .unwrap_or(0);
+            panic!(
+                "APIC Error (kernel mode): error_status={:#x} (send_checksum={} recv_checksum={} send_accept={} recv_accept={} illegal_vector={})",
+                error_status,
+                (error_status & 0x01) != 0,
+                (error_status & 0x02) != 0,
+                (error_status & 0x04) != 0,
+                (error_status & 0x08) != 0,
+                (error_status & 0x80) != 0
+            );
         }
 
         vectors::APIC_SPURIOUS => {
+            // Per Intel SDM, spurious interrupts should be ignored and NOT serviced.
+            // No EOI needed; CPU will auto-deassert the interrupt signal.
         }
 
         _ => {
@@ -206,7 +230,28 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
 
 #[inline]
 fn send_apic_eoi() {
-    platform::apic::eoi();
+    let local_apic = crate::trap::LOCAL_APIC_DOMAIN
+        .get()
+        .expect("local_apic domain not registered");
+    local_apic.eoi().expect("local_apic eoi failed");
+}
+
+fn handle_local_apic_timer(next_deadline: usize) {
+    let local_apic = crate::trap::LOCAL_APIC_DOMAIN
+        .get()
+        .expect("local_apic domain not registered");
+    // platform::println!(
+    //     "[x86_64][apic_timer] local_apic set_timer enter next_deadline={:#x}",
+    //     next_deadline
+    // );
+    local_apic
+        .set_timer(next_deadline)
+        .expect("local_apic set_timer failed");
+    // platform::println!(
+    //     "[x86_64][apic_timer] local_apic set_timer ok next_deadline={:#x}",
+    //     next_deadline
+    // );
+    local_apic.eoi().expect("local_apic eoi failed");
 }
 
 #[unsafe(no_mangle)]

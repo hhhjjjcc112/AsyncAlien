@@ -72,13 +72,6 @@ pub type PlatformInfo = common_x86_64::basic::MachineInfo;
 #[cfg(target_arch = "riscv64")]
 pub type PlatformInfo = common_riscv::basic::MachineInfo;
 
-/// x86_64 APIC 接口导出（兼容 kernel 侧 `platform::apic::*` 调用）。
-#[cfg(target_arch = "x86_64")]
-pub mod apic {
-    pub use crate::common_x86_64::apic::*;
-}
-
-
 /// 设置单次定时器。
 pub fn set_timer(time: usize) {
     Platform::set_timer(time as u64);

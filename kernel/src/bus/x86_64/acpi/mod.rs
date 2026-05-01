@@ -28,13 +28,13 @@ pub fn enumerate_static_devices() -> Vec<CommonDeviceType> {
 
     if let Some(tables) = tables {
         // 步骤2：按“静态表优先”顺序枚举 APIC/HPET/UART/RTC。
-        debug!("[bus][x86_64] enumerate static ACPI devices");
+        debug!("[bus][x86_64] ACPI tables ready, enumerate static devices from MADT/SPCR/HPET/FADT");
         devices.extend(enumerate_apic(tables));
         devices.extend(enumerate_hpet(tables));
         devices.extend(enumerate_uart(tables));
         devices.extend(enumerate_rtc(tables));
     } else {
-        warn!("[bus][x86_64] ACPI tables unavailable, skip static ACPI enumeration");
+        warn!("[bus][x86_64] ACPI tables unavailable, fallback to empty static device list");
     }
 
     devices
@@ -58,6 +58,7 @@ pub fn enumerate_uart_from_aml() -> Option<CommonDeviceType> {
 pub fn enumerate_pci_devices() -> Vec<CommonDeviceType> {
     // 步骤1：优先从 ACPI MCFG 枚举 PCI ECAM。
     if let Some(tables) = acpi_tables() {
+        debug!("[bus][x86_64][acpi][pci] ACPI tables ready, try MCFG first");
         return pci_enumerate::enumerate_pci_devices(tables);
     }
 
