@@ -17,7 +17,7 @@ mod data;
 mod vmm;
 
 pub use data::INITRD_DATA;
-pub use frame::{alloc_frame_trackers, alloc_frames, free_frames, FrameTracker};
+pub use frame::{alloc_frame_trackers, alloc_frame_trackers_no_dealloc, alloc_frames, free_frames, FrameTracker};
 use ksync::Mutex;
 pub use memory_addr::{PhysAddr, VirtAddr};
 pub use page_table::MappingFlags;
@@ -26,7 +26,8 @@ pub use ptable::*;
 use spin::Lazy;
 pub use vmm::{
     kernel_page_table_root_paddr, kernel_page_table_token, map_device_phys_range, map_domain_region,
-    map_kstack_for_task, query_kernel_space, set_memory_x, unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
+    map_kernel_pages, map_kstack_for_task, protect_kernel_pages, query_kernel_space, reserve_domain_region,
+    set_memory_x, unmap_domain_area, unmap_kstack_for_task, VirtDomainArea,
 };
 
 type AlienError = LinuxErrno;

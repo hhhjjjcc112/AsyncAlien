@@ -1,4 +1,4 @@
-use crate::{bump_layout_counters, read_clock_timespec, read_layout_probe, LayoutProbe, TimeSpec};
+use crate::{read_clock_timespec, TimeSpec};
 
 #[repr(C)]
 pub struct TimeVal {
@@ -10,14 +10,6 @@ pub struct TimeVal {
 pub struct TimeZone {
     pub tz_minuteswest: i32,
     pub tz_dsttime: i32,
-}
-
-
-#[unsafe(no_mangle)]
-pub extern "C" fn __vdso_probe_layout() -> LayoutProbe {
-    // 布局探针只用于确认 vVAR / 私有数据的地址关系，不涉及 syscall。
-    bump_layout_counters();
-    read_layout_probe()
 }
 
 

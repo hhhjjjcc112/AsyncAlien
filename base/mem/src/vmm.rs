@@ -332,8 +332,31 @@ impl VirtDomainArea {
 
 pub fn map_domain_region(size: usize) -> VirtDomainArea {
     assert_eq!(size % FRAME_SIZE, 0);
-    let mut virt_start = KERNEL_MAP_MAX.load(core::sync::atomic::Ordering::Relaxed);
+    let domain_area = reserve_domain_region(size);
+    let mut phy_frames: Vec<Box<dyn PhysPage>> = Vec::with_capacity(size / FRAME_SIZE);
+    for _ in 0..size / FRAME_SIZE {
+        phy_frames.push(Box::new(alloc_frame_trackers(1)));
+    }
+    map_kernel_pages(
+        domain_area.start,
+        domain_area.size,
+        MappingFlags::READ | MappingFlags::WRITE,
+        phy_frames,
+    );
+    domain_area
+}
+
+pub fn unmap_domain_area(area: VirtDomainArea) {
     let mut kernel_space = KERNEL_SPACE.write();
+    kernel_space.unmap(area.start).unwrap();
+    sfence_vma_all();
+}
+
+// 分配虚拟地址, 不建立映射
+pub fn reserve_domain_region(size: usize) -> VirtDomainArea {
+    assert_eq!(size % FRAME_SIZE, 0);
+    let mut virt_start = KERNEL_MAP_MAX.load(core::sync::atomic::Ordering::Relaxed);
+    let kernel_space = KERNEL_SPACE.read();
     // 跳过已映射区间（如 ACPI 保留尾段），确保域镜像映射到空闲地址。
     loop {
         let mut overlap = false;
@@ -351,31 +374,29 @@ pub fn map_domain_region(size: usize) -> VirtDomainArea {
         virt_start += FRAME_SIZE;
     }
     KERNEL_MAP_MAX.store(virt_start + size, core::sync::atomic::Ordering::Relaxed);
-    // 分配物理页并映射到内核虚拟地址。
-    log::debug!(
-        "[alloc_free_module_region] virt_start: {:#x}, size: {:#x}",
-        virt_start,
-        size
-    );
-    let mut phy_frames: Vec<Box<dyn PhysPage>> = vec![];
-    for _ in 0..size / FRAME_SIZE {
-        let frame = Box::new(alloc_frame_trackers(1));
-        phy_frames.push(frame);
-    }
-    let vm_area = VmArea::new(
-        virt_start..virt_start + size,
-        MappingFlags::READ | MappingFlags::WRITE,
-        phy_frames,
-    );
-    kernel_space.map(VmAreaType::VmArea(vm_area)).unwrap();
-    // 刷新 TLB。
-    sfence_vma_all();
     VirtDomainArea::new(virt_start, size)
 }
 
-pub fn unmap_domain_area(area: VirtDomainArea) {
+pub fn map_kernel_pages(
+    start: usize,
+    size: usize,
+    flags: MappingFlags,
+    frames: Vec<Box<dyn PhysPage>>,
+) {
+    assert_eq!(start % FRAME_SIZE, 0);
+    assert_eq!(size % FRAME_SIZE, 0);
     let mut kernel_space = KERNEL_SPACE.write();
-    kernel_space.unmap(area.start).unwrap();
+    let area = VmArea::new(start..start + size, flags, frames);
+    kernel_space.map(VmAreaType::VmArea(area)).unwrap();
+    sfence_vma_all();
+}
+
+// 修改权限
+pub fn protect_kernel_pages(start: usize, size: usize, flags: MappingFlags) {
+    assert_eq!(start % FRAME_SIZE, 0);
+    assert_eq!(size % FRAME_SIZE, 0);
+    let mut kernel_space = KERNEL_SPACE.write();
+    kernel_space.protect(start..start + size, flags).unwrap();
     sfence_vma_all();
 }
 

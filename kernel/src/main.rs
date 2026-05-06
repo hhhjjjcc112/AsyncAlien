@@ -36,6 +36,7 @@ extern crate alloc;
 mod bus;
 mod domain;
 mod domain_helper;
+mod vdso;
 mod domain_loader;
 mod domain_proxy;
 mod error;
@@ -77,6 +78,8 @@ fn main(boot_cpu_id: usize, boot_info_ptr: usize) {
     bus::init_with_boot_info().unwrap();
     
     domain::load_domains().unwrap();
+
+    vdso::init_vdso();
 
     let declared_secondary = machine_info.smp.saturating_sub(1);
     println!(

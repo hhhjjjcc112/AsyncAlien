@@ -97,7 +97,7 @@ fn handle_user_trap(frame: &mut X86TrapFrame) {
                 let _ = APIC_TIMER_USER_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
             }
-            let _ = task_domain!().vdso_update_time_snapshot();
+            crate::vdso::refresh_time_snapshot();
             handle_local_apic_timer(timer::next_trigger_deadline());
             crate::task::yield_now();
         }
@@ -182,7 +182,7 @@ fn handle_kernel_trap(frame: &mut X86TrapFrame) {
                 let _ = APIC_TIMER_KERNEL_TRAP_COUNT
                     .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
             }
-            let _ = task_domain!().vdso_update_time_snapshot();
+            crate::vdso::refresh_time_snapshot();
             handle_local_apic_timer(timer::next_trigger_deadline());
         }
 

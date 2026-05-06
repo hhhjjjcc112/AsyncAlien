@@ -77,7 +77,7 @@ impl TrapHandler for Trap {
             Trap::Interrupt(Interrupt::SupervisorTimer) => {
                 trace!("<do_user_handle> timer interrupt");
                 timer::set_next_trigger();
-                let _ = task_domain!().vdso_update_time_snapshot();
+                crate::vdso::refresh_time_snapshot();
                 crate::task::yield_now();
             }
             Trap::Interrupt(Interrupt::SupervisorExternal) => {
@@ -103,7 +103,7 @@ impl TrapHandler for Trap {
             Trap::Interrupt(Interrupt::SupervisorTimer) => {
                 trace!("<do_kernel_handle> timer interrupt");
                 timer::set_next_trigger();
-                let _ = task_domain!().vdso_update_time_snapshot();
+                crate::vdso::refresh_time_snapshot();
             }
             Trap::Exception(_) => {
                 panic!(

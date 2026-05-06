@@ -43,6 +43,9 @@ unwinding = { version="0.2.8", default-features = false, features = [
 ], optional = true }
 percpu = "0.3"
 
+vdso_api = { path = "../build/vdso/vdso_api" }
+crate_interface = "0.2"
+
 # Architecture-specific dependencies
 [target.'cfg(target_arch = "riscv64")'.dependencies]
 riscv = "0.11"

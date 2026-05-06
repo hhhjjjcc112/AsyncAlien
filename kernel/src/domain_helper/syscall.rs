@@ -291,6 +291,10 @@ impl CoreFunction for DomainSyscall {
         mem::query_kernel_space(vaddr).ok_or(AlienError::EINVAL)
     }
 
+    fn vdso_map_user(&self, vspace: usize) -> AlienResult<usize> {
+        Ok(vdso_api::map_so(vspace) as usize)
+    }
+
     fn task_op(&self, op: TaskOperation) -> corelib::AlienResult<OperationResult> {
         match op {
             TaskOperation::Create(task_meta) => {

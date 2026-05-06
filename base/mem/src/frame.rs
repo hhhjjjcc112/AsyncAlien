@@ -176,6 +176,10 @@ impl FrameTracker {
     pub fn start(&self) -> usize {
         self.start_page << FRAME_BITS
     }
+
+    pub fn get_dealloc(&self) -> bool {
+        self.dealloc
+    }
 }
 
 impl PhysPage for FrameTracker {
@@ -238,6 +242,7 @@ impl DerefMut for FrameTracker {
     }
 }
 
+/// 分配自动释放的FrameTracker，用于一般用途。
 pub fn alloc_frame_trackers(count: usize) -> FrameTracker {
     let frame = FRAME_ALLOCATOR
         .lock()
@@ -245,6 +250,16 @@ pub fn alloc_frame_trackers(count: usize) -> FrameTracker {
         .unwrap_or_else(|| panic!("alloc {} frame failed", count));
     trace!("alloc frame [{}] start page: {:#x}", count, frame);
     FrameTracker::new(frame, count, true)
+}
+
+/// unsafe函数，分配不自动释放的FrameTracker，用于共享页（vdso）
+pub unsafe fn alloc_frame_trackers_no_dealloc(count: usize) -> FrameTracker {
+    let frame = FRAME_ALLOCATOR
+        .lock()
+        .alloc_pages(count, FRAME_SIZE)
+        .unwrap_or_else(|| panic!("alloc {} frame failed", count));
+    trace!("alloc frame [{}] start page: {:#x}", count, frame);
+    FrameTracker::new(frame, count, false)
 }
 
 pub struct VmmPageAllocator;

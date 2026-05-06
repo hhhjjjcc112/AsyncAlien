@@ -304,7 +304,18 @@ build: vdso
 	@#LOG=$(LOG) cargo build --release -p kernel --target $(TARGET) --features $(FEATURES)
 	PLATFORM=$(PLATFORM) RUSTFLAGS='--cfg getrandom_backend="custom" --cfg $(PLATFORM)' LOG=$(LOG) cargo build --release -p kernel --target $(TARGET_CONFIG) $(BUILD_CFG) --features $(FEATURES)
 
-vdso:
+vdso_clean_cache:
+	@rm -rf ./build/vdso/target ./build/vdso/vdso_wrapper ./build/vdso/libvdso.so ./build/vdso/vdso_linker.lds ./build/vdso/vdso_version.map ./build/vdso/vdso_api
+
+vdso_api_bootstrap:
+	@if [ ! -f ./build/vdso/vdso_api/Cargo.toml ]; then \
+		echo "Bootstrapping placeholder vdso_api crate for Cargo workspace resolution..."; \
+		mkdir -p ./build/vdso/vdso_api/src; \
+		printf '%s\n' '[package]' 'name = "vdso_api"' 'version = "0.0.0"' 'edition = "2021"' '' '[lib]' 'path = "src/lib.rs"' > ./build/vdso/vdso_api/Cargo.toml; \
+		printf '%s\n' 'compile_error!("placeholder vdso_api crate: run `make vdso` to generate real API");' > ./build/vdso/vdso_api/src/lib.rs; \
+	fi
+
+vdso: vdso_clean_cache vdso_api_bootstrap
 	@echo "Building vDSO..."
 	VDSO_TOOLCHAIN=$(VDSO_TOOLCHAIN) VDSO_VERBOSE=$(VDSO_VERBOSE) cargo run --release -p vdso_builder
 
