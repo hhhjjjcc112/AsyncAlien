@@ -1522,9 +1522,9 @@ dependencies = [
  "vfs2",
  "vfs_common",
  "virtio_blk",
+ "virtio_common",
  "virtio_gpu",
  "virtio_input",
- "virtio_mmio_common",
  "virtio_net",
  "xlogger",
 ]
@@ -7185,7 +7185,18 @@ dependencies = [
  "log",
  "shared_heap",
  "virtio-drivers",
- "virtio_mmio_common",
+ "virtio_common",
+]
+
+[[package]]
+name = "virtio_common"
+version = "0.1.0"
+dependencies = [
+ "basic",
+ "interface",
+ "log",
+ "shared_heap",
+ "virtio-drivers",
 ]
 
 [[package]]
@@ -7197,7 +7208,7 @@ dependencies = [
  "log",
  "shared_heap",
  "virtio-drivers",
- "virtio_mmio_common",
+ "virtio_common",
 ]
 
 [[package]]
@@ -7208,17 +7219,7 @@ dependencies = [
  "interface",
  "shared_heap",
  "virtio-drivers",
- "virtio_mmio_common",
-]
-
-[[package]]
-name = "virtio_mmio_common"
-version = "0.1.0"
-dependencies = [
- "basic",
- "log",
- "shared_heap",
- "virtio-drivers",
+ "virtio_common",
 ]
 
 [[package]]
@@ -7230,7 +7231,7 @@ dependencies = [
  "log",
  "shared_heap",
  "virtio-drivers",
- "virtio_mmio_common",
+ "virtio_common",
 ]
 
 [[package]]
