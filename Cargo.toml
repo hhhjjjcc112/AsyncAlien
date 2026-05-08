@@ -28,6 +28,7 @@ members = [
     "user/tests/new/sys_random",
     "user/tests/new/sys_vdso_time_compare",
     "user/tests/new/syscall_all",
+    "utils/x86-apic",
 ]
 exclude = ["build/vdso", "vdso_crate_template"]
 resolver = "2"

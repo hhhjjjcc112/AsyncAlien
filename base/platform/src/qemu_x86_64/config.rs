@@ -3,14 +3,8 @@
 /// TSC 频率（Hz，运行期会重新校准）。
 pub const CLOCK_FREQ: usize = 4_000_000_000;
 
-/// 定时器中断向量。
-pub const TIMER_IRQ: u8 = 0xf0;
-
-/// APIC 伪中断向量。
-pub const APIC_SPURIOUS_VECTOR: u8 = 0xf1;
-
-/// APIC 错误中断向量。
-pub const APIC_ERROR_VECTOR: u8 = 0xf2;
+// Use shared APIC vector constants from the workspace config crate.
+pub use config::{APIC_TIMER_VECTOR as TIMER_IRQ, APIC_SPURIOUS_VECTOR, APIC_ERROR_VECTOR};
 
 /// 是否使用静态 ACPI 设备表（不做运行期 ACPI 表探测）。
 pub const STATIC_ACPI: bool = true;

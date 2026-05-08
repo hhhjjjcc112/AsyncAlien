@@ -32,41 +32,50 @@ fn program_oneshot_timer(local_apic: &mut x2apic::lapic::LocalApic) {
 pub fn init_primary_apic_timer() {
     calibrate_apic_timer();
 
-    let local_apic = unsafe { get_local_apic() };
-    program_oneshot_timer(local_apic);
+    if let Some(mut guard) = get_local_apic() {
+        if let Some(ctx) = guard.as_mut() {
+            program_oneshot_timer(ctx.as_mut());
+        }
+    }
 }
 
 /// Initialize APIC timer for secondary CPUs (AP)
 pub fn init_secondary_apic_timer() {
-    let local_apic = unsafe { get_local_apic() };
-    program_oneshot_timer(local_apic);
+    if let Some(mut guard) = get_local_apic() {
+        if let Some(ctx) = guard.as_mut() {
+            program_oneshot_timer(ctx.as_mut());
+        }
+    }
 }
 
 /// Calibrate APIC timer frequency using TSC
 fn calibrate_apic_timer() {
-    let local_apic = unsafe { get_local_apic() };
+    if let Some(mut guard) = get_local_apic() {
+        if let Some(ctx) = guard.as_mut() {
+            let local_apic = ctx.as_mut();
+            unsafe {
+                local_apic.enable_timer();
+                local_apic.set_timer_divide(TimerDivide::Div1);
+                local_apic.set_timer_mode(TimerMode::OneShot);
+                local_apic.set_timer_initial(0xFFFF_FFFF);
+            }
 
-    unsafe {
-        local_apic.enable_timer();
-        local_apic.set_timer_divide(TimerDivide::Div1);
-        local_apic.set_timer_mode(TimerMode::OneShot);
-        local_apic.set_timer_initial(0xFFFF_FFFF);
-    }
+            // Wait 10ms using TSC
+            let wait_duration = core::time::Duration::from_millis(10);
+            super::busy_wait(wait_duration);
 
-    // Wait 10ms using TSC
-    let wait_duration = core::time::Duration::from_millis(10);
-    super::busy_wait(wait_duration);
+            let remaining = unsafe { local_apic.timer_current() };
+            let elapsed = 0xFFFF_FFFF - remaining;
 
-    let remaining = unsafe { local_apic.timer_current() };
-    let elapsed = 0xFFFF_FFFF - remaining;
+            // Calculate frequency: ticks_per_10ms * 100 = ticks_per_second
+            let frequency = ((elapsed as u64) * 100).max(1);
+            APIC_TIMER_FREQUENCY.store(frequency, Ordering::SeqCst);
 
-    // Calculate frequency: ticks_per_10ms * 100 = ticks_per_second
-    let frequency = ((elapsed as u64) * 100).max(1);
-    APIC_TIMER_FREQUENCY.store(frequency, Ordering::SeqCst);
-
-    // Stop the timer
-    unsafe {
-        local_apic.set_timer_initial(0);
+            // Stop the timer
+            unsafe {
+                local_apic.set_timer_initial(0);
+            }
+        }
     }
 }
 
@@ -83,9 +92,12 @@ pub fn set_apic_timer(deadline_ns: u64) {
     // ticks = deadline_ns * freq / 1e9
     let ticks = ((deadline_ns as u128 * freq as u128 / 1_000_000_000) as u32).max(1);
 
-    let local_apic = unsafe { get_local_apic() };
-    unsafe {
-        local_apic.set_timer_initial(ticks);
+    if let Some(mut guard) = get_local_apic() {
+        if let Some(ctx) = guard.as_mut() {
+            unsafe {
+                ctx.as_mut().set_timer_initial(ticks);
+            }
+        }
     }
 }
 

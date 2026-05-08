@@ -98,7 +98,8 @@ pub fn boot_secondary_cpu(cpu_id: usize) -> bool {
     let stack_top = unsafe { AP_STARTUP_STACKS.as_ptr() } as usize + (cpu_id + 1) * BOOT_STACK_SIZE;
     setup_startup_page(cpu_id, stack_top);
 
-    let apic = unsafe { get_local_apic() };
+    let mut guard = get_local_apic().expect("APIC not initialized");
+    let apic = guard.as_mut().expect("APIC context missing");
     let target_apic_id = if is_x2apic() {
         cpu_id as u32
     } else {
@@ -106,13 +107,11 @@ pub fn boot_secondary_cpu(cpu_id: usize) -> bool {
     };
     let expected_count = AP_EARLY_BOOT_COUNT.load(Ordering::Acquire) + 1;
 
-    unsafe {
-        apic.send_init_ipi(target_apic_id);
-        busy_wait(Duration::from_millis(10));
-        apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
-        busy_wait(Duration::from_micros(200));
-        apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id);
-    }
+    apic.send_init_ipi(target_apic_id).ok();
+    busy_wait(Duration::from_millis(10));
+    apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id).ok();
+    busy_wait(Duration::from_micros(200));
+    apic.send_sipi(AP_START_PAGE_IDX as u8, target_apic_id).ok();
 
     wait_for_secondary_early_boot(cpu_id, expected_count)
 }
