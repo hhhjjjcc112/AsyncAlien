@@ -227,7 +227,7 @@ pub fn load_domains() -> AlienResult<()> {
     // device init function
     #[cfg(target_arch = "x86_64")]
     let X86ApicDomains {
-        local_apic,
+        local_apic: _,
         io_apic: interrupt_controller,
     } = init_device()?;
     #[cfg(target_arch = "riscv64")]
@@ -285,10 +285,7 @@ pub fn load_domains() -> AlienResult<()> {
     crate::task::register_task_domain(task);
     crate::trap::register_syscall_domain(syscall);
     crate::trap::register_interrupt_controller_domain(interrupt_controller);
-    #[cfg(target_arch = "x86_64")]
-    {
-        crate::trap::register_local_apic_domain(local_apic);
-    }
+    // 注：x86_64 的 local_apic 和 io_apic 已在 init_device() 中立即注册
     platform::println!("Register task domain and syscall domain to trap system");
     Ok(())
 }

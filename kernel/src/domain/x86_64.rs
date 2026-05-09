@@ -16,9 +16,54 @@ use crate::{
 };
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(super) struct X86ApicDomains {
     pub local_apic: Arc<dyn LocalAPICDomain>,
     pub io_apic: Arc<dyn IoAPICDomain>,
+}
+
+fn bind_irq_to_io_apic<T>(
+    io_apic: &Arc<T>,
+    irq: u32,
+    device_domain_name: &str,
+    device_kind: &str,
+) -> AlienResult<()>
+where
+    T: IoAPICDomain + ?Sized,
+{
+    let Ok(irq_u8) = u8::try_from(irq) else {
+        warn!(
+            "[x86_64][io_apic] skip {} irq={}, out of u8 range",
+            device_kind,
+            irq
+        );
+        return Ok(());
+    };
+
+    let vector = 32u16 + u16::from(irq_u8);
+    if vector > u16::from(u8::MAX) {
+        warn!(
+            "[x86_64][io_apic] skip {} irq={}, vector={} overflow u8",
+            device_kind,
+            irq,
+            vector
+        );
+        return Ok(());
+    }
+
+    let vector_u8 = vector as u8;
+    io_apic.configure_irq(irq_u8, vector_u8, 0)?;
+    io_apic.set_irq_enable(irq as usize, true)?;
+    io_apic.register_irq(
+        irq as usize,
+        &DVec::from_slice(device_domain_name.as_bytes()),
+    )?;
+    platform::println!(
+        "[x86_64][io_apic] register irq={} for device={}",
+        irq,
+        device_domain_name
+    );
+    Ok(())
 }
 
 fn init_x86_rtc_domain() -> AlienResult<()> {
@@ -204,18 +249,7 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
                 platform::println!("[x86_64][apic] uart irq branch enter irq={:?}", irq);
 
                 if let Some(irq) = irq {
-                    let vector = 32u8.saturating_add(irq as u8);
-                    platform::println!(
-                        "[x86_64][apic] uart irq setup begin irq={}, vector={:#x}",
-                        irq,
-                        vector
-                    );
-                    io_apic.configure_irq(irq as u8, vector, 0)?;
-                    platform::println!("[x86_64][apic] uart irq configure ok irq={}", irq);
-                    io_apic.set_irq_enable(irq as usize, true)?;
-                    platform::println!("[x86_64][apic] uart irq enable ok irq={}", irq);
-                    io_apic.register_irq(irq as _, &DVec::from_slice(buf_uart_name.as_bytes()))?;
-                    platform::println!("[x86_64][apic] uart irq register ok irq={}", irq);
+                    bind_irq_to_io_apic(&io_apic, irq, &buf_uart_name, "uart")?;
                 }
             }
             "rtc" => {
@@ -407,6 +441,7 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
 
     if let Some(ep) = net_ep {
         let bdf = ep.address();
+        let pci_irq = ep.interrupt_line().map(|irq| irq as u32);
         let legacy_io = ep.legacy_io_range();
         let modern = ep.virtio_modern_info();
         if let Some(modern_info) = modern.as_ref() {
@@ -438,13 +473,20 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
             )?;
             net_driver.init_by_box(Box::new(init_info))?;
             let net_domain = DomainType::NetDeviceDomain(net_driver.clone());
-            register_domain!(
+            let virtio_net_name = register_domain!(
                 "virtio_net",
                 domain_file_info.clone(),
                 net_domain.clone(),
                 false
             );
             register_domain!("nic", domain_file_info, net_domain, false);
+            if let Some(irq) = pci_irq {
+                log::debug!(
+                    "virtio-net irq {} detected, defer APIC route until trap domain is ready (domain={})",
+                    irq,
+                    virtio_net_name
+                );
+            }
             has_nic = true;
         } else {
             warn!(
@@ -459,6 +501,7 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
 
     for ep in input_eps {
         let bdf = ep.address();
+        let pci_irq = ep.interrupt_line().map(|irq| irq as u32);
         let legacy_io = ep.legacy_io_range();
         let modern = ep.virtio_modern_info();
         if let Some(modern_info) = modern.as_ref() {
@@ -492,6 +535,13 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
                 DomainType::InputDomain(input_driver),
                 false
             );
+            if let Some(irq) = pci_irq {
+                log::debug!(
+                    "virtio-input irq {} detected, defer APIC route until trap domain is ready (domain={})",
+                    irq,
+                    input_name
+                );
+            }
             let (buf_input, domain_file_info) = create_domain!(
                 BufInputDomainProxy,
                 DomainTypeRaw::BufInputDomain,
@@ -529,6 +579,7 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
 
     if let Some(ep) = gpu_ep {
         let bdf = ep.address();
+        let pci_irq = ep.interrupt_line().map(|irq| irq as u32);
         let legacy_io = ep.legacy_io_range();
         let modern = ep.virtio_modern_info();
         if let Some(modern_info) = modern.as_ref() {
@@ -557,12 +608,19 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
                 create_domain!(GpuDomainProxy, DomainTypeRaw::GpuDomain, "virtio_gpu")?;
             gpu_driver.init_by_box(Box::new(init_info))?;
             let gpu_domain = DomainType::GpuDomain(gpu_driver.clone());
-            register_domain!(
+            let virtio_gpu_name = register_domain!(
                 "virtio_gpu",
                 domain_file_info.clone(),
                 gpu_domain.clone(),
                 false
             );
+            if let Some(irq) = pci_irq {
+                log::debug!(
+                    "virtio-gpu irq {} detected, defer APIC route until trap domain is ready (domain={})",
+                    irq,
+                    virtio_gpu_name
+                );
+            }
             if !has_gpu_alias {
                 register_domain!("gpu", domain_file_info, gpu_domain, true);
                 has_gpu_alias = true;
@@ -749,6 +807,11 @@ pub(super) fn init_device() -> AlienResult<X86ApicDomains> {
         DomainType::EmptyDeviceDomain(random_device),
         true
     );
+
+    // 在 init_device() 末尾立即注册，以避免启动期间 trap handler 访问未初始化的域
+    crate::trap::register_local_apic_domain(local_apic.clone());
+    crate::trap::register_io_apic_domain(io_apic.clone());
+    platform::println!("[x86_64][apic] register local_apic and io_apic to trap system");
 
     Ok(X86ApicDomains {
         local_apic,
