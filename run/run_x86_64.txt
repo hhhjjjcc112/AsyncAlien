@@ -17,11 +17,11 @@ Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
 
 [0] [x86_platform] platform_init_primary enter cpu_id=0
 [0] [x86_platform] platform_init_primary ready cpu_id=0
-[0] Initrd from multiboot: 0xb31000..0xde3265
+[0] Initrd from multiboot: 0xb31000..0xde396d
 [0] Init logger Some("")
 [0] Frame range: 0x10b30000..0x7ffdc000, pages=0x6f4ac
-[0] initrd copy: src=0xb31000, size=2826853, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0xdc056bfe, dst=0xdc056bfe
+[0] initrd copy: src=0xb31000, size=2828653, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xa571abd9, dst=0xa571abd9
 [0] Relocate initrd data to 0x10b3e000
 [0] Frame allocator init success
 [0] Talloc allocator init success
@@ -43,7 +43,7 @@ Booting from ROM..[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
 SMP:     4 CPUs
 Memory:  0x100000..0x7ffdc000
 Compat:  plic=0x0..0x0, clint=0x0..0x0
-Initrd:  0xb31000..0xde3265
+Initrd:  0xb31000..0xde396d
 Bootargs: target/x86_64/release/kernel rdinit=/init
 
 [0] <register domain>: buf_uart
@@ -73,52 +73,52 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <register domain>: virtio_net
 [0] <register domain>: loopback
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 4125 us[0m
+[0] [31m[Load new domain] Time elapsed: 3450 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 772 us[0m
+[0] [31m[Load new domain] Time elapsed: 646 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 2321 us[0m
+[0] [31m[Load new domain] Time elapsed: 2179 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 1278 us[0m
+[0] [31m[Load new domain] Time elapsed: 1030 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 2218 us[0m
+[0] [31m[Load new domain] Time elapsed: 1735 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 1730 us[0m
+[0] [31m[Load new domain] Time elapsed: 1560 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 1743 us[0m
+[0] [31m[Load new domain] Time elapsed: 1503 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 1801 us[0m
+[0] [31m[Load new domain] Time elapsed: 1400 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 2354 us[0m
+[0] [31m[Load new domain] Time elapsed: 1922 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 1913 us[0m
+[0] [31m[Load new domain] Time elapsed: 1265 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 947 us[0m
+[0] [31m[Load new domain] Time elapsed: 892 us[0m
 [0] <attach domain>: task, it's name is task
 [0][Domain:12] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 2118 us[0m
+[0] [31m[Load new domain] Time elapsed: 1759 us[0m
 [0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
 [0][Domain:12] syscall domain init
 [0] <attach domain>: syscall, it's name is syscall
-[0] [31m[Load new domain] Time elapsed: 831 us[0m
+[0] [31m[Load new domain] Time elapsed: 575 us[0m
 [0] <attach domain>: local_apic, it's name is local_apic
-[0] [31m[Load new domain] Time elapsed: 867 us[0m
+[0] [31m[Load new domain] Time elapsed: 741 us[0m
 [0][Domain:14] IO APIC domain init enter base=0xfec00000
 [0][Domain:14] IO APIC domain init
 [0] <attach domain>: io_apic, it's name is io_apic
 [0] [x86_64][io_apic] after register_domain
 [0] [x86_64][io_apic] max_entries=24
-[0] [31m[Load new domain] Time elapsed: 472 us[0m
+[0] [31m[Load new domain] Time elapsed: 520 us[0m
 [0] <attach domain>: hpet, it's name is hpet
-[0] [31m[Load new domain] Time elapsed: 609 us[0m
+[0] [31m[Load new domain] Time elapsed: 569 us[0m
 [0][Domain:16] CmosRtc region: 0x70..0x72
 [0] <attach domain>: rtc, it's name is rtc
-[0] [31m[Load new domain] Time elapsed: 834 us[0m
+[0] [31m[Load new domain] Time elapsed: 697 us[0m
 [0][Domain:17] uart_addr: 0x3f8-0x400
 [0][Domain:17] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 738 us[0m
+[0] [31m[Load new domain] Time elapsed: 607 us[0m
 [0] [x86_64][buf_uart] before init_by_box
 [0][Domain:18] init buf uart success
 [0] [x86_64][buf_uart] after init_by_box
@@ -126,34 +126,32 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0] [x86_64][buf_uart] after register_domain name=buf_uart
 [0] [x86_64][apic] uart irq branch enter irq=Some(4)
-[0] [x86_64][apic] uart irq setup begin irq=4, vector=0x24
 [0][Domain:14] IO APIC configure irq enter irq=4 vector=0x24 dest_cpu=0 ready=true
-[0] [x86_64][apic] uart irq configure ok irq=4
-[0] [x86_64][apic] uart irq enable ok irq=4
 [0][Domain:14] IO APIC enable irq 4
-[0] [x86_64][apic] uart irq register ok irq=4
-[0] [31m[Load new domain] Time elapsed: 1103 us[0m
+[0] [x86_64][io_apic] register irq=4 for device=buf_uart
+[0] [31m[Load new domain] Time elapsed: 1015 us[0m
 [0][Domain:19] virtio_blk_pci(legacy): 0000:00:03.0, io=0xc000-0xc100
 [0][Domain:19] virtio_blk: create blk driver
 [0][Domain:19] virtio_blk: driver ready
 [0] virtio-pci block @ 0000:00:03.0
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
-[0] [31m[Load new domain] Time elapsed: 734 us[0m
+[0] [31m[Load new domain] Time elapsed: 629 us[0m
 [0][Domain:20] virtio_net_pci(legacy): 0000:00:02.0, io=0xc0c0-0xc1c0
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 1069 us[0m
+[0] [31m[Load new domain] Time elapsed: 799 us[0m
 [0][Domain:21] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 733 us[0m
+[0] [31m[Load new domain] Time elapsed: 625 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 2348 us[0m
+[0] [31m[Load new domain] Time elapsed: 1806 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 530 us[0m
+[0] [31m[Load new domain] Time elapsed: 381 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 413 us[0m
+[0] [31m[Load new domain] Time elapsed: 584 us[0m
 [0] <attach domain>: random, it's name is random
+[0] [x86_64][apic] register local_apic and io_apic to trap system
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
 [0][Domain:4] ramfs FsDomain init
@@ -165,7 +163,7 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 1506 us[0m
+[0] [31m[Load new domain] Time elapsed: 1288 us[0m
 [0][Domain:26] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
 [0][Domain:26] ramfs mount success
@@ -177,13 +175,13 @@ Bootargs: target/x86_64/release/kernel rdinit=/init
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 1251 us[0m
+[0] [31m[Load new domain] Time elapsed: 1049 us[0m
 [0][Domain:27] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
 [0][Domain:27] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 1192 us[0m
+[0] [31m[Load new domain] Time elapsed: 1049 us[0m
 [0][Domain:28] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
 [0][Domain:28] ramfs mount success
@@ -211,7 +209,7 @@ drwxr-xr-x      4KB usr
 [0] load_domains: after vfs init
 [0] Drop initrd data
 [0] load_domains: before task init
-[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13b06000
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x13bd7000
 [0][Domain:11] task::current_task: no current tid
 [0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
 [0][Domain:11] init_task enqueue init process tid=1
@@ -235,35 +233,35 @@ drwxr-xr-x      4KB usr
 [3] [kernel] secondary_main enter cpu_id=3
 [3] [kernel] secondary_main percpu ready cpu_id=3
 [3] [x86_platform] platform_init_secondary enter cpu_id=3
-[0] [kernel] secondary cpu launch result started=3 declared_expected=3
 [3] [x86_platform] platform_init_secondary ready cpu_id=3
 [3] [kernel] secondary_main platform ready cpu_id=3
+[0] [kernel] secondary cpu launch result started=3 declared_expected=3
 [1] [x86_platform] platform_init_secondary ready cpu_id=1
 [1] [kernel] secondary_main platform ready cpu_id=1
 [1] [kernel] secondary_main memory ready cpu_id=1
 [2] [x86_platform] platform_init_secondary ready cpu_id=2
 [2] [kernel] secondary_main platform ready cpu_id=2
-[2] [kernel] secondary_main memory ready cpu_id=2
-[2] [kernel] secondary_main trap ready cpu_id=2
 [3] [kernel] secondary_main memory ready cpu_id=3
-[3] [kernel] secondary_main trap ready cpu_id=3
-[3] CPU 3 start...
 [1] [kernel] secondary_main trap ready cpu_id=1
+[3] [kernel] secondary_main trap ready cpu_id=3
+[2] [kernel] secondary_main memory ready cpu_id=2
+[3] CPU 3 start...
+[2] [kernel] secondary_main trap ready cpu_id=2
 [1] CPU 1 start...
 [1] [kernel] secondary_main announced ready cpu_id=1 ready_count=2
-[3] [kernel] secondary_main announced ready cpu_id=3 ready_count=1
 [2] CPU 2 start...
 [2] [kernel] secondary_main announced ready cpu_id=2 ready_count=3
 [2] [kernel] secondary_main released cpu_id=2
-[3] [kernel] secondary_main released cpu_id=3
-[3] run_task bootstrap wake 0 tasks
-[0] [kernel] secondary cpus released count=3
 [1] [kernel] secondary_main released cpu_id=1
 [1] run_task bootstrap wake 0 tasks
 [2] run_task bootstrap wake 0 tasks
-[[0] Begin run task...
-3][Domain:11[0] run_task bootstrap wake 0 tasks
-] kthread_init start...
+[0] [kernel] secondary cpus released count=3
+[3] [kernel] secondary_main announced ready cpu_id=3 ready_count=1
+[3] [kernel] secondary_main released cpu_id=3
+[3] run_task bootstrap wake 0 tasks
+[1][Domain:11] kthread_init start...
+[0] Begin run task...
+[0] run_task bootstrap wake 0 tasks
 Init process is running
 [Init] start /tests/new/syscall_all
 [syscall_all] start
@@ -275,7 +273,7 @@ Init process is running
 [sys_poll] timeout poll ok
 [sys_poll] invalid fd poll ok
 [sys_poll] PASS
-[2][Domain:11] release task [3-3]
+[3][Domain:11] release task [3-3]
 [sys_fs] start
 [sys_fs] PASS
 [3][Domain:11] release task [3-3]
@@ -289,20 +287,20 @@ Init process is running
 [3][Domain:11] release task [3-3]
 [sys_random] start
 [sys_random] PASS
-[3][Domain:11] release task [3-3]
-[sys_time] start
-[sys_time] realtime=1s 989327357ns
-[sys_time] monotonic=1s 989382930ns
-[sys_time] monotonic_tick=1s 990850904ns
-[sys_time] monotonic_tick=1s 991622440ns
-[sys_time] monotonic_tick=1s 992795153ns
-[sys_time] monotonic_tick=1s 993606036ns
-[sys_time] PASS
 [1][Domain:11] release task [3-3]
-[sys_vdso_time_compare] start
-[sys_vdso_time_compare] vdso=12s 91253937ns raw=12s 91549745ns delta=295808ns
-[sys_vdso_time_compare] PASS
+[sys_time] start
+[sys_time] realtime=1s 647539443ns
+[sys_time] monotonic=1s 647588655ns
+[sys_time] monotonic_tick=1s 648684466ns
+[sys_time] monotonic_tick=1s 649269690ns
+[sys_time] monotonic_tick=1s 649873156ns
+[sys_time] monotonic_tick=1s 650490291ns
+[sys_time] PASS
 [3][Domain:11] release task [3-3]
+[sys_vdso_time_compare] start
+[sys_vdso_time_compare] vdso=11s 726530765ns raw=11s 726770134ns delta=239369ns
+[sys_vdso_time_compare] PASS
+[1][Domain:11] release task [3-3]
 [syscall_all] PASS
 [0][Domain:11] release task [2-2]
 [Init] PASS /tests/new/syscall_all
@@ -319,4 +317,13 @@ Test socket successes!
 [0][Domain:11] release task [2-2]
 [Init] PASS /tests/ping
 [Init] all tests passed
-[1m[32mAlien[0m:[1m[34m/[0m# qemu-system-x86_64: terminating on signal 15 from pid 78159 (timeout)
+[1m[32mAlien[0m:[1m[34m/[0m# ls
+[1;34mbin[m     [1;34mdomain[m  [1;34mproc[m    [1;34msbin[m    [1;34mtests[m   [1;34musr[m
+[1;34mdev[m     [1;34metc[m     [1;34mroot[m    [1;34msys[m     [1;34mtmp[m     [1;34mvar[m
+[2][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/[0m# ls
+[1;34mbin[m     [1;34mdomain[m  [1;34mproc[m    [1;34msbin[m    [1;34mtests[m   [1;34musr[m
+[1;34mdev[m     [1;34metc[m     [1;34mroot[m    [1;34msys[m     [1;34mtmp[m     [1;34mvar[m
+[2][Domain:11] release task [3-3]
+[1m[32mAlien[0m:[1m[34m/[0m# cd ..
+[1m[32mAlien[0m:[1m[34m/[0m# qemu-system-x86_64: terminating on signal 1 from pid 114734 (/bin/bash)
