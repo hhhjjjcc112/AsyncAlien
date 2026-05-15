@@ -31,3 +31,8 @@ task_list.md
 agent_next_tasks.md
 test_cfg.md
 x86_64_域加载与关键域测试报告.md
+
+# Office temporary files
+**/~$*.docx
+**/*.tmp
+**/*.bak
