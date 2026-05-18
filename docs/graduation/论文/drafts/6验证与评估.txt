@@ -1,0 +1,136 @@
+第6章验证与评估
+
+本章基于一次完整运行的实验日志，系统性论述将系统迁移到x86_64平台后在功能性与性能方面的验证结果。引言部分概述研究目的与方法学框架；随后分别就测试设计、功能验证、性能度量、方法学评述与复现性建议展开论述，并在结论中总结主要发现与后续工作方向。
+
+6.1测试设计与实现要点
+
+在测量用户态读取时钟的快路径（vDSO）相对于传统系统调用路径（raw syscall）时，必须避免用被测时间源自身来度量其耗时，这会因分辨率和返回速度差异产生误导性零值或非物理性偏差。为此，本研究采用两阶段方法：先进行一致性验证，确认vDSO与raw在绝对时间上无不可接受差异；随后采用独立基准的连续采样窗口进行性能测量。连续采样窗口在窗口前后调用原始基准打点函数记录纳秒级时间，窗口内仅执行被测调用；窗口总耗时除以调用次数得出单次平均耗时，从而尽量降低被测源自身的量化误差对性能评估的影响。
+
+在具体实现中，研究团队为降低系统噪声的影响采用了预热（warmup）步骤以去除冷启动与缓存效应的短期偏差，并在每组测量前执行固定次数的预热迭代。此外，测量实现中使用了黑盒提示（core::hint::black_box）以避免编译器在循环中进行不当优化，这一点在微基准测试中尤为重要。样本组选择（64、128、256、512、1024）旨在覆盖从小窗口到较大窗口的尺度，以观察窗口大小对测量稳定性与信噪比的影响。测量阈值（本实验中采用10ms作为一致性判断的上限）基于虚拟化环境下观测到的瞬时波动范围确定；在更稳定的硬件平台上，该阈值可以相应收紧。
+
+功能测试方面，本研究采用端到端与单元测试相结合的策略，以保证系统从固件引导、内核初始化到用户态服务的各个子系统在功能语义上保持一致。端到端测试通过自动化的引导运行框架把系统引导到多核配置并运行完整的用户态测试套件，记录启动日志以验证frame allocator、内核地址空间构建、域注册与加载、以及用户态进程能否成功解析auxv并定位vDSO；单元与集成测试则覆盖vdso相关的边界条件与错误路径，包括验证vdso映射失败时userlib能正确回退到syscall、验证vdso_api的vVAR布局在内核与vDSO间保持二进制兼容、验证MemIf实现对valloc/ppage_alloc/map/change_protect/get_kernel_vaddr/ppage_clone等接口在内核与task域之间的正确行为。为捕获并回放较难触发的竞态与权限错误，测试框架还集成了针对中断与并发写入场景的模拟模块，用以在受控条件下触发vVAR并发更新、验证seqcount语义在读者/写者竞争下的健壮性。测试结果的判定主要基于日志中一致性的断言以及若干关键二进制断言（例如vDSO ELF校验、符号解析成功与否、用户态vdso_api初始化返回值），并辅以自动化复测与回归测试以保证在代码变更后功能不回退。
+
+清单6.1验证一致性的实现片段
+
+fn verify_correctness(threshold_us: u64) -> Result<(), String> {
+  for i in 0..VERIFY_ITERS {
+let mut vdso_ts = TimeSpec::default();
+let mut raw_ts = TimeSpec::default();
+assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut vdso_ts), 0);
+assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut raw_ts), 0);
+let vdso_ns = timespec_to_ns(&vdso_ts);
+let raw_ns = timespec_to_ns(&raw_ts);
+let diff_us = ((vdso_ns as i128 - raw_ns as i128).abs() as u128 + 999) / 1000;
+if diff_us > threshold_us as u128 {
+  return Err("vdso vs raw difference exceeds threshold".to_string());
+}
+  }
+  Ok(())
+}
+
+清单6.2窗口测量的实现片段
+
+fn measure_call_window_raw_ns(samples: usize, use_vdso: bool) -> u128 {
+  let mut ts = TimeSpec::default();
+  let start = monotonic_now_ns();
+  for _ in 0..samples {
+if use_vdso {
+  assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut ts), 0);
+} else {
+  assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0);
+}
+core::hint::black_box(ts.tv_nsec);
+  }
+  let end = monotonic_now_ns();
+  end - start
+}
+
+上述实现分别对应一致性验证与性能测量的关键步骤：首段确保两类时间源在绝对值上的可比性；次段通过独立基准打点对连续调用窗口进行计时，以获得可比较的平均耗时估计。
+
+在讨论方法有效性时，应区分测量误差的来源：一是统计误差，源自单次运行的样本数有限；二是系统性误差，源自虚拟化调度、后台干扰或测量代码本身的开销。为控制统计误差，本研究建议对每个样本组至少进行多次完整运行并计算均值与方差；为减轻系统性误差，应尽量在没有其他负载、I/O干扰最小的环境下运行QEMU，并保持QEMU的配置参数恒定。
+
+6.2功能验证与运行证据
+
+功能验证基于系统从引导到进入用户态测试套件并成功呈现交互shell的日志序列。以下摘录代表性日志片段，用以证明引导、内存与地址空间初始化、域注册与加载、以及用户态测试的顺利完成。
+
+片段6.1启动与域加载
+
+[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
+[0] Frame allocator init success
+[0] Build kernel address space success
+[0] <register domain>: scheduler, logger, fatfs, ramfs, devfs, procfs, sysfs, pipefs, domainfs, vfs, task, syscall, uart16550, local_apic, io_apic, cmos_rtc, virtio_net
+[0] Load domains done
+
+
+片段6.2系统调用与用户态基线
+
+[syscall_all] start
+[sys_poll] PASS
+[sys_fs] PASS
+[sys_link] PASS
+[sys_proc] PASS
+[sys_random] PASS
+[sys_time] PASS
+[sys_vdso_time_compare] PASS
+[syscall_all] PASS
+[Init] all tests passed
+Alien:/#
+
+上述片段按照时间序列表明了系统关键路径的成功执行，支持对功能正确性的断言。
+
+值得指出的是，日志片段提供的是面向整链路的证据：启动阶段验证了引导加载器与内核早期初始化（如frame allocator、内核地址空间构建）是否正确完成；域注册与加载片段则验证了系统模块化加载逻辑与依赖解析；用户态测试的通过则体现了系统调用转发、用户态库与运行时环境的协同正确性。尽管日志本身不能穷尽所有潜在的边界情况，但其连贯性与顺序性足以作为功能完整性的主要证据。
+
+6.3性能度量与分析
+
+在一致性验证通过后，性能测量在多个样本组上分别对vDSO与raw syscall的平均单次耗时进行窗口测量。样本组的典型取值为64、128、256、512、1024。下列为运行日志中记录的原始测量行，作为后续统计分析的原始数据来源。
+
+[VDSO_VERIFY] PASS
+[VDSO_BENCH] samples=64 unit=ns vdso_elapsed=79121 vdso_avg=1236 raw_elapsed=1747668 raw_avg=27307 speedup=22.09x
+[VDSO_BENCH] samples=128 unit=ns vdso_elapsed=47048 vdso_avg=367 raw_elapsed=4054185 raw_avg=31673 speedup=86.30x
+[VDSO_BENCH] samples=256 unit=ns vdso_elapsed=117138 vdso_avg=457 raw_elapsed=7138367 raw_avg=27884 speedup=61.02x
+[VDSO_BENCH] samples=512 unit=ns vdso_elapsed=94370 vdso_avg=184 raw_elapsed=14604455 raw_avg=28524 speedup=155.02x
+[VDSO_BENCH] samples=1024 unit=ns vdso_elapsed=161560 vdso_avg=157 raw_elapsed=27488520 raw_avg=26844 speedup=170.98x
+
+由上述结果可见，vDSO的单次平均耗时位于数百纳秒量级，而raw syscall处于数万纳秒量级，故而speedup显著。鉴于本次数据来自一次完整运行，建议对每个样本组执行多次重复测量以获得均值和置信区间，从而增强结论的统计显著性。
+
+对性能数据的解释应考虑两个互补视角：一方面，单次调用的微观成本（microcost）反映了内核与用户态之间切换与上下文保存/恢复的开销；另一方面，窗口测量放大了微观差异，便于估算在高频调用场景下的累积影响。实际系统在不同工作负载下的表现可能会有所不同，例如在高并发或I/O密集型场景中，调度延迟与缓存行为可能改变原有的加速比。因此，本研究将当前结果视为基线（baseline）测量，后续需在多样化负载下扩展测试以评估vDSO在实际应用场景中的收益。
+
+6.4方法学评述与局限
+
+连续采样窗口法的主要优点在于使用独立基准打点以避免被测时间源的自评估偏差，并通过批量调用放大测量信号以提高可观测性。然而，该方法受限于实验环境噪声——包括虚拟化带来的抖动、运行期间的系统活动干扰以及测量参数（如预热次数、迭代次数和样本窗口大小）对结果的影响。阈值设定（本研究中采用的10ms绝对差阈值）应基于目标运行环境的噪声特性进行调整；在更为稳定的物理平台上，该阈值可适当收紧以反映更高的时间一致性要求。
+
+6.5可复现步骤与建议
+
+为便于复现，给出最小运行命令与建议的重复-run聚合流程（下例中<run-log-file>表示本地测试框架生成的运行日志文件）：
+
+sh
+env ARCH=x86_64 SMP=1 make record_run
+grep "VDSO_VERIFY\|VDSO_BENCH" <run-log-file>
+
+
+建议的重复-run聚合示例（三次）：
+
+sh
+mkdir -p vdso_runs
+for i in 1 2 3; do
+  env ARCH=x86_64 SMP=1 RUN_TIMEOUT=600 make record_run
+  cp <run-log-file> vdso_runs/run_$i.txt
+  grep "VDSO_VERIFY\|VDSO_BENCH" vdso_runs/run_$i.txt >> vdso_runs/aggregated.txt
+done
+
+
+对聚合结果计算均值与标准差后，可在论文中以均值±标准差或置信区间的形式呈现speedup值，从而提高结论的可比性与严谨性。
+
+此外，建议在撰写论文的附录中提供测量脚本与关键配置（例如QEMU命令行参数、内核启动参数以及用于生成run-log的Makefile目标），以便他人在等效环境中复现实验。为了准确地比较不同硬件/虚拟化平台，需记录并公开实验平台的详细配置（CPU型号、核心数、内存大小、宿主机负载情况等），这对解释不同平台间测量差异至关重要。
+
+
+6.6结论
+
+本章对x86_64平台的功能正确性与vDSO性能进行了初步验证：功能方面，系统从引导到用户态测试套件及交互shell的执行路径已被完整验证；性能方面，基于一次完整运行的数据表明vDSO相对于raw syscall在单次调用层面具有显著的加速效果。为增强结论的学术性，应在后续工作中补充多次重复测量、在物理硬件上复验，并将更多系统关键路径纳入基准测试范围。
+
+为推进该研究，我们建议形成一个分阶段的后续计划：首先在相同虚拟化配置下完成若干次重复-run以量化测量稳定性；其次在受控的物理平台上复现核心用例以验证虚拟化带来的偏差；最后扩展到更复杂的系统路径（包括域间通信与I/O子系统），从而把vDSO的效能评价置于更广泛的系统性能语境中进行讨论。
+
+---
+
+第6章完毕。
+

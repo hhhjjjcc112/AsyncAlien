@@ -1,0 +1,27 @@
+参考文献
+
+[1] 全国信息与文献标准化技术委员会. 文献著录规则: 信息与文献 参考文献著录规则: GB/T 7714—2015[S]. 北京: 中国标准出版社, 2015.
+
+[2] Tanenbaum A S. Modern Operating Systems[M]. 4th ed. Upper Saddle River, NJ: Pearson, 2014.
+
+[3] Klein G, Elphinstone K, Heiser G, Andronick J, Cock S, Fitzsimmons K, et al. seL4: formal verification of an OS microkernel[J]. Communications of the ACM, 2014, 57(6): 80-89.
+
+[4] Liedtke J. On µ-kernel construction[C]//Proceedings of the 15th ACM Symposium on Operating Systems Principles. 1995: 237-250.
+
+[5] Klabnik S, Nichols C. The Rust Programming Language[M]. 2nd ed. Sebastopol, CA: No Starch Press, 2018.
+
+[6] Kerrisk M. The Linux Programming Interface[M]. 1st ed. San Francisco: No Starch Press, 2010.
+
+[7] The Linux Kernel Archives. vDSO and vsyscall documentation[EB/OL]. (2016) [2026-05-18]. https://www.kernel.org/doc/html/latest/vm/vdso.html
+
+[8] RISC-V Foundation. RISC-V Instruction Set Manual: Volume II — Privileged Architecture[S]. 2019.
+
+[9] Intel Corporation. Intel 64 and IA-32 Architectures Software Developer’s Manual[EB/OL]. [2019] [2026-05-18]. https://software.intel.com/content/www/us/en/develop/articles/intel-sdm.html
+
+[10] Bellard F. QEMU — a fast and portable dynamic translator[EB/OL]. [2005] [2026-05-18]. https://www.qemu.org
+
+[11] MITRE. Common Vulnerabilities and Exposures (CVE) Dictionary[EB/OL]. [2026-05-18]. https://cve.mitre.org
+
+[12] AsyncAlien project. AsyncAlien: domain-isolation kernel — source code and documentation[R]. /home/hjch/AsyncAlien, 2026.
+
+[13] 项目内部文档: vdso_crate_template — vDSO 生成器与映射规范[R]. AsyncAlien 仓库文档, 2026.

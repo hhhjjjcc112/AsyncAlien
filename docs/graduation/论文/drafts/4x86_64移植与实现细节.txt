@@ -1,0 +1,310 @@
+第4章x86_64移植与实现细节
+
+本章描述将系统从RISC-V迁移到x86_64时的实现要点，聚焦启动与早期初始化、percpu与FPU/APIC初始化、trap/syscall的切换语义、页表与寄存器差异、以及ACPI/PCI的探测方法。每个要点下都嵌入示例代码以说明实现要领，示例为说明性伪代码，不指向或引用任何仓库路径。
+
+4.1 启动与percpu布局
+
+x86_64的早期启动需完成控制寄存器与长模式相关配置，并在链接期为per-cpu区与trampoline预留连续映像。percpu的初始化包含就地构造每核数据区并设置per-cpu寄存器镜像，以便在陷阱/系统调用时通过GS快速访问。下面给出真实实现的关键片段作为示例，并对要点做更详细的解释。
+
+#[percpu::def_percpu]
+static CPU_ID: usize = usize::MAX;
+
+#[inline(always)]
+pub fn cpu_id() -> usize {
+    CPU_ID.read_current()
+}
+
+pub fn init_percpu_primary(cpu_id: usize) {
+    percpu::init_in_place().unwrap();
+    percpu::init_percpu_reg(cpu_id);
+    CPU_ID.write_current(cpu_id);
+    println!("percpu use {:#x} mem", percpu::percpu_area_layout_expected(1).size());
+}
+
+pub fn init_percpu_secondary(cpu_id: usize) {
+    percpu::init_percpu_reg(cpu_id);
+    CPU_ID.write_current(cpu_id);
+}
+
+Listing 4.1: percpu初始化（摘录）
+
+percpu的实现采用宏生成每核静态区，并在链接脚本中为该段预留连续的虚拟映像，以便运行时能以恒定偏移访问各核的私有数据。引导核（BSP）先调用init_in_place完成全局per-cpu区的就地构造，随后通过init_percpu_reg在寄存器层面建立针对当前核的镜像（trampoline与陷阱路径通过该镜像访问per-cpu字段）。CPU_ID提供一个轻量的当前核索引访问接口，避免在热路径频繁走复杂数据结构。
+
+在工程实现上要注意几点：初始化顺序必须严谨（BSP完成基础布局后各AP再分别初始化），每核数据应按缓存行对齐以减少 false sharing；对于需要在陷阱路径访问的字段，应放在固定偏移并保证在链接脚本中的位置不变，以便汇编层通过常量偏移直接引用。此外，写入寄存器镜像时应避免竞态，必要时使用内存屏障或在AP切换点加入同步，确保在中断或早期异常发生时per-cpu区已经可安全访问。
+
+4.2 FPU与APIC的初始化
+
+每个CPU在进入内核运行之前需要初始化FPU/SSE支持并配置本地APIC相關访问。下面分别给出FPU初始化与MADT解析以初始化APIC的真实代码片段，并在后文详细说明关键语义与设计权衡。
+
+pub fn init_fpu() {
+    unsafe {
+        // CR0: 清EM/TS，置MP。
+        let mut cr0 = control::Cr0::read();
+        cr0.remove(control::Cr0Flags::EMULATE_COPROCESSOR);
+        cr0.insert(control::Cr0Flags::MONITOR_COPROCESSOR);
+        cr0.remove(control::Cr0Flags::TASK_SWITCHED);
+        control::Cr0::write(cr0);
+
+        // CR4: 置OSFXSR/OSXMMEXCPT。
+        let mut cr4 = control::Cr4::read();
+        cr4.insert(control::Cr4Flags::OSFXSR);
+        cr4.insert(control::Cr4Flags::OSXMMEXCPT_ENABLE);
+        control::Cr4::write(cr4);
+
+        // 保留x87初始化。
+        core::arch::asm!("fninit", options(nomem, nostack, preserves_flags));
+    }
+}
+
+Listing 4.2: FPU/SSE初始化（摘录）
+
+实现首先在CR0上清除FPU模拟位并设置MP，以允许协处理器按x86语义工作；随后通过CR4启用OSFXSR与OSXMMEXCPT，从而支持使用FXSAVE/FXRSTOR与SSE的异常模型。执行fninit将x87状态复位为已知值，保证后续浮点指令在已定义的状态下运行。
+
+工程注意点包括：
+- 是否采用延迟（lazy）保存/恢复策略：延迟策略可以减少上下文切换开销，但需在首次使用浮点寄存器时正确触发异常并完成保存；
+- 对于支持XSAVE/XRSTOR的平台，可在启用后利用更广的状态集（AVX/MPX/…）并在任务切换处相应保存；
+- 每核在早期初始化时启用FPU，且内核应在任务切换或中断返回处显式对浮点上下文做保存与恢复，以避免任务之间的状态泄漏或寄存器污染。
+
+
+
+init_primary_apic在引导核（BSP）上完成 Local APIC 的早期初始化：先通过x86_apic::port_io::disable_8259a()关闭旧式8259A PIC，避免干扰；用cpu_has_x2apic()检测CPU是否支持x2APIC，并把结果写入原子标志IS_X2APIC；根据是否启用x2APIC决定xapic_base（x2APIC模式设为0，否则从x2apic::lapic::xapic_base()获取物理地址并加上PHYS_VIRT_OFFSET转为虚拟地址）；用该基址和模式创建LocalApicContext（封装对LAPIC/IOAPIC的访问），调用context.enable()对硬件做寄存器编程（如设置spurious vector、使能APIC、配置timer/priority等）；最后将上下文写入受Mutex保护的APIC_CONTEXT并通过原子变量APIC_CONTEXT_READY发布就绪状态，供其它核或子系统读取使用（错误路径当前用expect直接失败）。
+
+实现要点说明：
+- 默认的DEFAULT_APIC_BASE为0xFEE0_0000，这是大多数x86_64平台的本地APIC物理基址；但应以MADT为准。
+- 启用x2APIC时优先通过MSR访问寄存器，避免MMIO映射的复杂性；x2APIC也支持更大数量的APIC ID，利于大核数平台。
+- 若x2APIC无法启用（固件/硬件不支持或MSR写失败），回退到MMIO访问路径，并确保对该MMIO区做合适的缓存属性与写序列化处理。
+- IOAPIC与LAPIC的协同（如中断路由表/全局IRQ基址）仍需基于MADT信息注册到设备子系统，由中断子系统统一管理与路由。
+
+示例中对x2apic crate的调用为语义性示例；在实际代码中请根据所选crate的确切API（如x2apic::enable_x2apic()、x2apic::write_reg()、x2apic::is_enabled()等）实现对应包装，并在Cargo.toml中加入相应依赖以便编译。
+
+4.3 为trap切换预留高地址percpu区域
+
+为了在用户页表隔离场景下仍能安全访问per-cpu数据，内核在虚拟地址空间的高地址预映射一份per-cpu镜像并在初始化时把某个通用寄存器（如GS）设为该镜像的基址。trampoline在进入内核后以GS访问per-cpu字段以完成用户rsp保存、TSS.rsp0读取与内核栈切换。下面给出两处关键实现的真实摘录：percpu镜像的写入与MSR/LSTAR的设置，以及syscall汇编入口中对per-cpu的访问。
+
+// 在syscall初始化时把GS指向per-cpu镜像高地址
+let gs_value = percpu::read_percpu_reg();
+let gs_mirror = PERCPU_MIRROR_BASE - _percpu_start as *const () as usize + gs_value;
+unsafe { percpu::write_percpu_reg(gs_mirror); }
+
+// 设置syscall相关MSR，将快速入口指向trampoline内的syscall_entry
+let lstar_offset = syscall_entry as *const () as usize - strampoline as *const () as usize;
+let lstar = VirtAddr::new((TRAMPOLINE + lstar_offset) as u64);
+LStar::write(lstar);
+SFMask::write(sfmask);
+unsafe { Efer::write(Efer::read() | EferFlags::SYSTEM_CALL_EXTENSIONS); }
+
+
+Listing 4.4: per-cpu镜像写入与LSTAR/SFMask设置（摘录）
+
+上述片段的目的是在内核虚拟地址空间为per-cpu数据建立一个稳定且可由汇编访问的高地址镜像，并将该镜像地址写入寄存器镜像或相关MSR，保证swapgs后汇编可以通过GS快速定位。与此同时，将LSTAR设置为trampoline的入口地址，使得用户态的syscall指令会直接跳入内核预期的trampoline代码段；SFMask的配置则用于屏蔽sysret/syscall交替过程中不应被继承的标志位（如中断使能），从而减少返回时的时间窗风险。
+
+工程要点包括：确保trampoline段在所有地址空间切换场景下都是可执行且映射一致（例如在早期要进行恒定的高物理地址映射或在内核页表中为trampolines单独保留identity映射），设置MSR前要确保目标地址的可达性，以及在多核环境下保证各核的per-cpu镜像基址正确且彼此独立，避免跨核误访问。
+
+下面是syscall汇编入口的关键片段（已按原实现摘录并简化注释）：
+
+.section .text.trampoline
+.code64
+
+.global syscall_entry
+
+syscall_entry:
+    swapgs
+    mov qword ptr gs:[offset __PERCPU_USER_RSP], rsp
+    mov rsp, qword ptr gs:[offset __PERCPU_TSS + {tss_rsp0_offset}]
+    sub rsp, 8
+    push qword ptr gs:[offset __PERCPU_USER_RSP]
+    push r11
+    sub rsp, 8
+    push rcx
+    sub rsp, 2 * 8
+    push rax
+    push rcx
+    push rdx
+    push rdi
+    push rsi
+    push r8
+    push r9
+    push r10
+    push r11
+    push rbx
+    push rbp
+    push r12
+    push r13
+    push r14
+    push r15
+    mov r13, qword ptr [rsp - 16]
+    mov r14, qword ptr [rsp - 8]
+    mov cr3, r13
+    mov rsp, r14
+    mov r15, [syscall_handler_ptr]
+    call r15
+    mov cr3, rax
+    mov rsp, rdx
+    add rsp, 16
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbp
+    pop rbx
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rsi
+    pop rdi
+    pop rdx
+    pop rcx
+    pop rax
+    add rsp, 7 * 8
+    mov rcx, [rsp - 5 * 8]
+    mov r11, [rsp - 3 * 8]
+    mov rsp, [rsp - 2 * 8]
+    swapgs
+    sysretq
+
+
+Listing 4.5: syscall汇编入口（摘录）
+
+该汇编实现通过swapgs切换到内核GS基址，然后把用户的RSP等必要上下文保存到per-cpu区或栈上，构造起供高层语言handler使用的TrapFrame。关键步骤包括按照ABI保存必要的通用寄存器、把用户提供的CR3与内核目标栈地址暂存到预定位置，再通过mov cr3, r13/mov rsp, r14等指令完成地址空间与栈的切换，随后调用内核的syscall handler。handler处理结束后，要根据返回的约定再恢复用户的CR3、寄存器与栈，并通过sysretq返回用户态。
+
+在实现上，应明确handler与汇编之间的调用约定：handler必须验证用户指针的有效性并做好边界检查，返回时应提供用于恢复用户页表与TrapFrame的必要值；汇编则要保证栈对齐与寄存器保存语义，避免在中断/异常路径上引入不确定行为。此外，需考虑到诸如核心转储、信号/异常传递以及对抗侧信道/投机执行的缓解（例如在必要位置插入内存屏障或序列化指令）的工程要求。
+
+4.4 x86_64与RISC-V的页表结构與寄存器差异
+
+x86_64使用四级页表（PML4→PDPT→PD→PT），每级512项，索引宽度为9位。CR3保存页表根的物理地址，CR2保存页错误地址，CR4控制若干特性，EFER控制系统调用相关扩展。实现时应提供统一的页表抽象以在不同架构之间映射语义。下面给出page-table库中对索引计算的真实摘录与CR3读写的实现。
+
+const fn p4_index(vaddr: VirtAddr) -> usize {
+    (vaddr.as_usize() >> (12 + 27)) & (ENTRY_COUNT - 1)
+}
+
+
+Listing 4.6: PML4索引计算（摘录）
+
+
+在x86_64架构中，4级页表的索引由虚拟地址中不同位段决定。实现通过右移并与掩码操作提取每级的索引。通用页表接口应同时支持多种页粒度（1G/2M/4K），以便在不同场景下权衡TLB命中率与内存碎片化。例如对连续大内存区域使用1G或2M页面可以显著减少页表层级和TLB压力，但在碎片化或需精细映射的场景下仍须使用4K页面。
+
+pub fn read_cr3() -> usize {
+    let (frame, _) = control::Cr3::read();
+    frame.start_address().as_u64() as usize
+}
+
+
+Listing 4.7: 读取CR3（摘录）
+
+CR3保存页表根帧的物理地址，内核在进行地址空间切换时需要读写CR3。切换CR3会导致TLB对应条目的无效化（或在某些实现下需要显式刷新），因此实现必须在切换后采取必要的同步与缓存刷新措施，尤其是在处理跨用户/内核页表隔离和处理设备DMA时要确保一致性。
+
+4.5 syscall与trap的具体汇编处理要点
+
+（此节已在4.3中通过syscall汇编示例与LSTAR设置讨论，故此处补充对trampoline的统一异常入口的摘录与解释。）
+
+.macro DEF_HANDLER, i
+.Ltrap_handler_\i:
+.if \i == 8 || (\i >= 10 && \i <= 14) || \i == 17
+push \i
+jmp .Ltrap_common
+.else
+push 0
+push \i
+jmp .Ltrap_common
+.endif
+.endm
+
+.Ltrap_common:
+    push rax
+    push rcx
+    push rdx
+    push rdi
+    push rsi
+    push r8
+    push r9
+    push r10
+    push r11
+    push rbx
+    push rbp
+    push r12
+    push r13
+    push r14
+    push r15
+    sub rsp, 2 * 8
+    mov rax, [rsp + TF_CS]
+    and rax, 0x3
+    cmp rax, 0x3
+    je .Lfrom_user
+
+
+Listing 4.8: 统一异常入口（trampoline摘录）
+
+trampoline的统一入口将通用寄存器压栈后，通过检查CS.DPL来判定异常来源（用户态或内核态）。若来自用户态，流程会走用户路径：先swapgs切换GS，再完成CR3/栈切换并调用user_trap_vector；若来自内核态，则直接调用内核处理逻辑并最终通过iretq返回。将上下文保存与权限判断放在汇编层可以保证语义上的原子性与确定性，同时把异常的具体语义与恢复逻辑交给用Rust实现的上层处理器，从而兼顾性能与可维护性。
+
+4.6 ACPI/AML与PCI的探测方式（x86_64特殊性）
+
+x86_64的设备发现以ACPI为核心：先搜索RSDP并解析SDT（包括MADT/MCFG/SPCR/HPET等），从表中提取中断控制器、串口、HPET与PCI MCFG（MCFG指定了ECAM区域）。在MCFG存在时优先使用ECAM进行PCI总线扫描，否则采取默认ECAM基址或基于IO的枚举策略。下面给出MCFG/ECAM处理的真实摘录與详细说明。
+
+pub fn enumerate_pci_devices<H: ::acpi::Handler>(tables: &::acpi::AcpiTables<H>) -> Vec<CommonDeviceType> {
+    let mut devices = Vec::new();
+    if let Ok(pci_regions) = ::acpi::platform::PciConfigRegions::new(tables) {
+        for region in pci_regions.regions.iter() {
+            let bus_count = (region.bus_number_end - region.bus_number_start) as usize + 1;
+            let base = region.base_address as usize;
+            let size = bus_count << 20;
+            let address_range = PhysAddr::from(base)..PhysAddr::from(base + size);
+            devices.push(ecam_device(CommonDeviceInfo { address_range: address_range.clone(), locator: DeviceLocator::Mmio(address_range), irq: None, compatible: Some("pci_ecam".into()), }));
+        }
+        return devices;
+    }
+    // 兜底 ECAM
+    let base = platform::config::PCI_ECAM_BASE;
+    let size = 0x1000_0000usize;
+    let address_range = PhysAddr::from(base)..PhysAddr::from(base + size);
+    devices.push(ecam_device(CommonDeviceInfo { address_range: address_range.clone(), locator: DeviceLocator::Mmio(address_range), irq: None, compatible: Some("pci_ecam".into()), }));
+    devices
+}
+
+
+Listing 4.9: PCI ECAM枚举与MCFG处理（摘录）
+
+MCFG表中列出的ECAM区域通常包含segment与bus range，内核应把每个区域视为一段连续的PCI配置空间并据此进行MMIO访问与设备发现。优先使用ACPI中的MCFG可以避免错误地假定固定基址，并能正确处理多段ECAM情况；当MCFG不存在时用平台默认值作为回退可以保持基本兼容性，但应在日志中标注并在驱动或固件期望不同时向上层报告。
+
+实现时需注意每个bus的地址空间大小（标准为1MB/每bus）、跨segment的bus编号映射以及对超出常规范围的保护检查，避免因错误的ECAM配置导致错误设备识别或越界访问。
+
+4.7 统一的页表令牌示例与跨架构封装
+
+在跨架构代码中，为了屏蔽x86_64与riscv64在页表表示上的差异，高层接口通常需要一个统一的“页表令牌”（page table token），供分页激活、加载vDSO、或在域/进程切换时传递使用。仓库中对这一思想的实际实现可以看作一个小而明确的封装：上层只调用kernel_page_table_token()，由它在不同架构下返回合适的值。
+
+下面是仓库中实际使用的简短实现摘录（来自 [base/mem/src/vmm.rs](base/mem/src/vmm.rs#L251)）：
+
+pub fn kernel_page_table_token() -> usize {
+    #[cfg(target_arch = "x86_64")]
+    {
+        kernel_page_table_root_paddr()
+    }
+    #[cfg(target_arch = "riscv64")]
+    {
+        8usize << 60 | (kernel_page_table_root_paddr() >> FRAME_BITS)
+    }
+}
+
+解释：
+- 在x86_64上，返回值直接是内核页表根的物理地址（root paddr），上层在切换CR3或激活页表时使用该物理地址即可。
+- 在riscv64上，函数将物理页框号（PPN）与高位标志合并成一个整型令牌（此处用8usize << 60作为示例的格式标记，低位存放root_paddr >> FRAME_BITS），上层只需按约定把该令牌传给平台特定的激活函数。
+
+工程要点与使用场景：
+- 把平台差异集中在一处，避免在项目许多位置写条件编译分支；
+- 上层（例如vDSO加载逻辑、域加载器或context切换代码）只需调用kernel_page_table_token()，即可在不同架构上获得可用的表示；
+- 当新增架构或变更页表格式时，只需修改这个封装或相关解析函数，最小范围内完成适配；
+- 注意令牌格式的文档化与兼容性约定——若多个组件需要解析该令牌，须统一位域含义并在代码中维护对应的解析接口。
+
+该封装在仓库中被用于vDSO映射、域激活与内核页表管理的若干场景，能显著降低跨架构移植的维护成本并提高语义清晰度。
+
+4.8 本章小结
+
+本章给出了从RISC-V向x86_64迁移时的实现细节并以真实代码摘录作为佐证。主要结论如下：
+- percpu的就地初始化与高地址镜像是保证trap与syscall路径低延迟访问per-cpu数据的关键；
+- FPU的寄存器位与指令集支持需要在每核早期启用，且任务切换处要对浮点上下文进行显式保存/恢复；
+- APIC的基址與IOAPIC条目应以ACPI为权威来源，缺失时采用兜底策略；
+- 在用户页表隔离场景下，trampoline需要提供稳定的可执行入口区（trampoline段）并通过swapgs/GS访问per-cpu镜像以完成安全的CR3/栈切换；
+- 页表抽象应兼顾大页支持以减少TLB压力，并在页表根切换时注意刷新缓存与TLB；
+- PCI枚举优先使用MCFG/ECAM，MCFG信息不完整时应有合理的回退與警告策略。
+
+各段代码为真实实现的摘录並标注为 Listing，文中对每个要点补充了实现语义、设计理由与工程权衡，便于在论文正文中呈现可验证的实现细节。

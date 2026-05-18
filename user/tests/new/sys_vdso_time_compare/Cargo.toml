@@ -6,3 +6,9 @@ edition = "2024"
 [dependencies]
 Mstd = { path = "../../../userlib" }
 pconst = { path = "../../../../utils/pconst" }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

@@ -1,0 +1,24 @@
+参考文献列表（仓库内部资源）
+
+以下条目均对应仓库内reference/目录下的参考资料，建议在论文中以本地文献或技术参考的形式列出，并在最终稿中补充更完整的元信息（作者、标题、版本、路径或URL、访问日期等）。
+
+1. arceos — 平台与启动相关参考实现（路径：reference/arceos/）
+2. vsched2 — 协作式调度参考（路径：reference/vsched2/）
+3. vdso_crate_template — vDSO构建模板与示例（路径：reference/vdso_crate_template/）
+4. page-table / page_table_multiarch — 页表与跨架构页表实现参考（路径：reference/page-table/或reference/page_table_multiarch/）
+5. virtio-drivers — VirtIO驱动与设备模型参考（路径：reference/virtio-drivers/）
+6. syscalls — 系统调用相关参考资料（路径：reference/syscalls/）
+7. x86_64-boot — x86_64启动相关参考（路径：reference/x86_64-boot/）
+8. percpu — per-CPU数据与实现注意事项（路径：reference/percpu/）
+9. uart_16550 — UART驱动参考实现（路径：reference/uart_16550/）
+10. axcpu / axplat_crates — CPU平台相关工件与抽象（路径：reference/axcpu/或reference/axplat_crates/）
+
+使用建议：
+-在论文中把上述条目作为内部技术参考列出，并在参考文献部分使用标准引用格式（BibTeX条目已生成为占位项，文件：docs/graduation/论文/references.bib）。
+-若需要引用外部学术论文、书籍或标准文档（例如关于微内核、vDSO、协作调度的论文），请告知我具体条目或主题，我将为每条添加完整的BibTeX元数据并更新references.bib。
+
+示例（后续可直接用于参考文献节）：
+- AsyncAlien reference: arceos — repository path: reference/arceos/ (具体文件/文档见仓库)
+- AsyncAlien reference: vdso_crate_template — repository path: reference/vdso_crate_template/
+
+注：该文件为初步列表，旨在集中展示仓库内可引用资源，便于后续在references.bib中补全并在论文最终稿中以正式参考文献形式呈现。
