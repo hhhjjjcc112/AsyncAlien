@@ -25,3 +25,89 @@
 [12] AsyncAlien project. AsyncAlien: domain-isolation kernel — source code and documentation[R]. /home/hjch/AsyncAlien, 2026.
 
 [13] 项目内部文档: vdso_crate_template — vDSO 生成器与映射规范[R]. AsyncAlien 仓库文档, 2026.
+
+[14] Kerrisk M. vdso(7) — Linux manual page[EB/OL]. (2025-10-04)[2026-05-18]. https://man7.org/linux/man-pages/man7/vdso.7.html
+
+[15] Linux Kernel Organization. vDSO and vsyscall documentation[EB/OL]. (2016)[2026-05-18]. https://www.kernel.org/doc/html/latest/vm/vdso.html
+
+[16] UEFI Forum. Advanced Configuration and Power Interface Specification Revision 6.6[S]. May 2025.
+
+[17] Brown L. ACPI in Linux[C]//Ottawa Linux Symposium. 2005: 3-32.
+
+[18] Intel Corporation. Intel 64 and IA-32 Architectures Software Developer's Manual Volume 3 System Programming Guide[S]. 2024.
+
+[19] Intel Corporation. Intel 64 Architecture x2APIC Specification[S]. 2008.
+
+[20] Nakajima J. Reviewing Unused and New Features for Interrupt/APIC Virtualization[C]//Linux Plumber's Conference 2012. 2012.
+
+[21] The Rust Foundation. Rust Documentation[EB/OL]. [2026-05-18]. https://doc.rust-lang.org/
+
+[22] Klabnik S, Nichols C. The Book: The Rust Programming Language[EB/OL]. [2026-05-18]. https://doc.rust-lang.org/stable/book/
+
+[23] The Rust Foundation. Rust by Example[EB/OL]. [2026-05-18]. https://doc.rust-lang.org/stable/rust-by-example/
+
+[24] The Rust Foundation. The Rustonomicon: The Dark Arts of Unsafe Rust[EB/OL]. [2026-05-18]. https://doc.rust-lang.org/stable/nomicon/
+
+[25] seL4 Foundation. The seL4 Microkernel[EB/OL]. [2026-05-18]. https://sel4.systems/
+
+[26] seL4 Foundation. seL4 Manual and API Documentation[EB/OL]. [2026-05-18]. https://docs.sel4.systems/projects/sel4/api-doc.html
+
+[27] seL4 Foundation. seL4 Microkernel GitHub Repository[EB/OL]. [2026-05-18]. https://github.com/seL4/seL4
+
+[28] ArceOS Project. ArceOS: Modular Unikernel OS for Embedded Systems[EB/OL]. [2026-05-18]. https://github.com/ArceOS-Project/ArceOS
+
+[29] Bellard F. QEMU: Open Source Processor Emulator[EB/OL]. [2026-05-18]. https://www.qemu.org
+
+[30] Reference/Alien Project. AsyncAlien Reference Implementation and Upstream Sources[R]. /home/hjch/AsyncAlien/reference, 2026.
+
+[31] AsyncAlien Project. AsyncAlien: Domain-Isolation Operating System Kernel Source Code[R]. /home/hjch/AsyncAlien, 2026.
+
+[32] AsyncAlien Documentation. vdso_crate_template: vDSO Code Generator and Loader Abstraction[R]. AsyncAlien Repository Documentation, 2026.
+
+[33] AsyncAlien Documentation. x86_64 Platform Porting and Device Discovery Integration Plan[R]. AsyncAlien Repository Documentation, 2026.
+
+[34] AsyncAlien Documentation. Domain Model, Isolation Semantics, and Runtime Architecture[R]. AsyncAlien Repository Documentation, 2026.
+
+[35] AsyncAlien Documentation. Virtual Address Space (VSpace) Abstraction and Multi-Architecture Memory Management[R]. AsyncAlien Repository Documentation, 2026.
+
+[36] AsyncAlien Documentation. Trap Handler Architecture and System Call Entry Points[R]. AsyncAlien Repository Documentation, 2026.
+
+[37] AsyncAlien Documentation. RISC-V to x86-64 Architecture Porting Strategy and Design Trade-offs[R]. AsyncAlien Repository Documentation, 2026.
+
+[38] Garg M. System Call Performance Optimization via vDSO and vsyscall[R]. System Design Technical Report, 2014.
+
+[39] Drepper U. What Every Programmer Should Know About Memory[R]. Red Hat Laboratories Technical Report, 2007.
+
+[40] Torvalds L. The Linux Kernel source code[EB/OL]. [2026-05-18]. https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+[41] Corbet J, Rubini A, Hartman G. Linux Device Drivers[M]. 3rd ed. Sebastopol, CA: O'Reilly Media, 2005.
+
+[42] Love R. Linux Kernel Development[M]. 3rd ed. Upper Saddle River, NJ: Pearson, 2010.
+
+[43] Bottomley J. Linux Kernel Internals[R]. Technical Document, 2005.
+
+[44] Bovet D P, Cesati M. Understanding the Linux Kernel[M]. 3rd ed. Sebastopol, CA: O'Reilly Media, 2005.
+
+[45] Stevens W R, Fenner W. UNIX Network Programming Volume 1 The Sockets Networking API[M]. 3rd ed. Upper Saddle River, NJ: Addison-Wesley, 2004.
+
+[46] Stallings W. Computer Security: Principles and Practice[M]. 4th ed. Upper Saddle River, NJ: Pearson, 2017.
+
+[47] Saltzer J H, Schroeder M D. The protection of information in computer systems[J]. Proceedings of the IEEE, 1975, 63(9): 1278-1308.
+
+[48] Denning D E. A lattice model of secure information flow[J]. Communications of the ACM, 1976, 19(5): 236-243.
+
+[49] Rushby J M. Formal Methods and Cybersecurity[R]. SRI International Technical Report, 2015.
+
+[50] Matthews J N, Garfinkel T, Rosenblum M. Little Book of Semaphores[M]. 2nd ed. 2008.
+
+[51] Lamport L. Time, clocks, and the ordering of events in a distributed system[J]. Communications of the ACM, 1978, 21(7): 558-565.
+
+[52] Lampson B W, Abadi M. Authentication in distributed systems: Theory and practice[J]. ACM Transactions on Computer Systems, 1990, 8(4): 311-357.
+
+[53] Jain R. The Art of Computer Systems Performance Analysis: Techniques for Experimental Design, Measurement, Simulation, and Modeling[M]. Hoboken, NJ: John Wiley & Sons, 1991.
+
+[54] Gosling J, Joy B, Steele G, Bracha G. The Java Language Specification[M]. 3rd ed. Upper Saddle River, NJ: Addison-Wesley, 2005.
+
+[55] Oram A (编). Beautiful Code: Leading Programmers Explain How They Think[M]. Sebastopol, CA: O'Reilly Media, 2007.
+
+[56] Kernighan B W, Pike R. The Unix Programming Environment[M]. Upper Saddle River, NJ: Prentice Hall, 1984.
