@@ -84,7 +84,7 @@ pub fn register_io_apic_domain(io_apic_domain: Arc<dyn IoAPICDomainTrait>) {
 }
 
 pub fn init_trap_subsystem() {
-    // println!(\"++++ setup interrupt +++\");
+    println!("++++ setup interrupt +++");
     // 只保留中断控制器注册逻辑，不打印
     // 架构相关的trap初始化
     init_trap();
@@ -95,5 +95,5 @@ pub fn init_trap_subsystem() {
     arch::interrupt_enable();
 
     let enable = arch::is_interrupt_enable();
-    // println!(\"++++ setup interrupt done, enable:{:?} +++\", enable);
+    println!("++++ setup interrupt done, enable:{:?} +++", enable);
 }

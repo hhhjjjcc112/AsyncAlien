@@ -4,48 +4,89 @@
 
 6.1测试设计与实现要点
 
-在测量用户态读取时钟的快路径（vDSO）相对于传统系统调用路径（raw syscall）时，必须避免用被测时间源自身来度量其耗时，这会因分辨率和返回速度差异产生误导性零值或非物理性偏差。为此，本研究采用两阶段方法：先进行一致性验证，确认vDSO与raw在绝对时间上无不可接受差异；随后采用独立基准的连续采样窗口进行性能测量。连续采样窗口在窗口前后调用原始基准打点函数记录纳秒级时间，窗口内仅执行被测调用；窗口总耗时除以调用次数得出单次平均耗时，从而尽量降低被测源自身的量化误差对性能评估的影响。
+在测量用户态读取时钟的快路径vDSO相对于传统系统调用路径raw syscall之前，先把两者的时间差检查当作功能测试。测试代码会先做16次校验，每次先调用vDSO，再调用raw syscall，然后把结果都转成纳秒并算出绝对差值。如果差值大于10ms，就直接判定失败。这样做的目的很明确：先确认vDSO和raw syscall都能正常返回时间，而且两条路径的结果没有明显异常，再进入后面的性能测试。
 
-在具体实现中，研究团队为降低系统噪声的影响采用了预热（warmup）步骤以去除冷启动与缓存效应的短期偏差，并在每组测量前执行固定次数的预热迭代。此外，测量实现中使用了黑盒提示（core::hint::black_box）以避免编译器在循环中进行不当优化，这一点在微基准测试中尤为重要。样本组选择（64、128、256、512、1024）旨在覆盖从小窗口到较大窗口的尺度，以观察窗口大小对测量稳定性与信噪比的影响。测量阈值（本实验中采用10ms作为一致性判断的上限）基于虚拟化环境下观测到的瞬时波动范围确定；在更稳定的硬件平台上，该阈值可以相应收紧。
+表6-1验证一致性的代码verify_correctness代码内容
 
-功能测试方面，本研究采用端到端与单元测试相结合的策略，以保证系统从固件引导、内核初始化到用户态服务的各个子系统在功能语义上保持一致。端到端测试通过自动化的引导运行框架把系统引导到多核配置并运行完整的用户态测试套件，记录启动日志以验证frame allocator、内核地址空间构建、域注册与加载、以及用户态进程能否成功解析auxv并定位vDSO；单元与集成测试则覆盖vdso相关的边界条件与错误路径，包括验证vdso映射失败时userlib能正确回退到syscall、验证vdso_api的vVAR布局在内核与vDSO间保持二进制兼容、验证MemIf实现对valloc/ppage_alloc/map/change_protect/get_kernel_vaddr/ppage_clone等接口在内核与task域之间的正确行为。为捕获并回放较难触发的竞态与权限错误，测试框架还集成了针对中断与并发写入场景的模拟模块，用以在受控条件下触发vVAR并发更新、验证seqcount语义在读者/写者竞争下的健壮性。测试结果的判定主要基于日志中一致性的断言以及若干关键二进制断言（例如vDSO ELF校验、符号解析成功与否、用户态vdso_api初始化返回值），并辅以自动化复测与回归测试以保证在代码变更后功能不回退。
+fn verify_correctness(threshold_us: u64) -> Result<(), &'static str> {
+    for i in 0..VERIFY_ITERS {
+        let mut vdso_ts = TimeSpec::default();
+        let mut raw_ts = TimeSpec::default();
+        assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut vdso_ts), 0);
+        assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut raw_ts), 0);
 
-清单6.1验证一致性的实现片段
-
-fn verify_correctness(threshold_us: u64) -> Result<(), String> {
-  for i in 0..VERIFY_ITERS {
-let mut vdso_ts = TimeSpec::default();
-let mut raw_ts = TimeSpec::default();
-assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut vdso_ts), 0);
-assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut raw_ts), 0);
-let vdso_ns = timespec_to_ns(&vdso_ts);
-let raw_ns = timespec_to_ns(&raw_ts);
-let diff_us = ((vdso_ns as i128 - raw_ns as i128).abs() as u128 + 999) / 1000;
-if diff_us > threshold_us as u128 {
-  return Err("vdso vs raw difference exceeds threshold".to_string());
-}
-  }
-  Ok(())
-}
-
-清单6.2窗口测量的实现片段
-
-fn measure_call_window_raw_ns(samples: usize, use_vdso: bool) -> u128 {
-  let mut ts = TimeSpec::default();
-  let start = monotonic_now_ns();
-  for _ in 0..samples {
-if use_vdso {
-  assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut ts), 0);
-} else {
-  assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0);
-}
-core::hint::black_box(ts.tv_nsec);
-  }
-  let end = monotonic_now_ns();
-  end - start
+        let vdso_ns = timespec_to_ns(&vdso_ts);
+        let raw_ns = timespec_to_ns(&raw_ts);
+        let diff_ns = if vdso_ns > raw_ns { vdso_ns - raw_ns } else { raw_ns - vdso_ns };
+        let diff_us = (diff_ns + 999) / 1000;
+        if diff_us > threshold_us as u128 {
+            println!("[VDSO_VERIFY] iter={} vdso_ns={} raw_ns={} diff_us={}", i, vdso_ns, raw_ns, diff_us);
+            return Err("vdso vs raw difference exceeds threshold");
+        }
+    }
+    Ok(())
 }
 
-上述实现分别对应一致性验证与性能测量的关键步骤：首段确保两类时间源在绝对值上的可比性；次段通过独立基准打点对连续调用窗口进行计时，以获得可比较的平均耗时估计。
+性能测试部分使用独立的时间基准来计时。代码不直接拿被测调用本身做时间判断，而是在窗口开始和窗口结束时分别调用原始时钟函数记录纳秒时间，窗口内部只执行被测调用。这样，窗口总耗时除以调用次数，就可以得到单次平均耗时。为了减少冷启动和缓存带来的影响，代码在每组正式测量前先做64次预热。为了避免编译器把循环优化掉，测量时还用了core::hint::black_box。样本组选了64、128、256、512、1024这几档，目的是从小窗口到大窗口都看一遍，观察窗口变大后结果是否更稳定。每组还会重复5次，再计算平均值和标准差，这样结果更容易看出波动情况。
+
+表6-2窗口测量的代码measure_groups代码内容
+
+fn measure_groups(groups: &[usize]) -> alloc::vec::Vec<PerfResult> {
+    let mut results: alloc::vec::Vec<PerfResult> = alloc::vec::Vec::new();
+    for &g in groups.iter() {
+        for _ in 0..WARMUP_ITERS {
+            let _ = { let mut ts = TimeSpec::default(); assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut ts), 0); ts };
+            let _ = { let mut ts = TimeSpec::default(); assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0); ts };
+        }
+
+        let mut vdso_avgs: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
+        let mut raw_avgs: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
+
+        for rep in 0..REPEATS {
+            let vdso_elapsed = measure_vdso_ns(g);
+            let raw_elapsed = measure_raw_ns(g);
+            let vdso_avg = vdso_elapsed / g as u128;
+            let raw_avg = raw_elapsed / g as u128;
+            let speedup = if vdso_avg == 0 { 0.0 } else { raw_avg as f64 / vdso_avg as f64 };
+
+            println!("[VDSO_BENCH] repeat={} samples={} unit={} vdso_elapsed={} vdso_avg={} raw_elapsed={} raw_avg={} speedup={:.2}x",
+                rep + 1, g, BENCH_UNIT, vdso_elapsed, vdso_avg, raw_elapsed, raw_avg, speedup);
+
+            vdso_avgs.push(vdso_avg);
+            raw_avgs.push(raw_avg);
+        }
+
+        let (vdso_mean, vdso_std) = compute_stats(&vdso_avgs);
+        let (raw_mean, raw_std) = compute_stats(&raw_avgs);
+        let agg_speedup = if vdso_mean == 0 { 0.0 } else { raw_mean as f64 / vdso_mean as f64 };
+
+        println!("[VDSO_AGG] samples={} repeats={} vdso_mean={} vdso_std={} raw_mean={} raw_std={} speedup_mean={:.2}x",
+            g, REPEATS, vdso_mean, vdso_std, raw_mean, raw_std, agg_speedup);
+
+        results.push(PerfResult {
+            samples: g,
+            unit: BENCH_UNIT,
+            vdso_elapsed: vdso_mean * g as u128,
+            vdso_avg: vdso_mean,
+            raw_elapsed: raw_mean * g as u128,
+            raw_avg: raw_mean,
+            speedup: agg_speedup,
+        });
+    }
+    results
+}
+
+整体上，这套测试分成两步。第一步先做功能检查，重点看vDSO和raw syscall的结果是不是在可接受范围内。第二步再做性能比较，重点看两条路径的单次平均耗时差多少。也就是说，vDSO与raw syscall时间差距首先被当作功能测试项处理，只有在功能确认通过后，才继续看性能数据。
+
+表6-3计时基准代码monotonic_now_ns代码内容
+
+fn monotonic_now_ns() -> u128 {
+    let mut ts = TimeSpec::default();
+    assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0);
+    timespec_to_ns(&ts)
+}
+
+这段基准代码很简单，只做一件事：调用raw syscall读取单调时钟，再把结果换算成纳秒。它的作用是给窗口前后提供同一个时间基准，避免用被测调用自己的返回值来回算耗时。这样得到的结果更稳定，也更适合比较vDSO和raw syscall在同一窗口里的平均表现。
 
 在讨论方法有效性时，应区分测量误差的来源：一是统计误差，源自单次运行的样本数有限；二是系统性误差，源自虚拟化调度、后台干扰或测量代码本身的开销。为控制统计误差，本研究建议对每个样本组至少进行多次完整运行并计算均值与方差；为减轻系统性误差，应尽量在没有其他负载、I/O干扰最小的环境下运行QEMU，并保持QEMU的配置参数恒定。
 
