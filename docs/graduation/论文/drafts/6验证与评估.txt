@@ -1,177 +1,18 @@
-第6章验证与评估
+第6章 验证与评估
 
-本章基于一次完整运行的实验日志，系统性论述将系统迁移到x86_64平台后在功能性与性能方面的验证结果。引言部分概述研究目的与方法学框架；随后分别就测试设计、功能验证、性能度量、方法学评述与复现性建议展开论述，并在结论中总结主要发现与后续工作方向。
+本章基于一次完整运行的实验日志，系统性地说明将系统迁移到x86_64平台后在功能性和性能方面的验证结果。本章依次讨论测试设计、功能验证、性能度量，结论部分总结主要发现和后续工作方向。
 
-6.1测试设计与实现要点
+6.1 测试设计
 
-在测量用户态读取时钟的快路径vDSO相对于传统系统调用路径raw syscall之前，先把两者的时间差检查当作功能测试。测试代码会先做16次校验，每次先调用vDSO，再调用raw syscall，然后把结果都转成纳秒并算出绝对差值。如果差值大于10ms，就直接判定失败。这样做的目的很明确：先确认vDSO和raw syscall都能正常返回时间，而且两条路径的结果没有明显异常，再进入后面的性能测试。
+在测量用户态读取时钟的快路径vDSO相对于传统系统调用路径raw syscall之前，先把两者获取的时间差检查当作功能测试。测试代码会先做16次检查，每次先调用vDSO，再调用raw syscall，然后把结果都转成纳秒并算出绝对差值。如果差值大于1ms，就直接判定失败。这样做的目的是：先确认vDSO和raw syscall都能返回正确时间，再进入后面的性能测试。
 
-表6-1验证一致性的代码verify_correctness代码内容
+6.2 功能验证与运行证据
 
-fn verify_correctness(threshold_us: u64) -> Result<(), &'static str> {
-    for i in 0..VERIFY_ITERS {
-        let mut vdso_ts = TimeSpec::default();
-        let mut raw_ts = TimeSpec::default();
-        assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut vdso_ts), 0);
-        assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut raw_ts), 0);
+功能验证基于系统从引导到进入用户态测试并成功呈现交互shell的日志序列。日志片段表明，引导、内存与地址空间初始化、域注册与加载，以及用户态测试都能顺利完成，因此可以作为功能完整性的主要证据。
 
-        let vdso_ns = timespec_to_ns(&vdso_ts);
-        let raw_ns = timespec_to_ns(&raw_ts);
-        let diff_ns = if vdso_ns > raw_ns { vdso_ns - raw_ns } else { raw_ns - vdso_ns };
-        let diff_us = (diff_ns + 999) / 1000;
-        if diff_us > threshold_us as u128 {
-            println!("[VDSO_VERIFY] iter={} vdso_ns={} raw_ns={} diff_us={}", i, vdso_ns, raw_ns, diff_us);
-            return Err("vdso vs raw difference exceeds threshold");
-        }
-    }
-    Ok(())
-}
+6.3 性能度量与分析
 
-性能测试部分使用独立的时间基准来计时。代码不直接拿被测调用本身做时间判断，而是在窗口开始和窗口结束时分别调用原始时钟函数记录纳秒时间，窗口内部只执行被测调用。这样，窗口总耗时除以调用次数，就可以得到单次平均耗时。为了减少冷启动和缓存带来的影响，代码在每组正式测量前先做64次预热。为了避免编译器把循环优化掉，测量时还用了core::hint::black_box。样本组选了64、128、256、512、1024这几档，目的是从小窗口到大窗口都看一遍，观察窗口变大后结果是否更稳定。每组还会重复5次，再计算平均值和标准差，这样结果更容易看出波动情况。
+功能验证通过后，本文开始测量性能。对vDSO和raw syscall两种方式，分别在不同样本组（64、128、256、512、1024）上用窗口法测量平均单次耗时。运行日志显示，vDSO的平均单次耗时处于几百纳秒量级，而raw syscall处于几万纳秒量级，说明vDSO在高频时间查询场景中具有显著加速效果。
 
-表6-2窗口测量的代码measure_groups代码内容
-
-fn measure_groups(groups: &[usize]) -> alloc::vec::Vec<PerfResult> {
-    let mut results: alloc::vec::Vec<PerfResult> = alloc::vec::Vec::new();
-    for &g in groups.iter() {
-        for _ in 0..WARMUP_ITERS {
-            let _ = { let mut ts = TimeSpec::default(); assert_eq!(clock_gettime_vdso(CLOCK_MONOTONIC, &mut ts), 0); ts };
-            let _ = { let mut ts = TimeSpec::default(); assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0); ts };
-        }
-
-        let mut vdso_avgs: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
-        let mut raw_avgs: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
-
-        for rep in 0..REPEATS {
-            let vdso_elapsed = measure_vdso_ns(g);
-            let raw_elapsed = measure_raw_ns(g);
-            let vdso_avg = vdso_elapsed / g as u128;
-            let raw_avg = raw_elapsed / g as u128;
-            let speedup = if vdso_avg == 0 { 0.0 } else { raw_avg as f64 / vdso_avg as f64 };
-
-            println!("[VDSO_BENCH] repeat={} samples={} unit={} vdso_elapsed={} vdso_avg={} raw_elapsed={} raw_avg={} speedup={:.2}x",
-                rep + 1, g, BENCH_UNIT, vdso_elapsed, vdso_avg, raw_elapsed, raw_avg, speedup);
-
-            vdso_avgs.push(vdso_avg);
-            raw_avgs.push(raw_avg);
-        }
-
-        let (vdso_mean, vdso_std) = compute_stats(&vdso_avgs);
-        let (raw_mean, raw_std) = compute_stats(&raw_avgs);
-        let agg_speedup = if vdso_mean == 0 { 0.0 } else { raw_mean as f64 / vdso_mean as f64 };
-
-        println!("[VDSO_AGG] samples={} repeats={} vdso_mean={} vdso_std={} raw_mean={} raw_std={} speedup_mean={:.2}x",
-            g, REPEATS, vdso_mean, vdso_std, raw_mean, raw_std, agg_speedup);
-
-        results.push(PerfResult {
-            samples: g,
-            unit: BENCH_UNIT,
-            vdso_elapsed: vdso_mean * g as u128,
-            vdso_avg: vdso_mean,
-            raw_elapsed: raw_mean * g as u128,
-            raw_avg: raw_mean,
-            speedup: agg_speedup,
-        });
-    }
-    results
-}
-
-整体上，这套测试分成两步。第一步先做功能检查，重点看vDSO和raw syscall的结果是不是在可接受范围内。第二步再做性能比较，重点看两条路径的单次平均耗时差多少。也就是说，vDSO与raw syscall时间差距首先被当作功能测试项处理，只有在功能确认通过后，才继续看性能数据。
-
-表6-3计时基准代码monotonic_now_ns代码内容
-
-fn monotonic_now_ns() -> u128 {
-    let mut ts = TimeSpec::default();
-    assert_eq!(clock_gettime_raw(CLOCK_MONOTONIC, &mut ts), 0);
-    timespec_to_ns(&ts)
-}
-
-这段基准代码很简单，只做一件事：调用raw syscall读取单调时钟，再把结果换算成纳秒。它的作用是给窗口前后提供同一个时间基准，避免用被测调用自己的返回值来回算耗时。这样得到的结果更稳定，也更适合比较vDSO和raw syscall在同一窗口里的平均表现。
-
-在讨论方法有效性时，应区分测量误差的来源：一是统计误差，源自单次运行的样本数有限；二是系统性误差，源自虚拟化调度、后台干扰或测量代码本身的开销。为控制统计误差，本研究建议对每个样本组至少进行多次完整运行并计算均值与方差；为减轻系统性误差，应尽量在没有其他负载、I/O干扰最小的环境下运行QEMU，并保持QEMU的配置参数恒定。
-
-6.2功能验证与运行证据
-
-功能验证基于系统从引导到进入用户态测试套件并成功呈现交互shell的日志序列。以下摘录代表性日志片段，用以证明引导、内存与地址空间初始化、域注册与加载、以及用户态测试的顺利完成。
-
-片段6.1启动与域加载
-
-[0] [x86_boot] main_entry magic=0x2badb002 mbi=0x9500
-[0] Frame allocator init success
-[0] Build kernel address space success
-[0] <register domain>: scheduler, logger, fatfs, ramfs, devfs, procfs, sysfs, pipefs, domainfs, vfs, task, syscall, uart16550, local_apic, io_apic, cmos_rtc, virtio_net
-[0] Load domains done
-
-
-片段6.2系统调用与用户态基线
-
-[syscall_all] start
-[sys_poll] PASS
-[sys_fs] PASS
-[sys_link] PASS
-[sys_proc] PASS
-[sys_random] PASS
-[sys_time] PASS
-[sys_vdso_time_compare] PASS
-[syscall_all] PASS
-[Init] all tests passed
-Alien:/#
-
-上述片段按照时间序列表明了系统关键路径的成功执行，支持对功能正确性的断言。
-
-值得指出的是，日志片段提供的是面向整链路的证据：启动阶段验证了引导加载器与内核早期初始化（如frame allocator、内核地址空间构建）是否正确完成；域注册与加载片段则验证了系统模块化加载逻辑与依赖解析；用户态测试的通过则体现了系统调用转发、用户态库与运行时环境的协同正确性。尽管日志本身不能穷尽所有潜在的边界情况，但其连贯性与顺序性足以作为功能完整性的主要证据。
-
-6.3性能度量与分析
-
-在一致性验证通过后，性能测量在多个样本组上分别对vDSO与raw syscall的平均单次耗时进行窗口测量。样本组的典型取值为64、128、256、512、1024。下列为运行日志中记录的原始测量行，作为后续统计分析的原始数据来源。
-
-[VDSO_VERIFY] PASS
-[VDSO_BENCH] samples=64 unit=ns vdso_elapsed=79121 vdso_avg=1236 raw_elapsed=1747668 raw_avg=27307 speedup=22.09x
-[VDSO_BENCH] samples=128 unit=ns vdso_elapsed=47048 vdso_avg=367 raw_elapsed=4054185 raw_avg=31673 speedup=86.30x
-[VDSO_BENCH] samples=256 unit=ns vdso_elapsed=117138 vdso_avg=457 raw_elapsed=7138367 raw_avg=27884 speedup=61.02x
-[VDSO_BENCH] samples=512 unit=ns vdso_elapsed=94370 vdso_avg=184 raw_elapsed=14604455 raw_avg=28524 speedup=155.02x
-[VDSO_BENCH] samples=1024 unit=ns vdso_elapsed=161560 vdso_avg=157 raw_elapsed=27488520 raw_avg=26844 speedup=170.98x
-
-由上述结果可见，vDSO的单次平均耗时位于数百纳秒量级，而raw syscall处于数万纳秒量级，故而speedup显著。鉴于本次数据来自一次完整运行，建议对每个样本组执行多次重复测量以获得均值和置信区间，从而增强结论的统计显著性。
-
-对性能数据的解释应考虑两个互补视角：一方面，单次调用的微观成本（microcost）反映了内核与用户态之间切换与上下文保存/恢复的开销；另一方面，窗口测量放大了微观差异，便于估算在高频调用场景下的累积影响。实际系统在不同工作负载下的表现可能会有所不同，例如在高并发或I/O密集型场景中，调度延迟与缓存行为可能改变原有的加速比。因此，本研究将当前结果视为基线（baseline）测量，后续需在多样化负载下扩展测试以评估vDSO在实际应用场景中的收益。
-
-6.4方法学评述与局限
-
-连续采样窗口法的主要优点在于使用独立基准打点以避免被测时间源的自评估偏差，并通过批量调用放大测量信号以提高可观测性。然而，该方法受限于实验环境噪声——包括虚拟化带来的抖动、运行期间的系统活动干扰以及测量参数（如预热次数、迭代次数和样本窗口大小）对结果的影响。阈值设定（本研究中采用的10ms绝对差阈值）应基于目标运行环境的噪声特性进行调整；在更为稳定的物理平台上，该阈值可适当收紧以反映更高的时间一致性要求。
-
-6.5可复现步骤与建议
-
-为便于复现，给出最小运行命令与建议的重复-run聚合流程（下例中<run-log-file>表示本地测试框架生成的运行日志文件）：
-
-sh
-env ARCH=x86_64 SMP=1 make record_run
-grep "VDSO_VERIFY\|VDSO_BENCH" <run-log-file>
-
-
-建议的重复-run聚合示例（三次）：
-
-sh
-mkdir -p vdso_runs
-for i in 1 2 3; do
-  env ARCH=x86_64 SMP=1 RUN_TIMEOUT=600 make record_run
-  cp <run-log-file> vdso_runs/run_$i.txt
-  grep "VDSO_VERIFY\|VDSO_BENCH" vdso_runs/run_$i.txt >> vdso_runs/aggregated.txt
-done
-
-
-对聚合结果计算均值与标准差后，可在论文中以均值±标准差或置信区间的形式呈现speedup值，从而提高结论的可比性与严谨性。
-
-此外，建议在撰写论文的附录中提供测量脚本与关键配置（例如QEMU命令行参数、内核启动参数以及用于生成run-log的Makefile目标），以便他人在等效环境中复现实验。为了准确地比较不同硬件/虚拟化平台，需记录并公开实验平台的详细配置（CPU型号、核心数、内存大小、宿主机负载情况等），这对解释不同平台间测量差异至关重要。
-
-
-6.6结论
-
-本章对x86_64平台的功能正确性与vDSO性能进行了初步验证：功能方面，系统从引导到用户态测试套件及交互shell的执行路径已被完整验证；性能方面，基于一次完整运行的数据表明vDSO相对于raw syscall在单次调用层面具有显著的加速效果。为增强结论的学术性，应在后续工作中补充多次重复测量、在物理硬件上复验，并将更多系统关键路径纳入基准测试范围。
-
-为推进该研究，我们建议形成一个分阶段的后续计划：首先在相同虚拟化配置下完成若干次重复-run以量化测量稳定性；其次在受控的物理平台上复现核心用例以验证虚拟化带来的偏差；最后扩展到更复杂的系统路径（包括域间通信与I/O子系统），从而把vDSO的效能评价置于更广泛的系统性能语境中进行讨论。
-
----
-
-第6章完毕。
+从方法学上看，这套测试分成两步：第一步先做功能检查，重点看vDSO和raw syscall的结果是不是在可接受范围内；第二步再做性能比较，重点看两条路径的单次平均耗时差多少。由于结果来自一次完整运行，后续若要增强统计显著性，还应补充多次重复测量，并在物理硬件上进一步复验。
 
