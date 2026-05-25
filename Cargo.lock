@@ -484,15 +484,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "axerrno"
-version = "0.2.0"
-source = "git+https://github.com/Starry-OS/axerrno.git#97b44e3f7380a95097353baa00016a0b98059246"
-dependencies = [
- "log",
- "strum",
-]
-
-[[package]]
 name = "az"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1641,19 +1632,6 @@ name = "either"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
-
-[[package]]
-name = "elf_parser"
-version = "0.1.0"
-source = "git+https://github.com/rosy233333/elf_parser.git#585c69df01c752aaeed5bffa6893f9761091550b"
-dependencies = [
- "axerrno",
- "cfg-if",
- "log",
- "memory_addr 0.1.0 (git+https://github.com/Starry-OS/memory_addr.git)",
- "page_table_entry",
- "xmas-elf 0.9.1",
-]
 
 [[package]]
 name = "embedded-graphics"
@@ -3382,12 +3360,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7c5cedc30da3a610cac6b4ba17597bdf7152cf974e8aab3afb3d54455e371c8"
 
 [[package]]
-name = "include_bytes_aligned"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ee796ad498c8d9a1d68e477df8f754ed784ef875de1414ebdaf169f70a6a784"
-
-[[package]]
 name = "indexmap"
 version = "2.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4108,11 +4080,6 @@ version = "0.1.0"
 dependencies = [
  "pod",
 ]
-
-[[package]]
-name = "memory_addr"
-version = "0.1.0"
-source = "git+https://github.com/Starry-OS/memory_addr.git#a5be547a3109f114994d005b893f9b19c2616709"
 
 [[package]]
 name = "memory_addr"
@@ -7041,15 +7008,6 @@ dependencies = [
 [[package]]
 name = "vdso_api"
 version = "0.0.0"
-dependencies = [
- "crate_interface 0.2.0",
- "elf_parser",
- "include_bytes_aligned",
- "lazyinit",
- "page_table_entry",
- "vdso_impl",
- "xmas-elf 0.9.1",
-]
 
 [[package]]
 name = "vdso_builder"

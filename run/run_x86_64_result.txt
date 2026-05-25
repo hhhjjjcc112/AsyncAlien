@@ -1,0 +1,18 @@
+[0] [x86_boot] main_entry magic=0x2badb002
+[0] Frame allocator init success
+[0] Build kernel address space success
+[0] ++++ setup interrupt +++
+[0] ++++ setup interrupt done, enable:true +++
+[0] <register domain>: scheduler, logger, fatfs, ramfs, devfs, procfs, sysfs, pipefs, domainfs, vfs, task, syscall, uart16550, local_apic, io_apic, cmos_rtc, virtio_net
+[0] Load domains done
+[syscall_all] start
+[sys_poll] PASS
+[sys_fs] PASS
+[sys_link] PASS
+[sys_proc] PASS
+[sys_random] PASS
+[sys_time] PASS
+[sys_vdso_time_compare] PASS
+[syscall_all] PASS
+[Init] all tests passed
+Alien:/#

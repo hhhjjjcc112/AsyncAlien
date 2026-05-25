@@ -28,5 +28,7 @@
         "unresolved-proc-macro"
     ],
     "window.zoomLevel": 0,
-    "workbench.editor.wrapTabs": true
+    "workbench.editor.wrapTabs": true,
+    "workbench.preferredDarkColorTheme": "Dark 2026",
+    "workbench.colorTheme": "Dark 2026"
 }
