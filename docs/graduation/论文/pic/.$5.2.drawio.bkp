@@ -1,0 +1,101 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="h1fQbd7oMSXn-_jG0tR0">
+    <mxGraphModel dx="1831" dy="1138" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="KernelVdsoMem 分支" vertex="1">
+          <mxGeometry height="300" width="545" x="20" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="vdso_api::map_so 内部流程" vertex="1">
+          <mxGeometry height="318" width="821" x="669" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="init_vdso 入口" vertex="1">
+          <mxGeometry height="148" width="599" x="20" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置VDSO_LOADED标志" vertex="1">
+          <mxGeometry height="54" width="241" x="45" y="87" as="geometry" />
+        </mxCell>
+        <mxCell id="VTj11FQ-Uz4V5Z5QA6Un-1" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="KZDhLAGz2PSa8aEIKf5m-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="调用map_so&#xa;传入内核page_table_token" vertex="1">
+          <mxGeometry height="78" width="258" x="336" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-9" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="KZDhLAGz2PSa8aEIKf5m-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="MemIf::valloc&#xa;预留虚拟地址空间" vertex="1">
+          <mxGeometry height="78" width="188" x="729" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-10" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="KZDhLAGz2PSa8aEIKf5m-8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="MemIf::ppage_alloc&#xa;分配物理页" vertex="1">
+          <mxGeometry height="78" width="209" x="975" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-11" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="KZDhLAGz2PSa8aEIKf5m-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="MemIf::map&#xa;建立页表映射" vertex="1">
+          <mxGeometry height="78" width="156" x="1260" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-12" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="KZDhLAGz2PSa8aEIKf5m-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="MemIf::get_kernel_vaddr&#xa;获取内核可写地址" vertex="1">
+          <mxGeometry height="78" width="248" x="1214" y="233" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-13" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="KZDhLAGz2PSa8aEIKf5m-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-14" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="KZDhLAGz2PSa8aEIKf5m-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="写入段数据与重定位" vertex="1">
+          <mxGeometry height="54" width="204" x="980" y="246" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="MemIf::change_protect&#xa;设置最终权限" vertex="1">
+          <mxGeometry height="78" width="237" x="704.5" y="234" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-12" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vspace ==&#xa;内核token?" vertex="1">
+          <mxGeometry height="161" width="161" x="85" y="272" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-13" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="直接操作页表&#xa;内核地址空间" vertex="1">
+          <mxGeometry height="78" width="156" x="368" y="266" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-14" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="通过task domain&#xa;操作用户地址空间" vertex="1">
+          <mxGeometry height="78" width="188" x="352" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-15" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="KZDhLAGz2PSa8aEIKf5m-16" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-15" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="init_vdso_vtable&#xa;初始化符号跳转" vertex="1">
+          <mxGeometry height="78" width="182" x="991" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-16" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="清除VDSO_LOADED标志" vertex="1">
+          <mxGeometry height="54" width="241" x="690" y="402" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-17" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-4" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.49;entryX=0;entryY=0.49;rounded=0;" target="KZDhLAGz2PSa8aEIKf5m-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-23" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-12" style="startArrow=none;endArrow=block;exitX=1;exitY=0.35;entryX=0;entryY=0.5;rounded=0;fontSize=16;" target="KZDhLAGz2PSa8aEIKf5m-13" value="是">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-24" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-12" style="startArrow=none;endArrow=block;exitX=1;exitY=0.81;entryX=0;entryY=0.5;rounded=0;fontSize=16;" target="KZDhLAGz2PSa8aEIKf5m-14" value="否">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KZDhLAGz2PSa8aEIKf5m-25" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.49;entryX=0;entryY=0.49;rounded=0;" target="KZDhLAGz2PSa8aEIKf5m-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uWne-UlsrJyPS0fuTESk-2" edge="1" parent="1" source="KZDhLAGz2PSa8aEIKf5m-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="KZDhLAGz2PSa8aEIKf5m-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,63 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="tbEMkg8QYXHVkO2h9n6f">
+    <mxGraphModel dx="1168" dy="719" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);verticalAlign=top;align=center;fontFamily=Helvetica;fontSize=20;" value="RISC-V中断初始化" vertex="1">
+          <mxGeometry height="148" width="350" x="1060" y="188" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);verticalAlign=top;align=center;fontFamily=Helvetica;fontSize=20;" value="x86_64中断初始化" vertex="1">
+          <mxGeometry height="148" width="666" x="810" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CD2VbWYhLtUL8UarXc1l-4" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="94VOV2vmR0ihsgm18Kmr-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="加载IDT (lidt)&#xa;IDT每项指向中断入口" vertex="1">
+          <mxGeometry height="75" width="170" x="840" y="56.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CD2VbWYhLtUL8UarXc1l-1" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" target="94VOV2vmR0ihsgm18Kmr-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CD2VbWYhLtUL8UarXc1l-2" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" target="94VOV2vmR0ihsgm18Kmr-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="建立跳板页&#xa;映射内核/用户切换代码" vertex="1">
+          <mxGeometry height="78" width="227" x="550" y="151" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-23" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="94VOV2vmR0ihsgm18Kmr-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="配置LSTAR MSR&#xa;指向syscall入口" vertex="1">
+          <mxGeometry height="78" width="179" x="1061.5" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="建立percpu镜像&#xa;用户态GS可访问" vertex="1">
+          <mxGeometry height="78" width="164" x="1280" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置stvec寄存器&#xa;指向统一中断入口" vertex="1">
+          <mxGeometry height="78" width="188" x="1142.5" y="229" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="中断系统就绪" vertex="1">
+          <mxGeometry height="54" width="156" x="1498" y="151" as="geometry" />
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-19" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.5;entryY=0;rounded=0;entryDx=0;entryDy=0;" target="94VOV2vmR0ihsgm18Kmr-12" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1501" y="94" />
+            </Array>
+            <mxPoint x="1565.9" y="139" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="94VOV2vmR0ihsgm18Kmr-20" edge="1" parent="1" source="94VOV2vmR0ihsgm18Kmr-9" style="curved=1;startArrow=none;endArrow=block;entryX=0.5;entryY=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryDx=0;entryDy=0;" target="94VOV2vmR0ihsgm18Kmr-12" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1501" y="262" />
+            </Array>
+            <mxPoint x="1450.9999999999995" y="262" as="sourcePoint" />
+            <mxPoint x="1565.9" y="217" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

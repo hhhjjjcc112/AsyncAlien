@@ -1,0 +1,95 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="a7aiQ0i-A0MMtgYKHCnY">
+    <mxGraphModel dx="1655" dy="2187" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-15" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="内核初始化阶段" vertex="1">
+          <mxGeometry height="380" width="640" x="550" y="-29" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="MemIf实现" vertex="1">
+          <mxGeometry height="197" width="390" x="580" y="23" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="生成阶段" vertex="1">
+          <mxGeometry height="276" width="455" x="80" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vdso_crate_template&#xa;读取配置" vertex="1">
+          <mxGeometry height="78" width="171" x="90" y="174" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="生成vDSO共享对象&#xa;包含代码与数据段" vertex="1">
+          <mxGeometry height="78" width="199" x="311" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="生成静态API库&#xa;记录函数偏移" vertex="1">
+          <mxGeometry height="78" width="166" x="328" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="预留虚拟地址区域" vertex="1">
+          <mxGeometry height="58" width="150" x="610" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="虚拟地址映射&#xa;默认使用读写权限" vertex="1">
+          <mxGeometry height="60" width="150" x="790" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="修改页权限" vertex="1">
+          <mxGeometry height="50" width="150" x="790" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-7" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="9f5TJAlXYr19sMvcyiNC-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-10" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" target="9f5TJAlXYr19sMvcyiNC-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-11" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" target="9f5TJAlXYr19sMvcyiNC-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-12" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" target="9f5TJAlXYr19sMvcyiNC-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="ELF解析与重定位" vertex="1">
+          <mxGeometry height="62" width="180" x="680" y="246" as="geometry" />
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-15" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.88;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="9f5TJAlXYr19sMvcyiNC-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="286" y="149" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-16" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.88;exitY=1;entryX=0;entryY=0.5;rounded=0;" target="9f5TJAlXYr19sMvcyiNC-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="286" y="277" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9f5TJAlXYr19sMvcyiNC-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="分配物理页" vertex="1">
+          <mxGeometry height="50" width="150" x="610" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-9" edge="1" parent="1" source="9f5TJAlXYr19sMvcyiNC-11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;dashed=1;" target="9f5TJAlXYr19sMvcyiNC-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-18" edge="1" parent="1" source="DK8PR3-Fq4_RAQZ88UXd-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="DK8PR3-Fq4_RAQZ88UXd-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-20" edge="1" parent="1" source="DK8PR3-Fq4_RAQZ88UXd-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="9f5TJAlXYr19sMvcyiNC-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-16" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="内核加载vDSO" vertex="1">
+          <mxGeometry height="48" width="150" x="1000" y="253" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-19" edge="1" parent="1" source="DK8PR3-Fq4_RAQZ88UXd-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;curved=1;" target="9f5TJAlXYr19sMvcyiNC-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-17" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="映射到用户&#xa;地址空间" vertex="1">
+          <mxGeometry height="58" width="150" x="1000" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-25" edge="1" parent="1" source="DK8PR3-Fq4_RAQZ88UXd-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="DK8PR3-Fq4_RAQZ88UXd-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DK8PR3-Fq4_RAQZ88UXd-26" connectable="0" parent="DK8PR3-Fq4_RAQZ88UXd-25" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;每进程重复&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1768" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

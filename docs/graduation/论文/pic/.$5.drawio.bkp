@@ -1,0 +1,128 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="D3v4X0zyC8H-9CEwEnwT">
+    <mxGraphModel dx="2014" dy="1252" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="用户运行时阶段" vertex="1">
+          <mxGeometry height="473" width="730" x="500" y="348" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="内核初始化阶段" vertex="1">
+          <mxGeometry height="168" width="961" x="237" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="构建阶段（build_vdso）" vertex="1">
+          <mxGeometry height="276" width="452" x="20" y="216" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vdso_impl&#xa;Rust源代码" vertex="1">
+          <mxGeometry height="78" width="142" x="45" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-2" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;curved=1;" target="PglG5yyU-ux4kxt2hGYz-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="编译为动态库&#xa;vdso.so" vertex="1">
+          <mxGeometry height="78" width="156" x="276" y="251" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-4" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;curved=1;" target="PglG5yyU-ux4kxt2hGYz-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="生成API库&#xa;vdso_api" vertex="1">
+          <mxGeometry height="78" width="134" x="288" y="379" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-1" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="PglG5yyU-ux4kxt2hGYz-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="KernelVdsoMem&#xa;实现MemIf接口" vertex="1">
+          <mxGeometry height="78" width="186" x="262" y="83" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="map_so&#xa;加载vDSO到内核" vertex="1">
+          <mxGeometry height="78" width="183" x="522" y="83" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-5" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="PglG5yyU-ux4kxt2hGYz-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="记录vVAR基址&#xa;初始化时间快照" vertex="1">
+          <mxGeometry height="78" width="172" x="755" y="83" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-7" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="PglG5yyU-ux4kxt2hGYz-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="进程初始化时&#xa;注入auxv" vertex="1">
+          <mxGeometry height="78" width="156" x="997" y="83" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-10" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="PglG5yyU-ux4kxt2hGYz-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="解析auxv&#xa;获取vDSO基址" vertex="1">
+          <mxGeometry height="78" width="167" x="991.5" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-11" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="PglG5yyU-ux4kxt2hGYz-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="init_vdso_vtable&#xa;绑定符号" vertex="1">
+          <mxGeometry height="78" width="182" x="984" y="507" as="geometry" />
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-9" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="PglG5yyU-ux4kxt2hGYz-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-13" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="调用快路径&#xa;__vdso_clock_gettime" vertex="1">
+          <mxGeometry height="78" width="224" x="963" y="621" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-14" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="快路径&#xa;是否成功?" vertex="1">
+          <mxGeometry height="150" width="150" x="755" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-15" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="返回结果" vertex="1">
+          <mxGeometry height="54" width="124" x="581" y="504" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-16" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="回退syscall" vertex="1">
+          <mxGeometry height="54" width="141" x="550" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-17" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="内核定时刷新vVAR" vertex="1">
+          <mxGeometry height="54" width="196" x="827" y="251" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-18" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.91;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="PglG5yyU-ux4kxt2hGYz-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="212" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-19" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.91;exitY=1;entryX=0;entryY=0.5;rounded=0;" target="PglG5yyU-ux4kxt2hGYz-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="212" y="418" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-21" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="PglG5yyU-ux4kxt2hGYz-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-26" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-14" style="startArrow=none;endArrow=block;exitX=0;exitY=0;entryX=0.5;entryY=1;rounded=0;exitDx=0;exitDy=0;entryDx=0;entryDy=0;fontSize=16;" target="PglG5yyU-ux4kxt2hGYz-15" value="成功">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="870.668292682927" y="557.9982926829266" as="sourcePoint" />
+            <mxPoint x="619.9999999999999" y="438.73" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-27" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-14" style="startArrow=none;endArrow=block;exitX=0;exitY=1;entryX=1;entryY=0.5;rounded=0;entryDx=0;entryDy=0;exitDx=0;exitDy=0;fontSize=16;" target="PglG5yyU-ux4kxt2hGYz-16" value="失败">
+          <mxGeometry relative="1" x="-0.0007" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-28" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-16" style="startArrow=none;endArrow=block;exitX=0.5;exitY=0;entryX=0.36;entryY=1;rounded=0;exitDx=0;exitDy=0;" target="PglG5yyU-ux4kxt2hGYz-15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PglG5yyU-ux4kxt2hGYz-33" edge="1" parent="1" source="PglG5yyU-ux4kxt2hGYz-9" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.77;entryX=0.4;entryY=0;rounded=0;" target="PglG5yyU-ux4kxt2hGYz-17" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="952" y="149" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rr-1J_G1-3mxQlOk3CZz-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="内核运行时阶段" vertex="1">
+          <mxGeometry height="120" width="240" x="810" y="210" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

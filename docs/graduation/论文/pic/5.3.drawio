@@ -1,0 +1,58 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="mXMDrpJilnFDW-I1sX5G">
+    <mxGraphModel dx="701" dy="940" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="内核刷新vVAR时序" vertex="1">
+          <mxGeometry height="360" width="490" x="1150" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-1" edge="1" parent="1" source="C5HrFB0zLBTiGIVIlq6C-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="C5HrFB0zLBTiGIVIlq6C-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="时钟中断到达" vertex="1">
+          <mxGeometry height="54" width="156" x="1318.5" y="61" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-2" edge="1" parent="1" source="C5HrFB0zLBTiGIVIlq6C-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="C5HrFB0zLBTiGIVIlq6C-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="读取当前时间&#xa;获取realtime_ns&#xa;和monotonic_ns" vertex="1">
+          <mxGeometry height="75" width="184" x="1180" y="162.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-3" edge="1" parent="1" source="C5HrFB0zLBTiGIVIlq6C-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="C5HrFB0zLBTiGIVIlq6C-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="seq ← seq + 1 | 1&#xa;置为奇数(写入中)" vertex="1">
+          <mxGeometry height="78" width="193" x="1175.5" y="278" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-4" edge="1" parent="1" source="C5HrFB0zLBTiGIVIlq6C-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="C5HrFB0zLBTiGIVIlq6C-9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="写入realtime_ns&#xa;和monotonic_ns" vertex="1">
+          <mxGeometry height="78" width="184" x="1417.5" y="278" as="geometry" />
+        </mxCell>
+        <mxCell id="C5HrFB0zLBTiGIVIlq6C-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="seq ← seq + 1&#xa;置为偶数(写入完成)" vertex="1">
+          <mxGeometry height="78" width="199" x="1410" y="162.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="用户读取时序" vertex="1">
+          <mxGeometry height="360" width="390" x="1680" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-8" edge="1" parent="1" source="uW8XNl2L6wGXMkmRrZM0-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="C5HrFB0zLBTiGIVIlq6C-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="此时读取&#xa;seq为奇数或&#xa;seq前后不一致" vertex="1">
+          <mxGeometry height="78" width="204.5" x="1770" y="278" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-10" edge="1" parent="1" source="uW8XNl2L6wGXMkmRrZM0-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;dashed=1;" target="C5HrFB0zLBTiGIVIlq6C-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-11" edge="1" parent="1" source="uW8XNl2L6wGXMkmRrZM0-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;dashed=1;" target="C5HrFB0zLBTiGIVIlq6C-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uW8XNl2L6wGXMkmRrZM0-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="非更新时seq为偶数&#xa;且两次一致&#xa;获取正确值" vertex="1">
+          <mxGeometry height="78" width="204.5" x="1770" y="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

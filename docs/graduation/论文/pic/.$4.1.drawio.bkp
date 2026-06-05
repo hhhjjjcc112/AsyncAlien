@@ -1,0 +1,101 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="U9U43lpZhQ9jZMnlC8fM">
+    <mxGraphModel dx="1655" dy="1018" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="进入main" vertex="1">
+          <mxGeometry height="148" width="724" x="194.5" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="PL6bcM3WCL3xXsms-aBM-2" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="VYrpRTvzAlMI3XywBlUJ-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="进入长模式" vertex="1">
+          <mxGeometry height="124" width="1073" x="20" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="PL6bcM3WCL3xXsms-aBM-1" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="VYrpRTvzAlMI3XywBlUJ-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="Multiboot引导" vertex="1">
+          <mxGeometry height="148" width="735" x="189" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="链接脚本嵌入&#xa;Multiboot header" vertex="1">
+          <mxGeometry height="78" width="194" x="214" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="指定ELF加载范围&#xa;与入口点" vertex="1">
+          <mxGeometry height="78" width="182" x="458" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="Bootloader加载内核" vertex="1">
+          <mxGeometry height="54" width="209" x="690" y="87" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="加载早期页表" vertex="1">
+          <mxGeometry height="54" width="156" x="45" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置CR0启用分页" vertex="1">
+          <mxGeometry height="54" width="187" x="251" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置CR4" vertex="1">
+          <mxGeometry height="54" width="123" x="487" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="22T1fRG9zJqUtUTyLvx_-1" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="VYrpRTvzAlMI3XywBlUJ-9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置EFER.LME" vertex="1">
+          <mxGeometry height="54" width="165" x="660" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="ljmp进入64位代码" vertex="1">
+          <mxGeometry height="54" width="193" x="875" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="eax存储魔数&#xa;ebx存储MB信息指针" vertex="1">
+          <mxGeometry height="78" width="209" x="219.5" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-13" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="按x86_64 ABI&#xa;edi=魔数 esi=指针" vertex="1">
+          <mxGeometry height="78" width="197" x="478.5" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-14" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="校验魔数&#xa;进入Rust main" vertex="1">
+          <mxGeometry height="78" width="168" x="725.5" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-15" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-4" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-16" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-17" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-7" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-18" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-19" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-9" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-20" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-10" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-21" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-12" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-13" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VYrpRTvzAlMI3XywBlUJ-22" edge="1" parent="1" source="VYrpRTvzAlMI3XywBlUJ-13" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VYrpRTvzAlMI3XywBlUJ-14" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

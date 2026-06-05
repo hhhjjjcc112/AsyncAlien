@@ -3,15 +3,14 @@ use alloc::{boxed::Box, string::ToString, sync::Arc};
 use basic::bus::mmio::VirtioMmioDeviceType;
 use corelib::AlienResult;
 use interface::*;
+use interface::PLICDomain as InterruptControllerDomain;
 use log::warn;
 use shared_heap::DVec;
 
-use super::{
-    InterruptControllerDomain, require_mmio_range_or_einval, try_virtio_mmio_range_or_skip,
-};
+use super::{require_mmio_range_or_einval, try_virtio_mmio_range_or_skip};
 use crate::{create_domain, domain_proxy::*, mmio_bus, platform_bus, register_domain};
 
-pub(super) fn init_device() -> AlienResult<Arc<InterruptControllerDomain>> {
+pub(super) fn init_device() -> AlienResult<Arc<dyn InterruptControllerDomain>> {
     let platform_bus = platform_bus!();
     let mut has_gpu_alias = false;
     let mut input_alias_count = 0usize;

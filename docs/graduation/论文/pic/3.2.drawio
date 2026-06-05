@@ -1,0 +1,96 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="5fa4Wvsn2plJs130aFhx">
+    <mxGraphModel dx="1419" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="物理内存" vertex="1">
+          <mxGeometry height="136" width="1103" x="20" y="1134" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="进程B地址空间" vertex="1">
+          <mxGeometry height="334" width="543" x="580" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="进程A地址空间" vertex="1">
+          <mxGeometry height="334" width="550" x="20" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-25" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;curved=1;" target="LA15kaeoCJSdTOkwBLxH-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="317" y="1110" />
+              <mxPoint x="442" y="1110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-27" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LA15kaeoCJSdTOkwBLxH-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-28" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" target="LA15kaeoCJSdTOkwBLxH-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vDSO代码段&#xa;只读可执行" vertex="1">
+          <mxGeometry height="78" width="151" x="241.5" y="843" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-29" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;dashed=1;dashPattern=8 8;" target="LA15kaeoCJSdTOkwBLxH-11">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="1090" />
+              <mxPoint x="708" y="1090" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vVAR共享数据区&#xa;只读" vertex="1">
+          <mxGeometry height="78" width="180" x="90" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-31" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-6" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=12 12;" target="LA15kaeoCJSdTOkwBLxH-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="私有数据区&#xa;读写" vertex="1">
+          <mxGeometry height="78" width="140" x="370" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-26" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;curved=1;" target="LA15kaeoCJSdTOkwBLxH-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="866" y="1110" />
+              <mxPoint x="442" y="1110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-33" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LA15kaeoCJSdTOkwBLxH-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vDSO代码段&#xa;只读可执行" vertex="1">
+          <mxGeometry height="78" width="151" x="798" y="843" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-30" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=8 8;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="708.4705882352941" y="1170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vVAR共享数据区&#xa;只读" vertex="1">
+          <mxGeometry height="78" width="180" x="618" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-32" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=12 12;curved=1;" target="LA15kaeoCJSdTOkwBLxH-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="私有数据区&#xa;读写" vertex="1">
+          <mxGeometry height="78" width="140" x="930" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vDSO代码物理页&#xa;所有进程共享" vertex="1">
+          <mxGeometry height="78" width="183" x="350" y="1169" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vVAR数据物理页&#xa;所有进程共享" vertex="1">
+          <mxGeometry height="78" width="180" x="618" y="1169" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="进程A私有物理页" vertex="1">
+          <mxGeometry height="54" width="183" x="80" y="1181" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-13" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="进程B私有物理页" vertex="1">
+          <mxGeometry height="54" width="182" x="870" y="1181" as="geometry" />
+        </mxCell>
+        <mxCell id="LA15kaeoCJSdTOkwBLxH-34" edge="1" parent="1" source="LA15kaeoCJSdTOkwBLxH-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LA15kaeoCJSdTOkwBLxH-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

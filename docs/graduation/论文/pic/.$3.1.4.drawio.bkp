@@ -1,0 +1,71 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="5TfyONlVHsoFfUGipYZ0">
+    <mxGraphModel dx="1655" dy="1018" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="域加载分层" vertex="1">
+          <mxGeometry height="172" width="740" x="570" y="72" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="设备探测抽象" vertex="1">
+          <mxGeometry height="276" width="510" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="x86_64: ACPI/PCI解析&#xa;MADT/MCFG/ECAM" vertex="1">
+          <mxGeometry height="78" width="222" x="60" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="RISC-V: FDT解析&#xa;设备树节点" vertex="1">
+          <mxGeometry height="78" width="183" x="80" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="统一设备信息列表" vertex="1">
+          <mxGeometry height="54" width="188" x="317" y="131" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="解压initrd&#xa;遍历CPIO档案" vertex="1">
+          <mxGeometry height="78" width="162" x="605" y="119" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="注册架构无关域&#xa;文件系统/网络栈等" vertex="1">
+          <mxGeometry height="79" width="203" x="817" y="118" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="注册架构相关域&#xa;APIC/PLIC/串口等" vertex="1">
+          <mxGeometry height="79" width="200" x="1070" y="119" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;rounded=1;align=center;verticalAlign=middle;arcSize=50;fontFamily=Helvetica;fontSize=16;fontStyle=0;" value="域加载完成" vertex="1">
+          <mxGeometry height="54" width="140" x="1340" y="131" as="geometry" />
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-10" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-3" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.23;entryY=0;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="292" y="94" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-11" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.99;exitY=0.5;entryX=0.23;entryY=1;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="292" y="222" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-12" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-6" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-13" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-7" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-14" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BhKzaBs9Vprih3FTZRD9-15" edge="1" parent="1" source="BhKzaBs9Vprih3FTZRD9-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="BhKzaBs9Vprih3FTZRD9-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,87 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="_rnsMFJR4IFjTGr8aUOa">
+    <mxGraphModel dx="1549" dy="963" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="syscall路径" vertex="1">
+          <mxGeometry height="148" width="1002" x="20" y="188" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="trap（故障）路径" vertex="1">
+          <mxGeometry height="148" width="1002" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="CPU自动压入&#xa;error_code (部分)" vertex="1">
+          <mxGeometry height="78" width="189" x="73" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="汇编入口补齐&#xa;error_code与vector" vertex="1">
+          <mxGeometry height="78" width="206" x="341" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="保存通用寄存器" vertex="1">
+          <mxGeometry height="54" width="172" x="597" y="67" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="通过CS.DPL判断&#xa;来源特权级" vertex="1">
+          <mxGeometry height="78" width="178" x="819" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="硬件自动保存&#xa;RIP→RCX, RFLAGS→R11" vertex="1">
+          <mxGeometry height="78" width="246" x="45" y="223" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="swapgs切换内核GS" vertex="1">
+          <mxGeometry height="54" width="202" x="343" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="暂存用户RSP&#xa;切换到内核栈" vertex="1">
+          <mxGeometry height="78" width="156" x="605" y="223" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="软件保存全部&#xa;通用寄存器" vertex="1">
+          <mxGeometry height="78" width="156" x="830" y="223" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="Rust分发函数&#xa;统一处理" vertex="1">
+          <mxGeometry height="78" width="158" x="1072" y="139" as="geometry" />
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-12" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-3" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-13" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-4" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-14" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-15" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-7" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-16" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-17" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-9" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-18" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-6" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.19;entryY=0;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1047" y="94" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qZwswwWhyQHUlMt1Y0G2-19" edge="1" parent="1" source="qZwswwWhyQHUlMt1Y0G2-10" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.19;entryY=1;rounded=0;" target="qZwswwWhyQHUlMt1Y0G2-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1047" y="262" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

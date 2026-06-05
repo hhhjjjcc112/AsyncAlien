@@ -1,0 +1,71 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="JFV1wX9jXkQVjy0b4lcL">
+    <mxGraphModel dx="701" dy="940" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="RISC-V中断初始化" vertex="1">
+          <mxGeometry height="148" width="517" x="1391" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="x86_64中断初始化" vertex="1">
+          <mxGeometry height="350" width="988" x="920" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-6" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dxvYcdMWtWSKDcEOeWR_-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="编写IDT入口汇编&#xa;为每个向量定义handler&#xa;区分故障与syscall" vertex="1">
+          <mxGeometry height="102" width="230" x="980" y="54.5" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-7" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dxvYcdMWtWSKDcEOeWR_-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="加载IDT (lidt)" vertex="1">
+          <mxGeometry height="54" width="157" x="1016.5" y="259.5" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-8" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dxvYcdMWtWSKDcEOeWR_-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="配置LSTAR MSR&#xa;指向trampoline内syscall_entry" vertex="1">
+          <mxGeometry height="102" width="260" x="1290" y="235.5" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置SFMask&#xa;屏蔽TF/IF/DF等标志位" vertex="1">
+          <mxGeometry height="78" width="221" x="1309" y="66.5" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-9" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dxvYcdMWtWSKDcEOeWR_-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="建立percpu高地址镜像&#xa;用户态GS可访问" vertex="1">
+          <mxGeometry height="78" width="225" x="1660" y="66.5" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-10" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dxvYcdMWtWSKDcEOeWR_-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="置EFER.SCE&#xa;启用syscall/sysret" vertex="1">
+          <mxGeometry height="78" width="192" x="1676.5" y="259.5" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置stvec&#xa;指向统一中断入口" vertex="1">
+          <mxGeometry height="78" width="188" x="1434" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="JnkU3cn_e-WJfZijPuDW-11" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="dxvYcdMWtWSKDcEOeWR_-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-11" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="无需额外初始化" vertex="1">
+          <mxGeometry height="54" width="172" x="1701" y="437" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-12" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="中断系统就绪&#xa;调用Rust分发函数" vertex="1">
+          <mxGeometry height="78" width="190" x="1973" y="259.5" as="geometry" />
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-17" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-7" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="dxvYcdMWtWSKDcEOeWR_-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dxvYcdMWtWSKDcEOeWR_-19" edge="1" parent="1" source="dxvYcdMWtWSKDcEOeWR_-10" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="dxvYcdMWtWSKDcEOeWR_-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

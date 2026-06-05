@@ -1,0 +1,57 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="70tLNLDNPTWMHqzbhiDO">
+    <mxGraphModel dx="1563" dy="940" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);verticalAlign=top;fontSize=20;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="虚拟内存管理" vertex="1">
+          <mxGeometry height="276" width="520" x="680" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="地址空间抽象接口&#xa;建立内核地址空间" vertex="1">
+          <mxGeometry height="81" width="180" x="730" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="x86_64实现&#xa;四级页表 + CR3" vertex="1">
+          <mxGeometry height="78" width="176" x="980" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="RISC-V实现&#xa;Sv39 + satp" vertex="1">
+          <mxGeometry height="78" width="166" x="985" y="242" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);fontSize=20;" value="物理内存管理" vertex="1">
+          <mxGeometry height="276" width="544" x="100" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-3" parent="kFKXPwTKq6X0D7YcOK5C-2" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="x86_64&#xa;Multiboot 内存信息" vertex="1">
+          <mxGeometry height="78" width="206.77" x="60" y="43" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-4" parent="kFKXPwTKq6X0D7YcOK5C-2" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="统一物理页帧管理器&#xa;裁剪低地址与内核ELF" vertex="1">
+          <mxGeometry height="78" width="186.56410256410257" x="332.15384615384613" y="107" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-5" parent="kFKXPwTKq6X0D7YcOK5C-2" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="RISC-V&#xa;FDT /memory 节点" vertex="1">
+          <mxGeometry height="78" width="206.77" x="60" y="171" as="geometry" />
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-6" edge="1" parent="kFKXPwTKq6X0D7YcOK5C-2" source="kFKXPwTKq6X0D7YcOK5C-3" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.09;entryY=0;rounded=0;" target="kFKXPwTKq6X0D7YcOK5C-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="299.02564102564105" y="82" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kFKXPwTKq6X0D7YcOK5C-7" edge="1" parent="kFKXPwTKq6X0D7YcOK5C-2" source="kFKXPwTKq6X0D7YcOK5C-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.09;entryY=1;rounded=0;" target="kFKXPwTKq6X0D7YcOK5C-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="299.02564102564105" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OAzamfSulyPuStoE8JhL-4" edge="1" parent="1" source="kFKXPwTKq6X0D7YcOK5C-9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="kFKXPwTKq6X0D7YcOK5C-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAzamfSulyPuStoE8JhL-6" edge="1" parent="1" source="kFKXPwTKq6X0D7YcOK5C-10" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="kFKXPwTKq6X0D7YcOK5C-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAzamfSulyPuStoE8JhL-16" edge="1" parent="1" source="kFKXPwTKq6X0D7YcOK5C-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="kFKXPwTKq6X0D7YcOK5C-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

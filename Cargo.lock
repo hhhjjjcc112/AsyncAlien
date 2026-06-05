@@ -1645,12 +1645,12 @@ checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 [[package]]
 name = "elf_parser"
 version = "0.1.0"
-source = "git+https://github.com/rosy233333/elf_parser.git#585c69df01c752aaeed5bffa6893f9761091550b"
+source = "git+https://github.com/rosy233333/elf_parser.git#7f07a2df3ece194cb0f6e249fe042ae70c063796"
 dependencies = [
  "axerrno",
  "cfg-if",
  "log",
- "memory_addr 0.1.0 (git+https://github.com/Starry-OS/memory_addr.git)",
+ "memory_addr 0.4.1",
  "page_table_entry",
  "xmas-elf 0.9.1",
 ]
@@ -4108,11 +4108,6 @@ version = "0.1.0"
 dependencies = [
  "pod",
 ]
-
-[[package]]
-name = "memory_addr"
-version = "0.1.0"
-source = "git+https://github.com/Starry-OS/memory_addr.git#a5be547a3109f114994d005b893f9b19c2616709"
 
 [[package]]
 name = "memory_addr"

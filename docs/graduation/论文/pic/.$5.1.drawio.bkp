@@ -1,0 +1,78 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="P8k3FouXwOhviKt_yRNM">
+    <mxGraphModel dx="1103" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="产物" vertex="1">
+          <mxGeometry height="290" width="248" x="870" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="build_vdso" vertex="1">
+          <mxGeometry height="270" width="567" x="283" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="输入" vertex="1">
+          <mxGeometry height="276" width="213" x="50" y="27" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="vdso_impl&#xa;Rust源码" vertex="1">
+          <mxGeometry height="78" width="137" x="88" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="BuildConfig&#xa;目标架构/路径" vertex="1">
+          <mxGeometry height="78" width="163" x="75" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="生成编译命令&#xa;编译为动态库" vertex="1">
+          <mxGeometry height="78" width="156" x="308" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="解析符号表&#xa;提取导出函数" vertex="1">
+          <mxGeometry height="78" width="140" x="490" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="生成API库源码" vertex="1">
+          <mxGeometry height="54" width="140" x="670" y="207" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="libvdso.so&#xa;可映射的共享对象" vertex="1">
+          <mxGeometry height="78" width="188" x="900" y="61" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="vdso_api&#xa;静态API库&#xa;包含函数偏移与ABI" vertex="1">
+          <mxGeometry height="102" width="198" x="895" y="183" as="geometry" />
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-11" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-6" style="curved=1;startArrow=none;endArrow=block;exitX=0.87;exitY=1;entryX=0;entryY=0.5;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="489" y="234" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-12" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-7" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-13" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-4" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.1;entryY=0;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="283" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-14" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.1;entryY=1;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="283" y="228" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-15" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-6" style="curved=1;startArrow=none;endArrow=block;exitX=0.87;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="489" y="94" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FSNjVBOMFyy5Y1TyhrNR-16" edge="1" parent="1" source="FSNjVBOMFyy5Y1TyhrNR-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="FSNjVBOMFyy5Y1TyhrNR-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

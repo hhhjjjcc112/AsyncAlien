@@ -1,0 +1,89 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="Bh74UOtWIM6JIGP63sB4">
+    <mxGraphModel dx="1451" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VU0toRholHzDS26CYpo0-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="Multiboot启动" vertex="1">
+          <mxGeometry height="54" width="169" x="50" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="SBI启动" vertex="1">
+          <mxGeometry height="54" width="116" x="251" y="148" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="设置长模式" vertex="1">
+          <mxGeometry height="54" width="140" x="239" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-22" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="VU0toRholHzDS26CYpo0-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="构造BootInfo指针" vertex="1">
+          <mxGeometry height="54" width="181" x="429" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="统一main入口" vertex="1">
+          <mxGeometry height="54" width="162" x="438.5" y="162.5" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="percpu初始化&#xa;设置GS/GP" vertex="1">
+          <mxGeometry height="78" width="161" x="630" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="x86_64早期初始化&#xa;APIC/FPU/早期时间" vertex="1">
+          <mxGeometry height="78" width="204" x="860" y="8.5" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="RISC-V早期初始化&#xa;无需特殊操作" vertex="1">
+          <mxGeometry height="78" width="193" x="860" y="138.5" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-10" parent="1" style="rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;fontStyle=0;" value="引导完成" vertex="1">
+          <mxGeometry height="39" width="89" x="1127" y="94.5" as="geometry" />
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-11" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-1" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VU0toRholHzDS26CYpo0-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-12" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-2" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VU0toRholHzDS26CYpo0-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-13" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-3" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;entryDx=0;entryDy=0;" target="VU0toRholHzDS26CYpo0-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="429.0000000000002" y="71" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-16" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-6" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="VU0toRholHzDS26CYpo0-7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-17" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-7" style="curved=1;startArrow=none;endArrow=block;exitX=0.9;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="VU0toRholHzDS26CYpo0-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="847" y="49.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-18" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-7" style="curved=1;startArrow=none;endArrow=block;exitX=0.9;exitY=1;entryX=0;entryY=0.5;rounded=0;" target="VU0toRholHzDS26CYpo0-9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="847" y="177.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-19" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-8" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.26;entryY=-0.01;rounded=0;" target="VU0toRholHzDS26CYpo0-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1102" y="49.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU0toRholHzDS26CYpo0-20" edge="1" parent="1" source="VU0toRholHzDS26CYpo0-9" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0.26;entryY=0.99;rounded=0;" target="VU0toRholHzDS26CYpo0-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1102" y="177.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
