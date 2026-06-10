@@ -53,19 +53,19 @@ Boot HART MEDELEG         : 0x0000000000f0b509
  /_/   \_\ |_| |_|  \___| |_| |_|
 
 [0] Init logger Some("")
-[0] Frame range: 0x842e5000..0x100000000, pages=0x7bd1b
-[0] initrd copy: src=0x88200000, size=2768867, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
-[0] initrd copy crc32: src=0xc31da0aa, dst=0xc31da0aa
-[0] Relocate initrd data to 0x842f5000
+[0] Frame range: 0x842c0000..0x100000000, pages=0x7bd40
+[0] initrd copy: src=0x88200000, size=2768819, head=[1f, 8b, 8, 0]->[1f, 8b, 8, 0]
+[0] initrd copy crc32: src=0xcc32247, dst=0xcc32247
+[0] Relocate initrd data to 0x842d0000
 [0] Frame allocator init success
 [0] Talloc allocator init success
-[0] kernel text:          0x80200000-0x8026a000
-[0] kernel rodata:        0x8026a000-0x80284000
-[0] kernel init_array:    0x80284000-0x80284000
-[0] kernel data:          0x80284000-0x802c5000
-[0] kernel bss:           0x802c5000-0x802e5000
-[0] kernel heap:          0x802e5000-0x842e5000
-[0] kernel alloc range:   0x842e5000-0x100000000
+[0] kernel text:          0x80200000-0x80260000
+[0] kernel rodata:        0x80260000-0x8027a000
+[0] kernel init_array:    0x8027a000-0x8027a000
+[0] kernel data:          0x8027a000-0x802bb000
+[0] kernel bss:           0x802bb000-0x802c0000
+[0] kernel heap:          0x802c0000-0x842c0000
+[0] kernel alloc range:   0x842c0000-0x100000000
 [0] map test: 0x100000-0x101000
 [0] map rtc: 0x101000-0x102000
 [0] map clint: 0x2000000-0x2010000
@@ -82,7 +82,7 @@ Memory: 0x80000000..0x100000000
 PLIC:   0xc000000..0xc600000
 CLINT:  0x2000000..0x2010000
 Initrd: Some(
-    0x88200000..0x884a3fe3,
+    0x88200000..0x884a3fb3,
 )
 Bootargs: Some("rdinit=/init")
 
@@ -111,71 +111,71 @@ Bootargs: Some("rdinit=/init")
 [0] <register domain>: virtio_blk
 [0] <register domain>: virtio_net
 [0][Domain:1] Fifo Scheduler
-[0] [31m[Load new domain] Time elapsed: 6899 us[0m
+[0] [31m[Load new domain] Time elapsed: 5939 us[0m
 [0] <attach domain>: scheduler, it's name is scheduler
-[0] [31m[Load new domain] Time elapsed: 1070 us[0m
+[0] [31m[Load new domain] Time elapsed: 856 us[0m
 [0][Domain:2] Logger init
 [0] <attach domain>: logger, it's name is logger
-[0] [31m[Load new domain] Time elapsed: 4360 us[0m
+[0] [31m[Load new domain] Time elapsed: 3033 us[0m
 [0] <attach domain>: fatfs, it's name is fatfs-1
-[0] [31m[Load new domain] Time elapsed: 2434 us[0m
+[0] [31m[Load new domain] Time elapsed: 1908 us[0m
 [0] <attach domain>: ramfs, it's name is ramfs-1
-[0] [31m[Load new domain] Time elapsed: 4086 us[0m
+[0] [31m[Load new domain] Time elapsed: 2866 us[0m
 [0] <attach domain>: devfs, it's name is devfs
-[0] [31m[Load new domain] Time elapsed: 4838 us[0m
+[0] [31m[Load new domain] Time elapsed: 3849 us[0m
 [0] <attach domain>: procfs, it's name is procfs
-[0] [31m[Load new domain] Time elapsed: 6669 us[0m
+[0] [31m[Load new domain] Time elapsed: 3577 us[0m
 [0] <attach domain>: sysfs, it's name is sysfs
-[0] [31m[Load new domain] Time elapsed: 3957 us[0m
+[0] [31m[Load new domain] Time elapsed: 3555 us[0m
 [0] <attach domain>: pipefs, it's name is pipefs
-[0] [31m[Load new domain] Time elapsed: 4557 us[0m
+[0] [31m[Load new domain] Time elapsed: 4170 us[0m
 [0] <attach domain>: domainfs, it's name is domainfs
-[0] [31m[Load new domain] Time elapsed: 2672 us[0m
+[0] [31m[Load new domain] Time elapsed: 2444 us[0m
 [0] <attach domain>: vfs, it's name is vfs
-[0] [31m[Load new domain] Time elapsed: 2808 us[0m
+[0] [31m[Load new domain] Time elapsed: 2220 us[0m
 [0] <attach domain>: task, it's name is task
 [0][Domain:12] syscall get 0 input domain
-[0] [31m[Load new domain] Time elapsed: 7032 us[0m
+[0] [31m[Load new domain] Time elapsed: 5027 us[0m
 [0][Domain:2] [35m[INFO] syscall domain test log domain.[0m
 [0][Domain:12] syscall domain init
 [0] <attach domain>: syscall, it's name is syscall
-[0] [31m[Load new domain] Time elapsed: 2519 us[0m
+[0] [31m[Load new domain] Time elapsed: 1744 us[0m
 [0][Domain:13] plic region: 0xc000000..0xc600000
 [0][Domain:13] Init qemu plic success
 [0] <attach domain>: plic, it's name is plic
-[0] [31m[Load new domain] Time elapsed: 1327 us[0m
+[0] [31m[Load new domain] Time elapsed: 1704 us[0m
 [0][Domain:14] Rtc region: 0x101000..0x102000
-[0][Domain:14] current time: 2026-06-01 16:01:54
+[0][Domain:14] current time: 2026-06-10 18:11:57
 [0] <attach domain>: rtc, it's name is rtc
 [0][Domain:13] PLIC enable irq 11 for hart 0, priority 1
-[0] [31m[Load new domain] Time elapsed: 1437 us[0m
+[0] [31m[Load new domain] Time elapsed: 1726 us[0m
 [0][Domain:15] uart_addr: 0x10000000-0x10000100
 [0][Domain:15] init uart success
 [0] <attach domain>: uart, it's name is uart
-[0] [31m[Load new domain] Time elapsed: 1124 us[0m
+[0] [31m[Load new domain] Time elapsed: 1238 us[0m
 [0][Domain:16] init buf uart success
 [0] <attach domain>: buf_uart, it's name is buf_uart
 [0][Domain:13] PLIC enable irq 10 for hart 0, priority 1
-[0] [31m[Load new domain] Time elapsed: 1280 us[0m
+[0] [31m[Load new domain] Time elapsed: 1070 us[0m
 [0][Domain:17] virtio_net_mmio: 0x10008000-0x10009000
 [0] <attach domain>: virtio_net, it's name is virtio_net-1
 [0] <attach domain>: nic, it's name is nic-1
-[0] [31m[Load new domain] Time elapsed: 1332 us[0m
+[0] [31m[Load new domain] Time elapsed: 1162 us[0m
 [0][Domain:18] virtio_blk_mmio: 0x10007000-0x10008000
 [0][Domain:18] virtio_blk: create blk driver
 [0][Domain:18] virtio_blk: driver ready
 [0] <attach domain>: virtio_block, it's name is virtio_block-1
 [0] <attach domain>: block, it's name is block-1
-[0] [31m[Load new domain] Time elapsed: 1865 us[0m
+[0] [31m[Load new domain] Time elapsed: 1596 us[0m
 [0][Domain:19] net stack init successes!
 [0] <attach domain>: net_stack, it's name is net_stack
-[0] [31m[Load new domain] Time elapsed: 1267 us[0m
+[0] [31m[Load new domain] Time elapsed: 1058 us[0m
 [0] <attach domain>: shadow_blk, it's name is shadow_blk-1
-[0] [31m[Load new domain] Time elapsed: 3306 us[0m
+[0] [31m[Load new domain] Time elapsed: 2979 us[0m
 [0] <attach domain>: cache_blk, it's name is cache_blk-1
-[0] [31m[Load new domain] Time elapsed: 1226 us[0m
+[0] [31m[Load new domain] Time elapsed: 791 us[0m
 [0] <attach domain>: null, it's name is null
-[0] [31m[Load new domain] Time elapsed: 1053 us[0m
+[0] [31m[Load new domain] Time elapsed: 742 us[0m
 [0] <attach domain>: random, it's name is random
 [0][Domain:5] devfs FsDomain init
 [0][Domain:3] fatfs FsDomain init
@@ -188,7 +188,7 @@ Bootargs: Some("rdinit=/init")
 [0][Domain:4] ramfs mount success
 [0][Domain:10] ramfs init success
 [0][Domain:6] procfs mount success
-[0] [31m[Load new domain] Time elapsed: 2875 us[0m
+[0] [31m[Load new domain] Time elapsed: 1820 us[0m
 [0][Domain:24] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-2
 [0][Domain:24] ramfs mount success
@@ -200,13 +200,13 @@ Bootargs: Some("rdinit=/init")
 [0][Domain:10] devfs init success
 [0][Domain:7] sysfs mount success
 [0][Domain:10] sysfs init success
-[0] [31m[Load new domain] Time elapsed: 3652 us[0m
+[0] [31m[Load new domain] Time elapsed: 1984 us[0m
 [0][Domain:25] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-3
 [0][Domain:25] ramfs mount success
 [0][Domain:8] pipefs mount success
 [0][Domain:10] pipefs init success
-[0] [31m[Load new domain] Time elapsed: 2799 us[0m
+[0] [31m[Load new domain] Time elapsed: 2155 us[0m
 [0][Domain:26] ramfs FsDomain init
 [0] <attach domain>: ramfs, it's name is ramfs-4
 [0][Domain:26] ramfs mount success
@@ -234,7 +234,7 @@ drwxr-xr-x      4KB usr
 [0] load_domains: after vfs init
 [0] Drop initrd data
 [0] load_domains: before task init
-[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x872aa000
+[0][Domain:11] kthread created: name=kthread_test, tid=0, k_sp=0x87285000
 [0][Domain:11] task::current_task: no current tid
 [0][Domain:11] INIT_PROCESS ready: path=/tests/init, tid=1
 [0][Domain:11] init_task enqueue init process tid=1
@@ -243,46 +243,46 @@ drwxr-xr-x      4KB usr
 [0] Load domains done
 [0] Register task domain and syscall domain to trap system
 [0] [kernel] starting secondary cpus declared_expected=3
-[0] [riscv_smp] hart_start hart_id=1 start_addr=0x80202174 error=0 value=0
-[0] [riscv_smp] hart_start hart_id=2 start_addr=0x80202174 error=0 value=0
-[0] [riscv_smp] hart_start hart_id=3 start_addr=0x80202174 error=0 value=0
-[1] [kernel] secondary_main enter cpu_id=1
-[2] [kernel] secondary_main enter cpu_id=2
-[1] [kernel] secondary_main percpu ready cpu_id=1
-[2] [kernel] secondary_main percpu ready cpu_id=2
-[3] [kernel] secondary_main enter cpu_id=3
-[2] [kernel] secondary_main platform ready cpu_id=2
-[3] [kernel] secondary_main percpu ready cpu_id=3
-[2] [kernel] secondary_main memory ready cpu_id=2
-[3] [kernel] secondary_main platform ready cpu_id=3
+[0] [riscv_smp] hart_start hart_id=1 start_addr=0x80202110 error=0 value=0
+[0] [riscv_smp] hart_start hart_id=2 start_addr=0x80202110 error=0 value=0
+[0] [riscv_smp] hart_start hart_id=3 start_addr=0x80202110 error=0 value=0
 [0] [kernel] secondary cpu launch result started=3 declared_expected=3
-[3] [kernel] secondary_main memory ready cpu_id=3
+[3] [kernel] secondary_main enter cpu_id=3
+[3] [kernel] secondary_main percpu ready cpu_id=3
+[1] [kernel] secondary_main enter cpu_id=1
+[1] [kernel] secondary_main percpu ready cpu_id=1
 [1] [kernel] secondary_main platform ready cpu_id=1
-[3] ++++ setup interrupt +++
+[3] [kernel] secondary_main platform ready cpu_id=3
+[2] [kernel] secondary_main enter cpu_id=2
+[2] [kernel] secondary_main percpu ready cpu_id=2
+[2] [kernel] secondary_main platform ready cpu_id=2
+[3] [kernel] secondary_main memory ready cpu_id=3
+[2] [kernel] secondary_main memory ready cpu_id=2
 [1] [kernel] secondary_main memory ready cpu_id=1
-[3] ++++ setup interrupt done, enable:true +++
-[2] ++++ setup interrupt +++
+[3] ++++ setup interrupt +++
 [1] ++++ setup interrupt +++
-[2] ++++ setup interrupt done, enable:true +++
-[3] [kernel] secondary_main trap ready cpu_id=3
+[2] ++++ setup interrupt +++
 [1] ++++ setup interrupt done, enable:true +++
-[3] CPU 3 start...
+[2] ++++ setup interrupt done, enable:true +++
+[3] ++++ setup interrupt done, enable:true +++
 [1] [kernel] secondary_main trap ready cpu_id=1
-[3] [kernel] secondary_main announced ready cpu_id=3 ready_count=1
-[1] CPU 1 start...
+[3] [kernel] secondary_main trap ready cpu_id=3
 [2] [kernel] secondary_main trap ready cpu_id=2
-[1] [kernel] secondary_main announced ready cpu_id=1 ready_count=2
+[1] CPU 1 start...
+[3] CPU 3 start...
 [2] CPU 2 start...
-[2] [kernel] secondary_main announced ready cpu_id=2 ready_count=3
+[1] [kernel] secondary_main announced ready cpu_id=1 ready_count=1
+[3] [kernel] secondary_main announced ready cpu_id=3 ready_count=2
 [3] [kernel] secondary_main released cpu_id=3
-[2] [kernel] secondary_main released cpu_id=2
 [0] [kernel] secondary cpus released count=3
 [1] [kernel] secondary_main released cpu_id=1
+[2] [kernel] secondary_main announced ready cpu_id=2 ready_count=3
 [3] run_task bootstrap wake 0 tasks
-[1] run_task bootstrap wake 0 tasks
-[2] run_task bootstrap wake 0 tasks
 [0] Begin run task...
+[2] [kernel] secondary_main released cpu_id=2
 [0] run_task bootstrap wake 0 tasks
+[2] run_task bootstrap wake 0 tasks
+[1] run_task bootstrap wake 0 tasks
 [3][Domain:11] kthread_init start...
 Init process is running
 [Init] start /tests/new/syscall_all
@@ -295,39 +295,83 @@ Init process is running
 [sys_poll] timeout poll ok
 [sys_poll] invalid fd poll ok
 [sys_poll] PASS
-[3][Domain:11] release task [3-3]
+[2][Domain:11] release task [3-3]
 [sys_fs] start
 [sys_fs] PASS
-[3][Domain:11] release task [3-3]
+[2][Domain:11] release task [3-3]
 [sys_link] start
 [sys_link] PASS
 [2][Domain:11] release task [3-3]
 [sys_proc] start
-[1][Domain:11] release task [4-4]
+[2][Domain:11] release task [4-4]
 [3][Domain:11] release task [4-4]
 [sys_proc] PASS
-[3][Domain:11] release task [3-3]
+[1][Domain:11] release task [3-3]
 [sys_random] start
 [sys_random] PASS
 [1][Domain:11] release task [3-3]
 [sys_time] start
-[sys_time] realtime=2s 38184320ns
-[sys_time] monotonic=2s 38261760ns
-[sys_time] monotonic_tick=2s 40581760ns
-[sys_time] monotonic_tick=2s 41372240ns
-[sys_time] monotonic_tick=2s 42340320ns
-[sys_time] monotonic_tick=2s 43297200ns
+[sys_time] realtime=1s 743972320ns
+[sys_time] monotonic=1s 744048640ns
+[sys_time] monotonic_tick=1s 745527360ns
+[sys_time] monotonic_tick=1s 746166560ns
+[sys_time] monotonic_tick=1s 746763440ns
+[sys_time] monotonic_tick=1s 747353920ns
 [sys_time] PASS
 [2][Domain:11] release task [3-3]
 [sys_vdso_time_compare] start
-[VDSO_VERIFY] iter=0 vdso_ns=2026821520 raw_ns=2071966320 diff_us=45145
-[VDSO_VERIFY] FAIL reason=vdso vs raw difference exceeds threshold
-[0][Domain:11] release task [3-3]
-[syscall_all] child exit 256 for /tests/new/sys_vdso_time_compare
-[syscall_all] FAIL: /tests/new/sys_vdso_time_compare
+[VDSO_VERIFY] PASS
+[VDSO_BENCH] repeat=1 samples=64 unit=ns vdso_elapsed=83280 vdso_avg=1301 raw_elapsed=2023680 raw_avg=31620 speedup=24.30x
+[VDSO_BENCH] repeat=2 samples=64 unit=ns vdso_elapsed=54240 vdso_avg=847 raw_elapsed=1998480 raw_avg=31226 speedup=36.87x
+[VDSO_BENCH] repeat=3 samples=64 unit=ns vdso_elapsed=52640 vdso_avg=822 raw_elapsed=2033440 raw_avg=31772 speedup=38.65x
+[VDSO_BENCH] repeat=4 samples=64 unit=ns vdso_elapsed=51200 vdso_avg=800 raw_elapsed=1996080 raw_avg=31188 speedup=38.98x
+[VDSO_BENCH] repeat=5 samples=64 unit=ns vdso_elapsed=51920 vdso_avg=811 raw_elapsed=2062800 raw_avg=32231 speedup=39.74x
+[VDSO_AGG] samples=64 repeats=5 vdso_mean=916 vdso_std=128 raw_mean=31607 raw_std=256 speedup_mean=34.51x
+[VDSO_BENCH] repeat=1 samples=128 unit=ns vdso_elapsed=63920 vdso_avg=499 raw_elapsed=5236560 raw_avg=40910 speedup=81.98x
+[VDSO_BENCH] repeat=2 samples=128 unit=ns vdso_elapsed=116080 vdso_avg=906 raw_elapsed=6298720 raw_avg=49208 speedup=54.31x
+[VDSO_BENCH] repeat=3 samples=128 unit=ns vdso_elapsed=67680 vdso_avg=528 raw_elapsed=3938240 raw_avg=30767 speedup=58.27x
+[VDSO_BENCH] repeat=4 samples=128 unit=ns vdso_elapsed=67040 vdso_avg=523 raw_elapsed=3998240 raw_avg=31236 speedup=59.72x
+[VDSO_BENCH] repeat=5 samples=128 unit=ns vdso_elapsed=67120 vdso_avg=524 raw_elapsed=3946000 raw_avg=30828 speedup=58.83x
+[VDSO_AGG] samples=128 repeats=5 vdso_mean=596 vdso_std=128 raw_mean=36589 raw_std=4096 speedup_mean=61.39x
+[VDSO_BENCH] repeat=1 samples=256 unit=ns vdso_elapsed=96160 vdso_avg=375 raw_elapsed=9193520 raw_avg=35912 speedup=95.77x
+[VDSO_BENCH] repeat=2 samples=256 unit=ns vdso_elapsed=100720 vdso_avg=393 raw_elapsed=10558720 raw_avg=41245 speedup=104.95x
+[VDSO_BENCH] repeat=3 samples=256 unit=ns vdso_elapsed=102640 vdso_avg=400 raw_elapsed=8001200 raw_avg=31254 speedup=78.14x
+[VDSO_BENCH] repeat=4 samples=256 unit=ns vdso_elapsed=100240 vdso_avg=391 raw_elapsed=8004800 raw_avg=31268 speedup=79.97x
+[VDSO_BENCH] repeat=5 samples=256 unit=ns vdso_elapsed=119360 vdso_avg=466 raw_elapsed=11402240 raw_avg=44540 speedup=95.58x
+[VDSO_AGG] samples=256 repeats=5 vdso_mean=405 vdso_std=16 raw_mean=36843 raw_std=4096 speedup_mean=90.97x
+[VDSO_BENCH] repeat=1 samples=512 unit=ns vdso_elapsed=159440 vdso_avg=311 raw_elapsed=16148160 raw_avg=31539 speedup=101.41x
+[VDSO_BENCH] repeat=2 samples=512 unit=ns vdso_elapsed=183760 vdso_avg=358 raw_elapsed=15842000 raw_avg=30941 speedup=86.43x
+[VDSO_BENCH] repeat=3 samples=512 unit=ns vdso_elapsed=172080 vdso_avg=336 raw_elapsed=15823120 raw_avg=30904 speedup=91.98x
+[VDSO_BENCH] repeat=4 samples=512 unit=ns vdso_elapsed=164480 vdso_avg=321 raw_elapsed=20584640 raw_avg=40204 speedup=125.25x
+[VDSO_BENCH] repeat=5 samples=512 unit=ns vdso_elapsed=275040 vdso_avg=537 raw_elapsed=28446480 raw_avg=55559 speedup=103.46x
+[VDSO_AGG] samples=512 repeats=5 vdso_mean=372 vdso_std=64 raw_mean=37829 raw_std=8192 speedup_mean=101.69x
+[VDSO_BENCH] repeat=1 samples=1024 unit=ns vdso_elapsed=301600 vdso_avg=294 raw_elapsed=46900560 raw_avg=45801 speedup=155.79x
+[VDSO_BENCH] repeat=2 samples=1024 unit=ns vdso_elapsed=343760 vdso_avg=335 raw_elapsed=31958320 raw_avg=31209 speedup=93.16x
+[VDSO_BENCH] repeat=3 samples=1024 unit=ns vdso_elapsed=294400 vdso_avg=287 raw_elapsed=38157360 raw_avg=37263 speedup=129.84x
+[VDSO_BENCH] repeat=4 samples=1024 unit=ns vdso_elapsed=290480 vdso_avg=283 raw_elapsed=32061120 raw_avg=31309 speedup=110.63x
+[VDSO_BENCH] repeat=5 samples=1024 unit=ns vdso_elapsed=316080 vdso_avg=308 raw_elapsed=37511920 raw_avg=36632 speedup=118.94x
+[VDSO_AGG] samples=1024 repeats=5 vdso_mean=301 vdso_std=16 raw_mean=36442 raw_std=4096 speedup_mean=121.07x
+[VDSO_BENCH] samples=64 unit=ns vdso_elapsed=58624 vdso_avg=916 raw_elapsed=2022848 raw_avg=31607 speedup=34.51x
+[VDSO_BENCH] samples=128 unit=ns vdso_elapsed=76288 vdso_avg=596 raw_elapsed=4683392 raw_avg=36589 speedup=61.39x
+[VDSO_BENCH] samples=256 unit=ns vdso_elapsed=103680 vdso_avg=405 raw_elapsed=9431808 raw_avg=36843 speedup=90.97x
+[VDSO_BENCH] samples=512 unit=ns vdso_elapsed=190464 vdso_avg=372 raw_elapsed=19368448 raw_avg=37829 speedup=101.69x
+[VDSO_BENCH] samples=1024 unit=ns vdso_elapsed=308224 vdso_avg=301 raw_elapsed=37316608 raw_avg=36442 speedup=121.07x
+[sys_vdso_time_compare] PASS
+[2][Domain:11] release task [3-3]
+[syscall_all] PASS
 [0][Domain:11] release task [2-2]
-[Init] FAIL /tests/new/syscall_all exit_code=256
-[0][Domain:11] Init process exit with code 0
-[31mPanicInfo { message: Init process exit, location: Location { file: "task/src/syscall/exit.rs", line: 18, column: 9 }, can_unwind: true, force_no_backtrace: false }[0m
-[0][Domain:11] [31mcatch unwind error[0m
-qemu-system-riscv64: terminating on signal 15 from pid 78704 (timeout)
+[Init] PASS /tests/new/syscall_all
+[Init] start /tests/ping
+Test socket
+Created socket: 3
+socket bind successes!
+Created socket: 4
+socket bind successes!
+Sent data to server: Ok("Hello Server!")
+receive 13 bytes from client 10.0.2.15:20001
+Received data from client: Ok("Hello Server!")
+Test socket successes!
+[0][Domain:11] release task [2-2]
+[Init] PASS /tests/ping
+[Init] all tests passed
+[1m[32mAlien[0m:[1m[34m/[0m# qemu-system-riscv64: terminating on signal 1 from pid 38456 ()

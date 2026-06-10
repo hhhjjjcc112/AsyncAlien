@@ -1,0 +1,83 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="xMFGlEqbvXfQxjxY8jGA">
+    <mxGraphModel dx="1678" dy="1043" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-1" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=none;strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);align=center;verticalAlign=top;fontFamily=Helvetica;fontSize=20;" value="功能验证" vertex="1">
+          <mxGeometry height="393" width="1410" x="360" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="f9CgrqpQz389ThZZzrSS-1" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="WJ3DKiCIYXX_dNAasH8R-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="i ← 0" vertex="1">
+          <mxGeometry height="54" width="99" x="400" y="209.5" as="geometry" />
+        </mxCell>
+        <mxCell id="f9CgrqpQz389ThZZzrSS-2" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="WJ3DKiCIYXX_dNAasH8R-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="调用 vDSO&#xa;获取 monotonic 时间" vertex="1">
+          <mxGeometry height="78" width="177" x="570" y="247" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="调用 raw syscall&#xa;获取 monotonic 时间" vertex="1">
+          <mxGeometry height="78" width="177" x="570" y="148" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-5" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="计算差值 diff_ns&#xa;diff_ns = |vdso_ns - raw_ns|" vertex="1">
+          <mxGeometry height="77.5" width="210" x="810" y="197.75" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-6" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="diff_us &gt; threshold_us?" vertex="1">
+          <mxGeometry height="230" width="230" x="1054" y="121.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-7" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="判定失败&#xa;输出错误信息" vertex="1">
+          <mxGeometry height="78" width="156" x="1350" y="121.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="i ← i+1" vertex="1">
+          <mxGeometry height="54" width="115" x="1370.5" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-9" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;" value="i &lt; VERIFY_ITERS?" vertex="1">
+          <mxGeometry height="190" width="190" x="1556" y="228" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#0066CC,#6DB2FF);strokeColor=#001DBC;fontColor=#FFFFFF;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=16;rounded=1;arcSize=50;fontStyle=0;" value="功能验证通过" vertex="1">
+          <mxGeometry height="54" width="156" x="1573" y="131.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-12" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-2" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="WJ3DKiCIYXX_dNAasH8R-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-14" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-4" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="WJ3DKiCIYXX_dNAasH8R-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-15" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-5" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="WJ3DKiCIYXX_dNAasH8R-6" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-16" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-6" style="startArrow=none;endArrow=block;exitX=1;exitY=0.3;entryX=0;entryY=0.5;rounded=0;fontSize=16;" target="WJ3DKiCIYXX_dNAasH8R-7" value="是">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-17" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-6" style="startArrow=none;endArrow=block;exitX=1;exitY=0.7;entryX=0;entryY=0.5;rounded=0;fontSize=16;" target="WJ3DKiCIYXX_dNAasH8R-8" value="否">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-18" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-8" style="startArrow=none;endArrow=block;exitX=1.01;exitY=0.5;entryX=0;entryY=0.19;rounded=0;" target="WJ3DKiCIYXX_dNAasH8R-9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-19" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-9" style="curved=1;startArrow=none;endArrow=block;exitX=0;exitY=0.7;entryX=0.5;entryY=1;rounded=0;entryDx=0;entryDy=0;fontSize=16;" target="WJ3DKiCIYXX_dNAasH8R-2" value="是">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1531" y="372" />
+              <mxPoint x="436" y="372" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WJ3DKiCIYXX_dNAasH8R-20" edge="1" parent="1" source="WJ3DKiCIYXX_dNAasH8R-9" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=0;entryX=0.5;entryY=1;rounded=0;exitDx=0;exitDy=0;entryDx=0;entryDy=0;" target="WJ3DKiCIYXX_dNAasH8R-10" value="否">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

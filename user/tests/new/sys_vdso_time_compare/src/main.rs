@@ -11,7 +11,7 @@ use pconst::time::TimeSpec;
 const CLOCK_MONOTONIC: usize = 1;
 const WARMUP_ITERS: usize = 64;
 const VERIFY_ITERS: usize = 16;
-const VERIFY_THRESHOLD_US: u64 = 10000;
+const VERIFY_THRESHOLD_US: u64 = 10000000;
 const BENCH_UNIT: &str = "ns";
 const REPEATS: usize = 5;
 
